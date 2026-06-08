@@ -1,0 +1,22 @@
+{
+  "hero.title": "Kamu Gak Perlu\n**Code.",
+  "hero.sub": "Masa depan itu agent-native. Bikin punyamu di Ritual Chain",
+  "hero.note": "Kamu bisa ubah kapan aja nanti. Deploy agent pertama gratis.",
+  "prompt.placeholder": "Jelasin agent impianmu...",
+  "category.llm": "LLM",
+  "category.image": "Gambar",
+  "category.audio": "Audio",
+  "category.http": "HTTP",
+  "category.all": "Semua Agent",
+  "example.chatbot": "Chatbot customer support 24/7",
+  "example.dataAnalysis": "Agent yang analisis data on-chain dan kirim laporan",
+  "example.imageGenerator": "Generate gambar dari prompt text pakai AI",
+  "buttons.launchApp": "Buka App",
+  "buttons.create": "Buat Agent",
+  "buttons.marketplace": "Marketplace",
+  "buttons.deploy": "Deploy",
+  "nav.features": "Fitur",
+  "nav.agents": "Agent",
+  "nav.docs": "Dokumentasi",
+  "nav.dashboard": "Dashboard"
+}

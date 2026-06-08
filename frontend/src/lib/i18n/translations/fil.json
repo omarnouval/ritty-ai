@@ -1,0 +1,22 @@
+{
+  "hero.title": "Hindi Mo Kailangan\nng **Code.",
+  "hero.sub": "Ang future ay agent-native. Gawin mo sa Ritual Chain",
+  "hero.note": "Pwede mong baguhin mamaya. Libre ang unang agent deploy.",
+  "prompt.placeholder": "I-describe ang ideal agent mo...",
+  "category.llm": "LLM",
+  "category.image": "Larawan",
+  "category.audio": "Audio",
+  "category.http": "HTTP",
+  "category.all": "Lahat ng Agent",
+  "example.chatbot": "Chatbot para sa customer support 24/7",
+  "example.dataAnalysis": "Agent na nag-aanalyze ng on-chain data at nagpapadala ng reports",
+  "example.imageGenerator": "Mag-generate ng larawan mula sa text prompts gamit ang AI",
+  "buttons.launchApp": "Buksan ang App",
+  "buttons.create": "Gumawa ng Agent",
+  "buttons.marketplace": "Marketplace",
+  "buttons.deploy": "I-deploy",
+  "nav.features": "Mga Tampok",
+  "nav.agents": "Agent",
+  "nav.docs": "Docs",
+  "nav.dashboard": "Dashboard"
+}

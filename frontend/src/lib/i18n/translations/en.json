@@ -1,0 +1,22 @@
+{
+  "hero.title": "You Don't Need\nto **Code.",
+  "hero.sub": "The future is agent-native. Build yours on Ritual Chain",
+  "hero.note": "You can always make changes later. Your first agent deploy is free.",
+  "prompt.placeholder": "Describe your ideal agent...",
+  "category.llm": "LLM",
+  "category.image": "Image",
+  "category.audio": "Audio",
+  "category.http": "HTTP",
+  "category.all": "All Agents",
+  "example.chatbot": "A chatbot that handles customer support 24/7",
+  "example.dataAnalysis": "An agent that analyzes on-chain data and sends reports",
+  "example.imageGenerator": "Generate images from text prompts using AI",
+  "buttons.launchApp": "Launch App",
+  "buttons.create": "Create Agent",
+  "buttons.marketplace": "Marketplace",
+  "buttons.deploy": "Deploy",
+  "nav.features": "Features",
+  "nav.agents": "Agents",
+  "nav.docs": "Docs",
+  "nav.dashboard": "Dashboard"
+}

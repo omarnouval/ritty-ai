@@ -1,0 +1,22 @@
+{
+  "hero.title": "आपको Code करने\nकी ज़रूरत नहीं है.",
+  "hero.sub": "भविष्य agent-native है। Ritual Chain पर अपना बनाएं",
+  "hero.note": "आप बाद में कभी भी बदलाव कर सकते हैं। पहला agent deploy मुफ्त है।",
+  "prompt.placeholder": "अपने ideal agent का वर्णन करें...",
+  "category.llm": "LLM",
+  "category.image": "इमेज",
+  "category.audio": "ऑडियो",
+  "category.http": "HTTP",
+  "category.all": "सभी Agent",
+  "example.chatbot": "24/7 कस्टमर सपोर्ट चैटबॉट",
+  "example.dataAnalysis": "ऑन-चेन डेटा विश्लेषण और रिपोर्ट भेजने वाला agent",
+  "example.imageGenerator": "AI से टेक्स्ट प्रॉम्प्ट से इमेज जनरेट करें",
+  "buttons.launchApp": "ऐप खोलें",
+  "buttons.create": "Agent बनाएं",
+  "buttons.marketplace": "मार्केटप्लेस",
+  "buttons.deploy": "डिप्लॉय",
+  "nav.features": "फीचर्स",
+  "nav.agents": "Agent",
+  "nav.docs": "डॉक्स",
+  "nav.dashboard": "डैशबोर्ड"
+}

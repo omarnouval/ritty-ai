@@ -1,0 +1,24 @@
+{
+  "name": "ritual-agent-marketplace",
+  "version": "0.1.0",
+  "description": "On-chain marketplace for autonomous AI agents on Ritual",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy:local": "npx hardhat run scripts/deploy.ts --network hardhat",
+    "deploy:ritual": "npx hardhat run scripts/deploy.ts --network ritual",
+    "deploy:testnet": "npx hardhat run scripts/deploy.ts --network ritualTestnet",
+    "create-agent": "npx hardhat run scripts/create-agent.ts --network ritual",
+    "test": "npx hardhat test",
+    "verify": "npx hardhat verify --network ritual"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.0"
+  },
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "viem": "^2.7.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "hero.title": "코딩은 필요\n없어요.",
+  "hero.sub": "미래는 에이전트 네이티브입니다. Ritual Chain에서 만드세요",
+  "hero.note": "나중에 언제든 변경할 수 있습니다. 첫 에이전트 배포는 무료입니다.",
+  "prompt.placeholder": "원하는 에이전트를 설명해주세요...",
+  "category.llm": "LLM",
+  "category.image": "이미지",
+  "category.audio": "오디오",
+  "category.http": "HTTP",
+  "category.all": "전체 에이전트",
+  "example.chatbot": "24시간 고객 지원 챗봇",
+  "example.dataAnalysis": "온체인 데이터를 분석하고 리포트를 보내는 에이전트",
+  "example.imageGenerator": "AI로 텍스트 프롬프트에서 이미지 생성",
+  "buttons.launchApp": "앱 실행",
+  "buttons.create": "에이전트 생성",
+  "buttons.marketplace": "마켓플레이스",
+  "buttons.deploy": "배포하기",
+  "nav.features": "기능",
+  "nav.agents": "에이전트",
+  "nav.docs": "문서",
+  "nav.dashboard": "대시보드"
+}

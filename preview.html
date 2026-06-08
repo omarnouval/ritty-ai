@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ritty.ai</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: rgb(8,9,23); color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  h1,h2,h3 { font-weight: 900; letter-spacing: -0.03em; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  .glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+  .glass:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
+  .pill { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; border: 1px solid transparent; cursor: pointer; transition: all 0.2s; background: none; color: #9ca3af; }
+  .pill:hover { color: white; background: rgba(255,255,255,0.06); }
+  .pill.active { color: white; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
+  .pill-icon { margin-right: 6px; font-size: 14px; }
+  .gradient-text { background: linear-gradient(135deg, #f97316 0%, #a855f7 50%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .input-area { transition: all 0.3s; }
+  .input-area:focus-within { box-shadow: 0 0 0 1px rgba(249,115,22,0.3), 0 0 40px rgba(249,115,22,0.06); border-color: rgba(249,115,22,0.35) !important; }
+  textarea { background: transparent; border: none; color: white; font-size: 15px; resize: none; outline: none; width: 100%; font-family: inherit; line-height: 1.5; }
+  textarea::placeholder { color: #4b5563; }
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 14px 28px; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; }
+  .nav-logo { width: 32px; height: 32px; border-radius: 10px; background: linear-gradient(135deg, #f97316, #a855f7); display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 15px; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: #6b7280; text-decoration: none; font-size: 14px; transition: 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: white; }
+  .connect-btn { background: rgba(249,115,22,0.85); color: white; padding: 8px 20px; border-radius: 999px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+  .connect-btn:hover { background: rgba(249,115,22,1); }
+  .main { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 60px); padding: 0 20px; }
+  .hero { text-align: center; max-width: 640px; width: 100%; }
+  .hero h1 { font-size: 52px; line-height: 1.08; margin-bottom: 12px; color: white; }
+  .hero-sub { font-size: 17px; color: #9ca3af; margin-bottom: 8px; }
+  .hero-sub2 { font-size: 17px; color: #6b7280; margin-bottom: 10px; }
+  .hero-note { font-size: 13px; color: #4b5563; margin-bottom: 36px; }
+  .tabs { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+  .chat-box { border-radius: 16px; padding: 16px 18px; margin-bottom: 28px; text-align: left; }
+  .chat-box textarea { min-height: 48px; }
+  .chat-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); }
+  .send-btn { width: 34px; height: 34px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.06); }
+  .send-btn.active { background: rgba(249,115,22,0.9); }
+  .char-count { font-size: 11px; color: #374151; }
+  .examples { text-align: left; }
+  .examples-label { font-size: 13px; color: #4b5563; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+  .example-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .example-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.2s; }
+  .example-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); transform: translateY(-1px); }
+  .example-card .ex-title { font-size: 13px; font-weight: 600; color: #e5e7eb; margin-bottom: 4px; }
+  .example-card .ex-desc { font-size: 11px; color: #6b7280; }
+  .example-card .ex-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+  .foot-note { font-size: 12px; color: #374151; margin-top: 32px; text-align: center; }
+  .foot-note span { color: #4b5563; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">R</div>
+    <span style="font-size:17px;font-weight:800;color:white;">Ritty.ai</span>
+  </div>
+  <div class="nav-links">
+    <a href="#">Marketplace</a>
+    <a href="#">Create</a>
+    <a href="#">Dashboard</a>
+  </div>
+  <button class="connect-btn">Connect Wallet</button>
+</nav>
+
+<div class="main">
+  <div class="hero">
+    <h1>You Don't Need<br>to <span class="gradient-text">Code.</span></h1>
+    <p class="hero-sub">The future is agent-native. Build yours on Ritual Chain</p>
+    <p class="hero-note">You can always make changes later. Your first agent deploy is free.</p>
+
+    <!-- Category tabs -->
+    <div class="tabs">
+      <button class="pill active"><span class="pill-icon">✨</span> Start</button>
+      <button class="pill"><span class="pill-icon">📈</span> Trading</button>
+      <button class="pill"><span class="pill-icon">🔬</span> Research</button>
+      <button class="pill"><span class="pill-icon">📡</span> Monitor</button>
+      <button class="pill"><span class="pill-icon">🧑‍💻</span> Code Review</button>
+      <button class="pill"><span class="pill-icon">✍️</span> Content</button>
+      <button class="pill"><span class="pill-icon">💬</span> Chatbot</button>
+      <button class="pill"><span class="pill-icon">📊</span> Analysis</button>
+    </div>
+
+    <!-- Chat input -->
+    <div class="chat-box glass input-area">
+      <textarea rows="2" placeholder="Describe your agent, Ritual will bring it on-chain..." id="prompt"></textarea>
+      <div class="chat-footer">
+        <span class="char-count" id="charCount"></span>
+        <button class="send-btn" id="sendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Example prompts -->
+    <div class="examples">
+      <div class="examples-label">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Try an example prompt
+      </div>
+      <div class="example-grid">
+        <div class="example-card" onclick="setPrompt('Build an alpha signal bot that monitors Twitter and Telegram for trading signals, analyzes sentiment, and sends alerts')">
+          <span class="ex-icon">🎯</span>
+          <div class="ex-title">Alpha Signal Bot</div>
+          <div class="ex-desc">Monitor social media, analyze sentiment, send alerts</div>
+        </div>
+        <div class="example-card" onclick="setPrompt('Create a code review agent that analyzes pull requests, checks for security vulnerabilities, and suggests improvements')">
+          <span class="ex-icon">🧑‍💻</span>
+          <div class="ex-title">Code Review Agent</div>
+          <div class="ex-desc">Analyze PRs, check security, suggest fixes</div>
+        </div>
+        <div class="example-card" onclick="setPrompt('Deploy a research analyst agent that deep-dives into crypto projects, analyzes tokenomics, and generates reports')">
+          <span class="ex-icon">🔬</span>
+          <div class="ex-title">Research Analyst</div>
+          <div class="ex-desc">Deep-dive projects, analyze tokenomics, generate reports</div>
+        </div>
+        <div class="example-card" onclick="setPrompt('Launch an auto-trader agent that executes DCA strategies, manages portfolio rebalancing, and runs on-chain 24/7')">
+          <span class="ex-icon">⚡</span>
+          <div class="ex-title">Auto-Trader</div>
+          <div class="ex-desc">DCA strategies, portfolio rebalancing, 24/7 on-chain</div>
+        </div>
+        <div class="example-card" onclick="setPrompt('Build a content generator agent that writes Twitter threads, blog posts, and newsletters about Web3 trends')">
+          <span class="ex-icon">✍️</span>
+          <div class="ex-title">Content Generator</div>
+          <div class="ex-desc">Twitter threads, blogs, newsletters about Web3</div>
+        </div>
+        <div class="example-card" onclick="setPrompt('Create a customer support chatbot agent that handles FAQs, troubleshoots issues, and escalates complex cases')">
+          <span class="ex-icon">💬</span>
+          <div class="ex-title">Support Chatbot</div>
+          <div class="ex-desc">Handle FAQs, troubleshoot, escalate complex cases</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="foot-note">Built on <span>Ritual Chain</span> · Persistent agents via <span>0x0820</span> · Sovereign agents via <span>0x080C</span></p>
+  </div>
+</div>
+
+<script>
+  const textarea = document.getElementById('prompt');
+  const sendBtn = document.getElementById('sendBtn');
+  const charCount = document.getElementById('charCount');
+  textarea.addEventListener('input', () => {
+    const len = textarea.value.length;
+    sendBtn.classList.toggle('active', len > 0);
+    sendBtn.querySelector('svg').setAttribute('stroke', len > 0 ? 'white' : '#6b7280');
+    charCount.textContent = len > 0 ? len + '/500' : '';
+  });
+  function setPrompt(text) {
+    textarea.value = text;
+    textarea.dispatchEvent(new Event('input'));
+    textarea.focus();
+  }
+  document.querySelectorAll('.tabs .pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tabs .pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
