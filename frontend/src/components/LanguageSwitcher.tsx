@@ -20,7 +20,7 @@ export default function LanguageSwitcher() {
   return (
     <div ref={ref} style={{ position: 'relative', zIndex: 9999 }}>
       <div
-        onClick={() => setOpen(!open)}
+        onMouseDown={(e) => { e.stopPropagation(); setOpen(!open); }}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -33,6 +33,7 @@ export default function LanguageSwitcher() {
           fontSize: 12,
           fontWeight: 500,
           cursor: 'pointer',
+          userSelect: 'none',
         }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,45 +52,37 @@ export default function LanguageSwitcher() {
           background: '#111',
           border: '1px solid #222',
           borderRadius: 12,
-          overflow: 'visible',
+          overflow: 'hidden',
           minWidth: 140,
           zIndex: 99999,
           boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
           {SUPPORTED.map((code) => (
-            <button
+            <div
               key={code}
               onMouseDown={(e) => {
-                console.log('mousedown!', code);
-              }}
-              onClick={(e) => {
-                console.log('click!', code);
+                e.stopPropagation();
+                e.preventDefault();
                 setLocale(code);
                 setOpen(false);
               }}
               style={{
-                display: 'block',
-                width: '100%',
                 padding: '10px 16px',
-                textAlign: 'left',
                 background: code === locale ? '#1a1a1a' : 'transparent',
                 color: code === locale ? '#fff' : '#A1A1AA',
-                border: 'none',
                 fontSize: 13,
                 cursor: 'pointer',
                 transition: 'background 0.15s',
-                pointerEvents: 'all' as const,
-                position: 'relative' as const,
-                zIndex: 999999,
+                userSelect: 'none',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = '#1a1a1a')}
-              onMouseLeave={e => (e.currentTarget.style.background = code === locale ? '#1a1a1a' : 'transparent')}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#1a1a1a')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = code === locale ? '#1a1a1a' : 'transparent')}
             >
               {FULL_LABELS[code]}
               {code === locale && (
                 <span style={{ float: 'right', color: '#22c55e' }}>✓</span>
               )}
-            </button>
+            </div>
           ))}
         </div>
       )}
