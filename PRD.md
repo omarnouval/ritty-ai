@@ -1,8 +1,8 @@
 # Ritty.ai — Product Requirements Document
 
-**Version:** 1.0
+**Version:** 2.0
 **Last Updated:** June 2026
-**Status:** In Development
+**Status:** Phase 2 Complete ✅
 
 ---
 
@@ -109,6 +109,12 @@ A decentralized marketplace where:
 - Language preference saved in localStorage
 - Full translation of landing page content
 
+### 3.7 Precompile Integration ✅
+- `executeTask()` — Run tasks on persistent agents (0x0820)
+- `createSovereignTask()` — One-shot tasks on sovereign agents (0x080C)
+- `onlyActiveRental` modifier — Only active renters can execute
+- Precompile interface validation on agent listing
+
 ---
 
 ## 4. Smart Contracts
@@ -119,7 +125,9 @@ Core marketplace contract handling:
 - `rentAgent(id, hours)` — User rents agent for specified duration
 - `rateAgent(id, rating)` — User rates agent after rental
 - `withdrawEarnings()` — Creator withdraws accumulated RITUAL
-- `getAgent(id)` — Fetch agent details
+- `executeTask(id, task)` — Execute task on rented persistent agent
+- `createSovereignTask(id, input)` — Create one-shot task on sovereign agent
+- `isPrecompileAgent(id)` — Check if agent uses precompile
 - Platform fee: 5% per rental
 
 ### 4.2 Interfaces
@@ -128,8 +136,10 @@ Core marketplace contract handling:
 - `AgentTypes.sol` — Shared types and precompile addresses
 
 ### 4.3 Contract State
-- **Status:** Written, NOT deployed
+- **Status:** Deployed ✅
 - **Network:** Ritual Testnet (Chain ID 1979)
+- **Contract Address:** `0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE`
+- **Explorer:** https://explorer.ritualfoundation.org/address/0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE
 - **Compiler:** Solidity ^0.8.20
 - **Framework:** Hardhat
 
@@ -138,7 +148,7 @@ Core marketplace contract handling:
 ## 5. Tech Stack
 
 ### 5.1 Frontend
-- **Framework:** Next.js 15.1 (App Router)
+- **Framework:** Next.js 16.2.7 (App Router, Turbopack)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Web3:** wagmi + viem + RainbowKit
@@ -149,9 +159,74 @@ Core marketplace contract handling:
 - **Framework:** Hardhat
 - **Network:** Ritual Chain (ID 1979)
 
-### 5.3 Infrastructure
-- **Hosting:** TBD (VPS 2: 4GB RAM insufficient for Next.js production)
-- **Domain:** ritty.ai (TBD — not yet registered)
+### 5.3 Backend (Serverless API)
+- **Runtime:** Next.js API Routes (App Router)
+- **Database:** In-memory + blockchain reads (Phase 1)
+- **Future:** PostgreSQL / Supabase (Phase 2)
+
+### 5.4 Infrastructure
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        USERS                                │
+│              (Desktop / Mobile Browser)                      │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    VERCEL CDN                                │
+│            https://ritty-ai.vercel.app                       │
+│                                                              │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │   Static     │  │   SSR/ISR   │  │   API Routes        │ │
+│  │   Assets     │  │   Pages     │  │   (Serverless)      │ │
+│  │             │  │             │  │                     │ │
+│  │  - CSS/JS   │  │  - Landing  │  │  /api/agents        │ │
+│  │  - Images   │  │  - Market   │  │  /api/agents/[id]   │ │
+│  │  - Logo     │  │  - Create   │  │  /api/search        │ │
+│  │             │  │  - Dashboard│  │  /api/stats         │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│               RITUAL CHAIN (ID 1979)                         │
+│            https://rpc.ritualfoundation.org                   │
+│                                                              │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │            AgentMarketplace.sol                        │  │
+│  │         0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE    │  │
+│  │                                                        │  │
+│  │  - listAgent()     - rentAgent()      - rateAgent()   │  │
+│  │  - executeTask()   - createTask()     - withdraw()    │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  0x0820      │  │  0x080C      │  │  0x0802      │      │
+│  │  Persistent  │  │  Sovereign   │  │  LLM         │      │
+│  │  Agent       │  │  Agent       │  │  Inference   │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.5 Data Flow
+
+```
+User Action → Frontend (wagmi) → Smart Contract → Ritual Chain
+     ↑                                    │
+     │                                    ▼
+     └──────── Events/State ◄──── Precompile (0x0820/0x080C)
+     
+API Routes → Blockchain RPC → Cache Response → Frontend
+```
+
+### 5.6 Deployment Pipeline
+
+```
+Local Edit → Git Push → GitHub → Vercel Auto-Deploy → Production
+     │
+     └── Contract Deploy → Hardhat → Ritual Testnet
+```
 
 ---
 
@@ -197,6 +272,7 @@ Core marketplace contract handling:
 | Stats section | 0x0820 / 0x080C / 5% | Technical credibility, Ritual-native |
 | Rental UX | Preset buttons + custom | Quick selection + flexibility |
 | Language switcher | Globe icon, dropdown | Universal icon, non-intrusive |
+| Mobile nav | Hidden links, logo + connect only | Clean mobile experience |
 
 ---
 
@@ -211,45 +287,81 @@ Core marketplace contract handling:
 - [x] Basic marketplace/create/dashboard pages
 - [x] Rental UX (presets + custom duration)
 
-### Phase 2 — Deploy & Connect 🔄
-- [ ] Deploy contracts to Ritual Testnet
-- [ ] Connect frontend to contracts (ABI integration)
-- [ ] Wallet connect flow (marketplace/create/dashboard)
-- [ ] Rent agent flow (real transactions)
-- [ ] Withdraw earnings flow
+### Phase 2 — Deploy & Connect ✅
+- [x] Deploy contracts to Ritual Testnet
+- [x] Connect frontend to contracts (ABI integration)
+- [x] Wallet connect flow (marketplace/create/dashboard)
+- [x] Rent agent flow (real transactions)
+- [x] Withdraw earnings flow
+- [x] Agent detail page (/agent/[id])
+- [x] Precompile integration (executeTask, createSovereignTask)
+- [x] Mobile responsive
 
-### Phase 3 — Polish & Launch 📋
-- [ ] Agent detail page
-- [ ] Search & filter marketplace
-- [ ] Rating system
-- [ ] Agent categories (Research, Trading, Monitor, etc.)
-- [ ] Mobile responsive
+### Phase 3 — Polish & Launch 🔄
+- [x] Vercel deployment + auto-deploy
+- [x] Environment variables configured
+- [ ] Search & filter marketplace (API routes)
+- [ ] Agent metadata (IPFS)
+- [ ] Rating system UI
 - [ ] Error handling & loading states
-- [ ] Deploy to production (Vercel or upgraded VPS)
 - [ ] Domain setup (ritty.ai)
 
-### Phase 4 — Growth 🚀
-- [ ] Agent templates (pre-built configs)
+### Phase 4 — Backend & Scale 📋
+- [ ] Serverless API routes (search, stats, cache)
 - [ ] Agent analytics dashboard
 - [ ] Featured agents / trending
+- [ ] Notification system
+- [ ] PostgreSQL for off-chain data
+
+### Phase 5 — Growth 🚀
+- [ ] Agent templates (pre-built configs)
 - [ ] Social features (reviews, comments)
 - [ ] Multi-chain support
+- [ ] Subgraph indexer
 - [ ] API for third-party integrations
+- [ ] Mobile app
 
 ---
 
-## 9. Open Questions
+## 9. API Routes (Serverless)
+
+### 9.1 Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/agents` | List all active agents (paginated) |
+| GET | `/api/agents/[id]` | Get agent details + rental history |
+| GET | `/api/search?q=&type=&minPrice=&maxPrice=` | Search agents |
+| GET | `/api/stats` | Platform statistics |
+| GET | `/api/user/[address]` | User's agents + earnings |
+
+### 9.2 Response Format
+
+```json
+{
+  "success": true,
+  "data": { ... },
+  "meta": {
+    "page": 1,
+    "limit": 20,
+    "total": 100
+  }
+}
+```
+
+---
+
+## 10. Open Questions
 
 1. **Domain:** ritty.ai not yet registered — need to secure
-2. **Hosting:** VPS 2 (4GB) insufficient — Vercel or upgrade?
-3. **Contract audit:** Needed before mainnet
-4. **Token economics:** RITUAL token distribution, staking?
-5. **Agent storage:** Where do agent prompts/configs live? (IPFS? On-chain?)
-6. **KYC/Compliance:** Required for marketplace?
+2. **Contract audit:** Needed before mainnet
+3. **Token economics:** RITUAL token distribution, staking?
+4. **Agent storage:** Where do agent prompts/configs live? (IPFS? On-chain?)
+5. **KYC/Compliance:** Required for marketplace?
 
 ---
 
-## 10. Success Metrics
+## 11. Success Metrics
 
 | Metric | Target (Month 1) | Target (Month 6) |
 |--------|-------------------|-------------------|
@@ -262,3 +374,4 @@ Core marketplace contract handling:
 ---
 
 *This is a living document. Update as product evolves.*
+*Last updated: June 2026 — Phase 2 Complete*
