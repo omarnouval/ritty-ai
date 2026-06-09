@@ -85,10 +85,10 @@ export default function Home() {
       <div className="blob" style={{ width: 300, height: 300, background: '#2EF19C', top: '40%', left: '60%', animationDelay: '-10s' }} />
 
       {/* ─── Nav ─── */}
-      <nav className="relative z-10 flex justify-between items-center px-6 lg:px-12 py-5" style={{ borderBottom: '1px solid #161616' }}>
-        <Link href="/" className="flex items-center gap-3">
-          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-10 w-auto" />
-          <span className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
+      <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 lg:px-12 py-4" style={{ borderBottom: '1px solid #161616' }}>
+        <Link href="/" className="flex items-center gap-2 md:gap-3">
+          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-8 md:h-10 w-auto" />
+          <span className="text-lg md:text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
@@ -103,9 +103,9 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           <LanguageSwitcher />
-          <Link href="/marketplace" className="text-sm font-medium px-5 py-2.5 rounded-xl transition-all hover:shadow-lg" style={{ background: '#40FFAF', color: '#050505', boxShadow: '0 0 20px rgba(64,255,175,0.15)' }}>
+          <Link href="/marketplace" className="text-xs md:text-sm font-medium px-3 md:px-5 py-2 md:py-2.5 rounded-xl transition-all hover:shadow-lg" style={{ background: '#40FFAF', color: '#050505', boxShadow: '0 0 20px rgba(64,255,175,0.15)' }}>
             {nav.launch}
           </Link>
         </div>
@@ -115,12 +115,12 @@ export default function Home() {
       <div className="relative z-10 flex flex-col items-center justify-center px-4" style={{ minHeight: 'calc(100vh - 76px)' }}>
         <div className="max-w-2xl w-full text-center">
           {/* Heading */}
-          <h1 className="text-6xl md:text-7xl font-bold leading-[1.05] mb-5 tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-5 tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             {hero.line1}<br />
             to <span style={{ color: '#40FFAF' }}>{hero.boldWord}</span><span style={{ color: '#40FFAF', fontSize: '0.5em', verticalAlign: 'super' }}>.</span>
           </h1>
 
-          <p className="text-lg mb-3 font-light" style={{ color: '#FFFFFF', opacity: 0.7, fontFamily: 'DM Sans, sans-serif' }}>
+          <p className="text-base md:text-lg mb-3 font-light" style={{ color: '#FFFFFF', opacity: 0.7, fontFamily: 'DM Sans, sans-serif' }}>
             {HERO_SUB[l] || HERO_SUB.en}
           </p>
 
@@ -197,16 +197,16 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 mt-20 max-w-lg mx-auto">
+          <div className="grid grid-cols-3 gap-3 md:gap-6 mt-12 md:mt-20 max-w-lg mx-auto px-2">
             {[
               { value: '0x0820', label: 'Persistent', sub: 'always-on' },
               { value: '0x080C', label: 'Sovereign', sub: 'one-shot' },
               { value: '5%', label: 'Platform Fee', sub: 'per rental' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-lg font-bold font-mono mb-1" style={{ color: '#40FFAF', fontFamily: 'Space Grotesk, monospace' }}>{stat.value}</div>
+                <div className="text-sm md:text-lg font-bold font-mono mb-1" style={{ color: '#40FFAF', fontFamily: 'Space Grotesk, monospace' }}>{stat.value}</div>
                 <div className="text-xs font-medium" style={{ color: '#A1A1AA' }}>{stat.label}</div>
-                <div className="text-xs mt-0.5" style={{ color: '#3A3A3A' }}>{stat.sub}</div>
+                <div className="text-[10px] md:text-xs mt-0.5" style={{ color: '#3A3A3A' }}>{stat.sub}</div>
               </div>
             ))}
           </div>

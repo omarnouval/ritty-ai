@@ -7,15 +7,15 @@ import Link from 'next/link';
 export default function DashboardPage() {
   return (
     <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
-      <nav className="flex justify-between items-center px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
         <Link href="/" className="flex items-center gap-2.5">
           <img src="/ritty-logo.png" alt="Ritty.ai" className="h-8 w-auto" />
           <span className="text-lg font-heavy text-white">Ritty.ai</span>
         </Link>
-        <div className="flex items-center gap-6">
-          <Link href="/marketplace" className="text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
-          <Link href="/create" className="text-sm text-gray-400 hover:text-white transition">Create</Link>
-          <Link href="/dashboard" className="text-sm text-orange-400 font-medium">Dashboard</Link>
+        <div className="flex items-center gap-3 md:gap-6">
+          <Link href="/marketplace" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
+          <Link href="/create" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Create</Link>
+          <Link href="/dashboard" className="hidden md:block text-sm text-orange-400 font-medium">Dashboard</Link>
           <ConnectButton />
         </div>
       </nav>

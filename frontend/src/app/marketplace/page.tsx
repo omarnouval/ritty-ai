@@ -35,20 +35,20 @@ export default function MarketplacePage() {
   return (
     <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
       {/* Nav */}
-      <nav className="flex justify-between items-center px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <Link href="/" className="flex items-center gap-2.5">
-          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-8 w-auto" />
-          <span className="text-lg font-heavy text-white">Ritty.ai</span>
+      <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <Link href="/" className="flex items-center gap-2">
+          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-7 md:h-8 w-auto" />
+          <span className="text-base md:text-lg font-heavy text-white">Ritty.ai</span>
         </Link>
-        <div className="flex items-center gap-6">
-          <Link href="/marketplace" className="text-sm text-orange-400 font-medium">Marketplace</Link>
-          <Link href="/create" className="text-sm text-gray-400 hover:text-white transition">Create</Link>
-          <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
+        <div className="flex items-center gap-3 md:gap-6">
+          <Link href="/marketplace" className="hidden md:block text-sm text-orange-400 font-medium">Marketplace</Link>
+          <Link href="/create" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Create</Link>
+          <Link href="/dashboard" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
           <ConnectButton />
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         {/* Header + Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -67,7 +67,7 @@ export default function MarketplacePage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search agents…"
-                className="pl-10 pr-4 py-2 rounded-xl text-sm text-white placeholder-gray-500 outline-none w-64"
+                className="pl-10 pr-4 py-2 rounded-xl text-sm text-white placeholder-gray-500 outline-none w-full md:w-64"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
               />
             </div>
