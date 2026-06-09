@@ -17,7 +17,7 @@ const DURATIONS = [
 
 export default function AgentDetailPage() {
   const params = useParams();
-  const agentId = params?.id ? BigInt(params.id as string) : 0n;
+  const agentId = params?.id ? BigInt(params.id as string) : BigInt(0);
   const { address, isConnected } = useAccount();
 
   const [selectedHours, setSelectedHours] = useState(1);
