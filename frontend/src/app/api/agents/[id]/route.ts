@@ -25,7 +25,6 @@ export async function GET(
     const { id } = await params;
     const agentId = BigInt(id);
 
-    // Get agent details
     const data = await client.readContract({
       address: MARKETPLACE_ADDRESS,
       abi: MARKETPLACE_ABI,
@@ -45,34 +44,13 @@ export async function GET(
       ratingCount,
       isActive,
       agentType,
-    ] = data as any[];
+    ] = data as unknown as any[];
 
     if (!owner || owner === '0x0000000000000000000000000000000000000000') {
       return NextResponse.json(
         { success: false, error: 'Agent not found' },
         { status: 404 }
       );
-    }
-
-    // Get rental history
-    let rentals: any[] = [];
-    try {
-      const rentalData = await client.readContract({
-        address: MARKETPLACE_ADDRESS,
-        abi: MARKETPLACE_ABI,
-        functionName: 'getRentals',
-        args: [agentId],
-      });
-
-      rentals = (rentalData as any[]).map((r: any) => ({
-        renter: r.renter,
-        startTime: Number(r.startTime),
-        endTime: Number(r.endTime),
-        totalPaid: formatEther(r.totalPaid),
-        isActive: r.isActive && Date.now() / 1000 < Number(r.endTime),
-      }));
-    } catch {
-      // getRentals might not exist on old contract
     }
 
     return NextResponse.json({
@@ -90,7 +68,6 @@ export async function GET(
         ratingCount: ratingCount.toString(),
         isActive,
         agentType: agentType === 0 ? 'sovereign' : 'persistent',
-        rentals,
       },
     });
   } catch (error: any) {

@@ -62,7 +62,7 @@ export async function GET(
           ratingCount,
           isActive,
           agentType,
-        ] = data as any[];
+        ] = data as unknown as any[];
 
         return {
           id: id.toString(),

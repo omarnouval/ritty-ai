@@ -48,7 +48,7 @@ export async function GET() {
         args: [id],
       });
 
-      const agent = data as any[];
+      const agent = data as unknown as any[];
       totalRentals += Number(agent[6]); // totalRentals
       totalEarnings += agent[5]; // totalEarnings
       if (agent[10] === 1) persistentCount++; // agentType
