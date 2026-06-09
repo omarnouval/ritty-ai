@@ -1,4 +1,4 @@
-export const MARKETPLACE_ADDRESS = process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS as `0x${string}`;
+export const MARKETPLACE_ADDRESS = (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || '0xfd708eEbc4c8032e39c0c46D399faAa49cEC635c') as `0x${string}`;
 
 export const MARKETPLACE_ABI = [
   // Events

@@ -1,0 +1,152 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/root/ritual-agent-marketplace/contracts/AgentMarketplace.sol": {
+      "lastModificationDate": 1780957273669,
+      "contentHash": "c6dd7b99c681e9ba46f3ba3addcdbe0a",
+      "sourceName": "contracts/AgentMarketplace.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IPersistentAgent.sol",
+        "./interfaces/ISovereignAgent.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AgentMarketplace"
+      ]
+    },
+    "/root/ritual-agent-marketplace/contracts/interfaces/IPersistentAgent.sol": {
+      "lastModificationDate": 1780957273669,
+      "contentHash": "ce2b4ab1a4a2f19a60aabbe18fb62744",
+      "sourceName": "contracts/interfaces/IPersistentAgent.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IPersistentAgent"
+      ]
+    },
+    "/root/ritual-agent-marketplace/contracts/interfaces/ISovereignAgent.sol": {
+      "lastModificationDate": 1780957273670,
+      "contentHash": "4c876ab2f15cc0cdc0b04a9cb128872d",
+      "sourceName": "contracts/interfaces/ISovereignAgent.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ISovereignAgent"
+      ]
+    },
+    "/root/ritual-agent-marketplace/contracts/libraries/AgentTypes.sol": {
+      "lastModificationDate": 1780957273671,
+      "contentHash": "26b422ed42444cf05a7316a6b4d7f451",
+      "sourceName": "contracts/libraries/AgentTypes.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AgentTypes"
+      ]
+    }
+  }
+}

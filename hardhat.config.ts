@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 
@@ -12,12 +13,12 @@ const config: HardhatUserConfig = {
   },
   networks: {
     ritual: {
-      url: process.env.RITUAL_RPC_URL || "https://rpc.ritual.net",
+      url: process.env.RITUAL_RPC_URL || "https://rpc.ritualfoundation.org",
       chainId: 1979,
       accounts: [PRIVATE_KEY],
     },
     ritualTestnet: {
-      url: process.env.RITUAL_TESTNET_RPC_URL || "https://testnet.rpc.ritual.net",
+      url: process.env.RITUAL_TESTNET_RPC_URL || "https://rpc.ritualfoundation.org",
       chainId: 1979,
       accounts: [PRIVATE_KEY],
     },
