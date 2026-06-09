@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./interfaces/IPersistentAgent.sol";
 import "./interfaces/ISovereignAgent.sol";
+import "./libraries/AgentTypes.sol";
 
 contract AgentMarketplace {
     // ============ Enums ============
@@ -50,10 +51,21 @@ contract AgentMarketplace {
     event AgentRated(uint256 indexed agentId, address indexed rater, uint8 rating);
     event AgentDeactivated(uint256 indexed agentId);
     event EarningsWithdrawn(address indexed owner, uint256 amount);
+    event TaskExecuted(uint256 indexed agentId, bytes32 taskId, address indexed renter);
 
     // ============ Modifiers ============
     modifier onlyAgentOwner(uint256 _agentId) {
         require(agents[_agentId].owner == msg.sender, "Not agent owner");
+        _;
+    }
+
+    modifier onlyActiveRental(uint256 _agentId) {
+        Rental[] storage rentalList = rentals[_agentId];
+        require(rentalList.length > 0, "No rentals");
+        Rental storage latest = rentalList[rentalList.length - 1];
+        require(latest.renter == msg.sender, "Not renter");
+        require(latest.isActive, "Rental expired");
+        require(block.timestamp <= latest.endTime, "Rental expired");
         _;
     }
 
@@ -77,6 +89,21 @@ contract AgentMarketplace {
         require(_agentContract != address(0), "Invalid agent contract");
         require(_pricePerHour > 0, "Price must > 0");
         require(bytes(_name).length > 0, "Name required");
+
+        // Validate precompile interface
+        if (_agentType == AgentType.PERSISTENT) {
+            // Verify the contract implements IPersistentAgent
+            IPersistentAgent agent = IPersistentAgent(_agentContract);
+            // Try calling a view function to verify interface
+            try agent.isRunning() returns (bool) {
+                // Interface verified
+            } catch {
+                revert("Invalid persistent agent");
+            }
+        } else {
+            // For sovereign agents, we accept any address
+            // (one-shot tasks don't require persistent connection)
+        }
 
         agentCount++;
         uint256 id = agentCount;
@@ -130,6 +157,30 @@ contract AgentMarketplace {
         }
 
         emit AgentRented(_agentId, msg.sender, _hours, msg.value);
+    }
+
+    /// @notice Execute a task on a rented persistent agent
+    function executeTask(uint256 _agentId, bytes calldata _task) external onlyActiveRental(_agentId) returns (bytes memory) {
+        Agent storage agent = agents[_agentId];
+        require(agent.agentType == AgentType.PERSISTENT, "Not persistent agent");
+
+        IPersistentAgent persistentAgent = IPersistentAgent(agent.agentContract);
+        bytes memory result = persistentAgent.executeTask(_task);
+
+        emit TaskExecuted(_agentId, bytes32(0), msg.sender);
+        return result;
+    }
+
+    /// @notice Create a one-shot task on a rented sovereign agent
+    function createSovereignTask(uint256 _agentId, bytes calldata _input) external onlyActiveRental(_agentId) returns (bytes32) {
+        Agent storage agent = agents[_agentId];
+        require(agent.agentType == AgentType.SOVEREIGN, "Not sovereign agent");
+
+        ISovereignAgent sovereignAgent = ISovereignAgent(agent.agentContract);
+        bytes32 taskId = sovereignAgent.createTask(_input);
+
+        emit TaskExecuted(_agentId, taskId, msg.sender);
+        return taskId;
     }
 
     /// @notice Rate an agent (1-5)
@@ -240,5 +291,14 @@ contract AgentMarketplace {
     /// @notice Calculate rental cost
     function calculateRentalCost(uint256 _agentId, uint256 _hours) external view returns (uint256) {
         return agents[_agentId].pricePerHour * _hours;
+    }
+
+    /// @notice Check if agent is a precompile-based agent
+    function isPrecompileAgent(uint256 _agentId) external view returns (bool) {
+        Agent storage a = agents[_agentId];
+        if (a.agentType == AgentType.PERSISTENT) {
+            return AgentTypes.isValidPrecompile(a.agentContract, true);
+        }
+        return AgentTypes.isValidPrecompile(a.agentContract, false);
     }
 }

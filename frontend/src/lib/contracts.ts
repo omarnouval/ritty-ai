@@ -1,4 +1,4 @@
-export const MARKETPLACE_ADDRESS = (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || '0xfd708eEbc4c8032e39c0c46D399faAa49cEC635c') as `0x${string}`;
+export const MARKETPLACE_ADDRESS = (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE') as `0x${string}`;
 
 export const MARKETPLACE_ABI = [
   // Events
@@ -124,5 +124,33 @@ export const MARKETPLACE_ABI = [
     stateMutability: 'nonpayable',
     inputs: [{ name: '_agentId', type: 'uint256' }],
     outputs: [],
+  },
+  // Precompile integration
+  {
+    type: 'function',
+    name: 'executeTask',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: '_agentId', type: 'uint256' },
+      { name: '_task', type: 'bytes' },
+    ],
+    outputs: [{ name: '', type: 'bytes' }],
+  },
+  {
+    type: 'function',
+    name: 'createSovereignTask',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: '_agentId', type: 'uint256' },
+      { name: '_input', type: 'bytes' },
+    ],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    type: 'function',
+    name: 'isPrecompileAgent',
+    stateMutability: 'view',
+    inputs: [{ name: '_agentId', type: 'uint256' }],
+    outputs: [{ name: '', type: 'bool' }],
   },
 ] as const;

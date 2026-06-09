@@ -58,12 +58,15 @@ export interface AgentMarketplaceInterface extends Interface {
       | "agentCount"
       | "agents"
       | "calculateRentalCost"
+      | "createSovereignTask"
       | "deactivateAgent"
+      | "executeTask"
       | "getActiveAgents"
       | "getAgent"
       | "getRentals"
       | "getUserAgents"
       | "hasRated"
+      | "isPrecompileAgent"
       | "listAgent"
       | "platformTreasury"
       | "rateAgent"
@@ -81,6 +84,7 @@ export interface AgentMarketplaceInterface extends Interface {
       | "AgentRated"
       | "AgentRented"
       | "EarningsWithdrawn"
+      | "TaskExecuted"
   ): EventFragment;
 
   encodeFunctionData(
@@ -104,8 +108,16 @@ export interface AgentMarketplaceInterface extends Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "createSovereignTask",
+    values: [BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "deactivateAgent",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "executeTask",
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getActiveAgents",
@@ -126,6 +138,10 @@ export interface AgentMarketplaceInterface extends Interface {
   encodeFunctionData(
     functionFragment: "hasRated",
     values: [BigNumberish, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isPrecompileAgent",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "listAgent",
@@ -175,7 +191,15 @@ export interface AgentMarketplaceInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "createSovereignTask",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "deactivateAgent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "executeTask",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -189,6 +213,10 @@ export interface AgentMarketplaceInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "hasRated", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isPrecompileAgent",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "listAgent", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "platformTreasury",
@@ -301,6 +329,24 @@ export namespace EarningsWithdrawnEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace TaskExecutedEvent {
+  export type InputTuple = [
+    agentId: BigNumberish,
+    taskId: BytesLike,
+    renter: AddressLike
+  ];
+  export type OutputTuple = [agentId: bigint, taskId: string, renter: string];
+  export interface OutputObject {
+    agentId: bigint;
+    taskId: string;
+    renter: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export interface AgentMarketplace extends BaseContract {
   connect(runner?: ContractRunner | null): AgentMarketplace;
   waitForDeployment(): Promise<this>;
@@ -388,9 +434,21 @@ export interface AgentMarketplace extends BaseContract {
     "view"
   >;
 
+  createSovereignTask: TypedContractMethod<
+    [_agentId: BigNumberish, _input: BytesLike],
+    [string],
+    "nonpayable"
+  >;
+
   deactivateAgent: TypedContractMethod<
     [_agentId: BigNumberish],
     [void],
+    "nonpayable"
+  >;
+
+  executeTask: TypedContractMethod<
+    [_agentId: BigNumberish, _task: BytesLike],
+    [string],
     "nonpayable"
   >;
 
@@ -442,6 +500,12 @@ export interface AgentMarketplace extends BaseContract {
 
   hasRated: TypedContractMethod<
     [arg0: BigNumberish, arg1: AddressLike],
+    [boolean],
+    "view"
+  >;
+
+  isPrecompileAgent: TypedContractMethod<
+    [_agentId: BigNumberish],
     [boolean],
     "view"
   >;
@@ -556,8 +620,22 @@ export interface AgentMarketplace extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "createSovereignTask"
+  ): TypedContractMethod<
+    [_agentId: BigNumberish, _input: BytesLike],
+    [string],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "deactivateAgent"
   ): TypedContractMethod<[_agentId: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "executeTask"
+  ): TypedContractMethod<
+    [_agentId: BigNumberish, _task: BytesLike],
+    [string],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "getActiveAgents"
   ): TypedContractMethod<
@@ -615,6 +693,9 @@ export interface AgentMarketplace extends BaseContract {
     [boolean],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "isPrecompileAgent"
+  ): TypedContractMethod<[_agentId: BigNumberish], [boolean], "view">;
   getFunction(
     nameOrSignature: "listAgent"
   ): TypedContractMethod<
@@ -711,6 +792,13 @@ export interface AgentMarketplace extends BaseContract {
     EarningsWithdrawnEvent.OutputTuple,
     EarningsWithdrawnEvent.OutputObject
   >;
+  getEvent(
+    key: "TaskExecuted"
+  ): TypedContractEvent<
+    TaskExecutedEvent.InputTuple,
+    TaskExecutedEvent.OutputTuple,
+    TaskExecutedEvent.OutputObject
+  >;
 
   filters: {
     "AgentDeactivated(uint256)": TypedContractEvent<
@@ -766,6 +854,17 @@ export interface AgentMarketplace extends BaseContract {
       EarningsWithdrawnEvent.InputTuple,
       EarningsWithdrawnEvent.OutputTuple,
       EarningsWithdrawnEvent.OutputObject
+    >;
+
+    "TaskExecuted(uint256,bytes32,address)": TypedContractEvent<
+      TaskExecutedEvent.InputTuple,
+      TaskExecutedEvent.OutputTuple,
+      TaskExecutedEvent.OutputObject
+    >;
+    TaskExecuted: TypedContractEvent<
+      TaskExecutedEvent.InputTuple,
+      TaskExecutedEvent.OutputTuple,
+      TaskExecutedEvent.OutputObject
     >;
   };
 }
