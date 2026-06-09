@@ -5,6 +5,7 @@ import { MARKETPLACE_ABI, MARKETPLACE_ADDRESS } from '@/lib/contracts';
 import { AgentCard } from '@/components/AgentCard';
 import { useState } from 'react';
 import Link from 'next/link';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const CAP_COLORS: Record<string, string> = {
   'research': 'cyan',
@@ -43,6 +44,7 @@ export default function MarketplacePage() {
           <Link href="/marketplace" className="text-sm text-orange-400 font-medium">Marketplace</Link>
           <Link href="/create" className="text-sm text-gray-400 hover:text-white transition">Create</Link>
           <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
+          <ConnectButton />
         </div>
       </nav>
 
