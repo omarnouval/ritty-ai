@@ -87,7 +87,7 @@ export default function Home() {
       {/* ─── Nav ─── */}
       <nav className="relative z-10 flex justify-between items-center px-6 lg:px-12 py-5" style={{ borderBottom: '1px solid #161616' }}>
         <Link href="/" className="flex items-center gap-3">
-          <img src="/ritty-logo.jpg" alt="Ritty.ai" className="h-10 w-auto" />
+          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-10 w-auto" />
           <span className="text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
         </Link>
 
