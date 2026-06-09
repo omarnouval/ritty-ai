@@ -19,10 +19,11 @@ const client = createPublicClient({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const agentId = BigInt(params.id);
+    const { id } = await params;
+    const agentId = BigInt(id);
 
     // Get agent details
     const data = await client.readContract({
@@ -77,7 +78,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: {
-        id: params.id,
+        id,
         owner,
         agentContract,
         name,

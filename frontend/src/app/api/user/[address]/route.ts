@@ -19,10 +19,11 @@ const client = createPublicClient({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { address: string } }
+  { params }: { params: Promise<{ address: string }> }
 ) {
   try {
-    const address = params.address as `0x${string}`;
+    const { address: addr } = await params;
+    const address = addr as `0x${string}`;
 
     if (!address || !address.startsWith('0x')) {
       return NextResponse.json(
