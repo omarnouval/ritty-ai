@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { MARKETPLACE_ABI, MARKETPLACE_ADDRESS } from '@/lib/contracts';
 import { formatEther } from 'viem';
@@ -110,7 +111,8 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
 
   // Grid view (default)
   return (
-    <div className="glass rounded-2xl p-5 hover:bg-white/[0.06] transition group">
+    <Link href={`/agent/${agent.id.toString()}`}>
+      <div className="glass rounded-2xl p-5 hover:bg-white/[0.06] transition group cursor-pointer">
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
@@ -178,6 +180,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           View on RitualScan ↗
         </a>
       )}
-    </div>
+      </div>
+    </Link>
   );
 }
