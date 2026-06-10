@@ -4,9 +4,13 @@
 import type * as interfaces from "./interfaces";
 export type { interfaces };
 export type { AgentMarketplace } from "./AgentMarketplace";
+export type { RittyAgent } from "./RittyAgent";
+export type { RittyProfile } from "./RittyProfile";
 export * as factories from "./factories";
 export { AgentMarketplace__factory } from "./factories/AgentMarketplace__factory";
 export type { IPersistentAgent } from "./interfaces/IPersistentAgent";
 export { IPersistentAgent__factory } from "./factories/interfaces/IPersistentAgent__factory";
 export type { ISovereignAgent } from "./interfaces/ISovereignAgent";
 export { ISovereignAgent__factory } from "./factories/interfaces/ISovereignAgent__factory";
+export { RittyAgent__factory } from "./factories/RittyAgent__factory";
+export { RittyProfile__factory } from "./factories/RittyProfile__factory";

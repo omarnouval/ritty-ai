@@ -148,6 +148,78 @@
       "artifacts": [
         "AgentTypes"
       ]
+    },
+    "/root/ritual-agent-marketplace/contracts/RittyAgent.sol": {
+      "lastModificationDate": 1781105515870,
+      "contentHash": "54dc53778927bddb68081971faf5f36a",
+      "sourceName": "contracts/RittyAgent.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "RittyAgent"
+      ]
+    },
+    "/root/ritual-agent-marketplace/contracts/RittyProfile.sol": {
+      "lastModificationDate": 1781111178375,
+      "contentHash": "30ece35654e851425e8411095c476c5a",
+      "sourceName": "contracts/RittyProfile.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "RittyProfile"
+      ]
     }
   }
 }

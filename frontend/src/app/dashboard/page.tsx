@@ -6,6 +6,7 @@ import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChatBox } from '@/components/ChatBox';
+import { UsernameModal } from '@/components/UsernameModal';
 import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
 
 interface ActiveRental {
@@ -41,6 +42,8 @@ export default function DashboardPage() {
   ]);
   const [chatRental, setChatRental] = useState<ActiveRental | null>(null);
   const [counters, setCounters] = useState<Record<string, number>>({});
+  const [username, setUsername] = useState<string | null>(null);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
 
   // Countdown timer
   useEffect(() => {
@@ -54,6 +57,18 @@ export default function DashboardPage() {
     }, 1000);
     return () => clearInterval(interval);
   }, [activeRentals]);
+
+  // Check username on connect
+  useEffect(() => {
+    if (isConnected && address) {
+      const stored = localStorage.getItem(`ritty_username_${address}`);
+      if (stored) {
+        setUsername(stored);
+      } else {
+        setShowUsernameModal(true);
+      }
+    }
+  }, [isConnected, address]);
 
   const handleRentCategory = (cat: AgentCategory) => {
     if (cat.id === 'custom') {
@@ -108,7 +123,14 @@ export default function DashboardPage() {
           <Link href="/marketplace" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
           <Link href="/create" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Create</Link>
           <Link href="/dashboard" className="hidden md:block text-sm text-[#40FFAF] font-medium">Dashboard</Link>
-          <ConnectButton />
+          <div className="flex items-center gap-2">
+            {username && (
+              <span className="text-sm text-gray-300 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(64,255,175,0.08)', border: '1px solid rgba(64,255,175,0.15)' }}>
+                @{username}
+              </span>
+            )}
+            <ConnectButton />
+          </div>
         </div>
       </nav>
 
@@ -217,6 +239,16 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Username Modal */}
+      {showUsernameModal && (
+        <UsernameModal
+          onComplete={(name) => {
+            setUsername(name);
+            setShowUsernameModal(false);
+          }}
+        />
+      )}
     </main>
   );
 }

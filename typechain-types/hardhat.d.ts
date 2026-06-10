@@ -25,6 +25,14 @@ declare module "hardhat/types/runtime" {
       name: "ISovereignAgent",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISovereignAgent__factory>;
+    getContractFactory(
+      name: "RittyAgent",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RittyAgent__factory>;
+    getContractFactory(
+      name: "RittyProfile",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RittyProfile__factory>;
 
     getContractAt(
       name: "AgentMarketplace",
@@ -41,6 +49,16 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ISovereignAgent>;
+    getContractAt(
+      name: "RittyAgent",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RittyAgent>;
+    getContractAt(
+      name: "RittyProfile",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RittyProfile>;
 
     deployContract(
       name: "AgentMarketplace",
@@ -54,6 +72,14 @@ declare module "hardhat/types/runtime" {
       name: "ISovereignAgent",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ISovereignAgent>;
+    deployContract(
+      name: "RittyAgent",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyAgent>;
+    deployContract(
+      name: "RittyProfile",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyProfile>;
 
     deployContract(
       name: "AgentMarketplace",
@@ -70,6 +96,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ISovereignAgent>;
+    deployContract(
+      name: "RittyAgent",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyAgent>;
+    deployContract(
+      name: "RittyProfile",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyProfile>;
 
     // default types
     getContractFactory(

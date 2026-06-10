@@ -3,3 +3,5 @@
 /* eslint-disable */
 export * as interfaces from "./interfaces";
 export { AgentMarketplace__factory } from "./AgentMarketplace__factory";
+export { RittyAgent__factory } from "./RittyAgent__factory";
+export { RittyProfile__factory } from "./RittyProfile__factory";
