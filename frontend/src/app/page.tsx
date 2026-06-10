@@ -202,8 +202,8 @@ export default function Home() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 md:gap-6 mt-12 md:mt-20 max-w-lg mx-auto px-2">
             {[
-              { value: '0x0820', label: 'Persistent', sub: 'always-on' },
-              { value: '0x080C', label: 'Sovereign', sub: 'one-shot' },
+              { value: '1979', label: 'Ritual Chain', sub: 'testnet' },
+              { value: '5+', label: 'AI Agents', sub: 'ready to rent' },
               { value: '5%', label: 'Platform Fee', sub: 'per rental' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">

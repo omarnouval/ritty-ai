@@ -110,7 +110,7 @@ export default function AgentDetailPage() {
                   {isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
-              <p className="text-gray-400 text-sm">Type: {agentTypes[Number(agentType)] || 'Unknown'}</p>
+              <p className="text-gray-400 text-sm">AI Agent</p>
             </div>
             <div className="text-right">
               <div className="text-2xl font-heavy text-white">{pricePerHourEth} <span className="text-sm text-gray-500">RITUAL/hr</span></div>

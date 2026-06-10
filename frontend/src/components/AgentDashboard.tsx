@@ -102,8 +102,8 @@ function AgentRow({ agentId }: { agentId: bigint }) {
       <div>
         <div className="flex items-center gap-2 mb-1">
           <h3 className="text-white font-bold">{name}</h3>
-          <span className={`px-2 py-0.5 rounded text-xs ${agentType === 0 ? 'bg-blue-900 text-blue-300' : 'bg-purple-900 text-purple-300'}`}>
-            {agentType === 0 ? 'Sovereign' : 'Persistent'}
+          <span className="px-2 py-0.5 rounded text-xs bg-green-900/30 text-green-400">
+            AI Agent
           </span>
           {!isActive && (
             <span className="px-2 py-0.5 rounded text-xs bg-red-900 text-red-300">Inactive</span>

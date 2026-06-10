@@ -48,8 +48,8 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
   };
 
   const rating = agent.ratingCount > BigInt(0) ? Number(agent.rating) / 100 : 0;
-  const typeLabel = agent.agentType === 0 ? 'Sovereign' : 'Persistent';
-  const typeColor = agent.agentType === 0 ? 'blue' : 'purple';
+  const typeLabel = 'AI Agent';
+  const typeColor = 'green';
   const caps = ['research', 'monitoring']; // In production, fetch from contract metadata
 
   if (viewMode === 'compact') {

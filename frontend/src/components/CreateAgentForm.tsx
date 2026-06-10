@@ -95,30 +95,9 @@ export function CreateAgentForm() {
               <p className="text-xs text-gray-600 mt-1.5">Comma-separated</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs text-gray-400 mb-2 font-medium uppercase tracking-wider">Price (RITUAL/hr)</label>
-                <input type="number" step="0.001" min="0.001" value={form.pricePerHour} onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })} placeholder="0.01" className={inputStyle} required />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-400 mb-2 font-medium uppercase tracking-wider">Type</label>
-                <div className="flex gap-2">
-                  {[
-                    { value: 0, label: 'Sovereign', icon: '⚡' },
-                    { value: 1, label: 'Persistent', icon: '🔄' },
-                  ].map((type) => (
-                    <button
-                      key={type.value}
-                      type="button"
-                      onClick={() => setForm({ ...form, agentType: type.value as 0 | 1 })}
-                      className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-medium transition ${form.agentType === type.value ? 'bg-white/10 text-white border border-white/20' : 'bg-white/[0.03] text-gray-500 border border-white/[0.06] hover:text-gray-300'}`}
-                    >
-                      <span>{type.icon}</span>
-                      {type.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-2 font-medium uppercase tracking-wider">Price (RITUAL/hr)</label>
+              <input type="number" step="0.001" min="0.001" value={form.pricePerHour} onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })} placeholder="0.01" className={inputStyle} required />
             </div>
           </div>
 
