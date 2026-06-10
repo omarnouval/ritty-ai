@@ -112,7 +112,7 @@ function AgentRow({ agentId }: { agentId: bigint }) {
         <p className="text-gray-500 text-sm font-mono">{agentContract}</p>
       </div>
       <div className="text-right">
-        <div className="text-green-400 font-mono">{formatEther(totalEarnings)} ETH earned</div>
+        <div className="text-green-400 font-mono">{formatEther(totalEarnings)} RITUAL earned</div>
         <div className="text-gray-400 text-sm">
           {totalRentals.toString()} rentals · {'★'.repeat(Math.round(avgRating))} ({ratingCount.toString()})
         </div>

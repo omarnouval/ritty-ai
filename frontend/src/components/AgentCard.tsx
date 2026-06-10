@@ -94,7 +94,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           </div>
         </div>
         <div className="text-right shrink-0">
-          <div className="text-sm font-mono text-green-400 font-medium">{formatEther(agent.pricePerHour)} ETH/hr</div>
+          <div className="text-sm font-mono text-green-400 font-medium">{formatEther(agent.pricePerHour)} RITUAL/hr</div>
           <div className="text-xs text-gray-500 mt-1">{'★'.repeat(Math.round(rating))} · {agent.totalRentals.toString()} rentals</div>
         </div>
         <button
@@ -157,7 +157,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
             ))}
           </select>
           <span className="text-sm font-mono text-green-400 font-medium">
-            {formatEther(agent.pricePerHour * BigInt(hours))} ETH
+            {formatEther(agent.pricePerHour * BigInt(hours))} RITUAL
           </span>
         </div>
         <button

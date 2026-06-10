@@ -97,7 +97,7 @@ export function CreateAgentForm() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-gray-400 mb-2 font-medium uppercase tracking-wider">Price (ETH/hr)</label>
+                <label className="block text-xs text-gray-400 mb-2 font-medium uppercase tracking-wider">Price (RITUAL/hr)</label>
                 <input type="number" step="0.001" min="0.001" value={form.pricePerHour} onChange={(e) => setForm({ ...form, pricePerHour: e.target.value })} placeholder="0.01" className={inputStyle} required />
               </div>
               <div>
