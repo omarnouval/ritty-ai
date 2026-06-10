@@ -48,19 +48,39 @@ export function ChatBox({ agentName, agentCategory, agentIcon, remainingTime, on
 
     const userMsg: Message = { role: 'user', content: input.trim(), timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
+    const messageToSend = input.trim();
     setInput('');
     setIsTyping(true);
 
-    // Simulate agent response (replace with actual agent call later)
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentCategory,
+          message: messageToSend,
+          userAddress: '0x0000000000000000000000000000000000000000',
+        }),
+      });
+
+      const data = await response.json();
+      
       const agentMsg: Message = {
         role: 'agent',
-        content: `[${agentCategory} Agent] I received your message: "${userMsg.content}". This is a demo response — connect your agent contract to enable real responses.`,
+        content: data.success ? data.data.response : 'Sorry, I encountered an error. Please try again.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, agentMsg]);
+    } catch (error) {
+      const agentMsg: Message = {
+        role: 'agent',
+        content: 'Sorry, I encountered an error. Please try again.',
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, agentMsg]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (
