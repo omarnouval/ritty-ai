@@ -46,13 +46,7 @@ export function CreateAgentForm() {
   if (isSuccess) {
     return (
       <div className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
-        <nav className="flex justify-between items-center px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-purple-600 flex items-center justify-center text-sm font-bold">R</div>
-            <span className="text-lg font-heavy text-white">Ritual Agents</span>
-          </Link>
-        </nav>
-        <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
+        <div className="flex items-center justify-center" style={{ minHeight: '100vh' }}>
           <div className="glass rounded-2xl p-10 text-center max-w-md">
             <div className="text-5xl mb-4">🎉</div>
             <h3 className="text-xl font-heavy text-white mb-2">Agent Listed!</h3>
@@ -74,20 +68,7 @@ export function CreateAgentForm() {
   const inputStyle = "w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-orange-500/40 focus:bg-white/[0.06] transition placeholder-gray-600";
 
   return (
-    <div className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
-      <nav className="flex justify-between items-center px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-purple-600 flex items-center justify-center text-sm font-bold">R</div>
-          <span className="text-lg font-heavy text-white">Ritual Agents</span>
-        </Link>
-        <div className="flex items-center gap-6">
-          <Link href="/marketplace" className="text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
-          <Link href="/create" className="text-sm text-orange-400 font-medium">Create</Link>
-          <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
-        </div>
-      </nav>
-
-      <div className="flex items-center justify-center px-4 py-12" style={{ minHeight: 'calc(100vh - 64px)' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
         <form onSubmit={handleSubmit} className="glass rounded-2xl p-8 w-full max-w-lg">
           <h2 className="text-2xl font-heavy text-white mb-1">List Your Agent</h2>
           <p className="text-sm text-gray-500 mb-8">Deploy an agent to the Ritual marketplace</p>
