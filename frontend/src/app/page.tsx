@@ -148,18 +148,21 @@ export default function Home() {
                 className="flex-1 text-white text-sm resize-none outline-none leading-relaxed"
                 style={{ background: 'transparent', fontFamily: 'DM Sans, sans-serif', color: '#fff' }}
               />
-              <button
+              <Link
+                href={selectedType ? `/dashboard?category=${selectedType}` : prompt ? '/dashboard' : '#'}
                 className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
                 style={{
-                  background: prompt ? '#40FFAF' : '#1A1A1A',
-                  boxShadow: prompt ? '0 0 15px rgba(64,255,175,0.2)' : 'none',
+                  background: prompt || selectedType ? '#40FFAF' : '#1A1A1A',
+                  boxShadow: prompt || selectedType ? '0 0 15px rgba(64,255,175,0.2)' : 'none',
+                  pointerEvents: prompt || selectedType ? 'auto' : 'none',
+                  opacity: prompt || selectedType ? 1 : 0.5,
                 }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={prompt ? '#050505' : '#555'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="22" y1="2" x2="11" y2="13" />
                   <polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
-              </button>
+              </Link>
             </div>
 
             {/* Type pills */}
