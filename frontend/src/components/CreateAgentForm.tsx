@@ -69,7 +69,7 @@ export function CreateAgentForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
-        <form onSubmit={handleSubmit} className="glass rounded-2xl p-8 w-full max-w-lg">
+      <form onSubmit={handleSubmit} className="glass rounded-2xl p-8 w-full max-w-lg">
           <h2 className="text-2xl font-heavy text-white mb-1">List Your Agent</h2>
           <p className="text-sm text-gray-500 mb-8">Deploy an agent to the Ritual marketplace</p>
 
@@ -130,8 +130,7 @@ export function CreateAgentForm() {
           >
             {isPending ? 'Confirm in wallet…' : isConfirming ? 'Listing…' : 'List Agent'}
           </button>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }
