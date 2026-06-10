@@ -56,7 +56,7 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
   // Check if user already has profile
-  const { data: hasProfile } = useReadContract({
+  const { data: hasProfile, isLoading: isCheckingProfile } = useReadContract({
     address: PROFILE_ADDRESS,
     abi: PROFILE_ABI,
     functionName: 'hasProfile',
@@ -67,10 +67,16 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
   // If already has profile, skip modal
   useEffect(() => {
     if (hasProfile === true) {
-      // Get existing username and complete
-      onComplete(''); // Will be fetched elsewhere
+      onComplete('');
     }
   }, [hasProfile, onComplete]);
+
+  // Show modal after profile check completes
+  useEffect(() => {
+    if (!isCheckingProfile && hasProfile === false) {
+      // Profile doesn't exist, modal should be visible
+    }
+  }, [isCheckingProfile, hasProfile]);
 
   // Check username availability with debounce
   useEffect(() => {
