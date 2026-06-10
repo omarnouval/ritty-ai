@@ -1,4 +1,4 @@
-import { createConfig, http } from 'wagmi';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { defineChain } from 'viem';
 
 export const ritual = defineChain({
@@ -11,7 +11,7 @@ export const ritual = defineChain({
   },
   rpcUrls: {
     default: {
-      http: [process.env.NEXT_PUBLIC_RITUAL_RPC_URL || 'https://rpc.ritualfoundation.org'],
+      http: ['https://rpc.ritualfoundation.org'],
     },
   },
   blockExplorers: {
@@ -22,9 +22,8 @@ export const ritual = defineChain({
   },
 });
 
-export const config = createConfig({
+export const config = getDefaultConfig({
+  appName: 'Ritty.ai',
+  projectId: 'ritty-ai-demo', // WalletConnect project ID
   chains: [ritual],
-  transports: {
-    [ritual.id]: http(process.env.NEXT_PUBLIC_RITUAL_RPC_URL || 'https://rpc.ritualfoundation.org'),
-  },
 });
