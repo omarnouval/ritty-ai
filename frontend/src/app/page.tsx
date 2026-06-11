@@ -39,12 +39,12 @@ const PROMPT_PH: Record<string, string> = {
   hi: 'अपने ideal agent का वर्णन करें...',
 };
 
-const NAV_LABELS: Record<string, { agentRent: string; create: string; dashboard: string }> = {
-  en: { agentRent: 'Agent Rent', create: 'Create', dashboard: 'Dashboard' },
-  id: { agentRent: 'Agent Rent', create: 'Buat Agent', dashboard: 'Dashboard' },
-  fil: { agentRent: 'Agent Rent', create: 'Gumawa ng Agent', dashboard: 'Dashboard' },
-  ko: { agentRent: 'Agent Rent', create: '에이전트 생성', dashboard: '대시보드' },
-  hi: { agentRent: 'Agent Rent', create: 'Agent बनाएं', dashboard: 'डैशबोर्ड' },
+const NAV_LABELS: Record<string, { agentRent: string; create: string; dashboard: string; howItWorks: string }> = {
+  en: { agentRent: 'Agent Rent', create: 'Create', dashboard: 'Dashboard', howItWorks: 'How It Works' },
+  id: { agentRent: 'Agent Rent', create: 'Buat Agent', dashboard: 'Dashboard', howItWorks: 'Cara Kerja' },
+  fil: { agentRent: 'Agent Rent', create: 'Gumawa ng Agent', dashboard: 'Dashboard', howItWorks: 'Paano Ito Gumagana' },
+  ko: { agentRent: 'Agent Rent', create: '에이전트 생성', dashboard: '대시보드', howItWorks: '이용 방법' },
+  hi: { agentRent: 'Agent Rent', create: 'Agent बनाएं', dashboard: 'डैशबोर्ड', howItWorks: 'कैसे काम करता है' },
 };
 
 const SUGGESTIONS: Record<string, string[]> = {
@@ -70,13 +70,22 @@ export default function Home() {
   const nav = NAV_LABELS[l] || NAV_LABELS.en;
   const suggestions = SUGGESTIONS[l] || SUGGESTIONS.en;
 
+  const AGENT_LABELS: Record<string, { research: string; trading: string; monitor: string; codeReview: string; content: string; chatbot: string }> = {
+    en: { research: 'Research', trading: 'Trading', monitor: 'Monitor', codeReview: 'Code Review', content: 'Content', chatbot: 'Chatbot' },
+    id: { research: 'Riset', trading: 'Trading', monitor: 'Monitor', codeReview: 'Review Kode', content: 'Konten', chatbot: 'Chatbot' },
+    fil: { research: 'Pananaliksik', trading: 'Trading', monitor: 'Monitor', codeReview: 'Code Review', content: 'Content', chatbot: 'Chatbot' },
+    ko: { research: '리서치', trading: '트레이딩', monitor: '모니터', codeReview: '코드 리뷰', content: '콘텐츠', chatbot: '챗봇' },
+    hi: { research: 'अनुसंधान', trading: 'ट्रेडिंग', monitor: 'मॉनिटर', codeReview: 'कोड रिव्यू', content: 'कंटेंट', chatbot: 'चैटबॉट' },
+  };
+
+  const agentLabels = AGENT_LABELS[l] || AGENT_LABELS.en;
   const agentTypes = [
-    { id: 'research', label: 'Research', icon: '🔬' },
-    { id: 'trading', label: 'Trading', icon: '📈' },
-    { id: 'monitoring', label: 'Monitor', icon: '📡' },
-    { id: 'code-review', label: 'Code Review', icon: '🧑‍💻' },
-    { id: 'content', label: 'Content', icon: '✍️' },
-    { id: 'chatbot', label: 'Chatbot', icon: '💬' },
+    { id: 'research', label: agentLabels.research, icon: '🔬' },
+    { id: 'trading', label: agentLabels.trading, icon: '📈' },
+    { id: 'monitoring', label: agentLabels.monitor, icon: '📡' },
+    { id: 'code-review', label: agentLabels.codeReview, icon: '🧑‍💻' },
+    { id: 'content', label: agentLabels.content, icon: '✍️' },
+    { id: 'chatbot', label: agentLabels.chatbot, icon: '💬' },
   ];
 
   const handleSearch = () => {
@@ -107,7 +116,7 @@ export default function Home() {
             {nav.agentRent}
           </Link>
           <Link href="/how-it-works" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
-            How It Works
+            {nav.howItWorks}
           </Link>
           {isConnected && (
             <Link href="/dashboard" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
