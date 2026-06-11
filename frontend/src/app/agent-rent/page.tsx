@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const VIEW_MODES = ['grid', 'list', 'compact'] as const;
 
@@ -39,6 +40,7 @@ export default function AgentRentPage() {
             <Link href="/dashboard" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
           )}
           <ConnectButton />
+          <LanguageSwitcher />
         </div>
       </nav>
 

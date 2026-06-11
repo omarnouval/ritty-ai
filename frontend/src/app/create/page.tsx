@@ -3,6 +3,7 @@
 import { CreateAgentForm } from '@/components/CreateAgentForm';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function CreatePage() {
   return (
@@ -16,6 +17,7 @@ export default function CreatePage() {
           <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
           <Link href="/create" className="hidden md:block text-sm text-orange-400 font-medium">Create</Link>
           <ConnectButton />
+          <LanguageSwitcher />
         </div>
       </nav>
       <div className="px-4 py-8">

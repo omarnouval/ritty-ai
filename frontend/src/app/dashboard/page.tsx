@@ -5,6 +5,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import Link from 'next/link';
 import Image from 'next/image';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { ChatBox } from '@/components/ChatBox';
 import { UsernameModal } from '@/components/UsernameModal';
 import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
@@ -99,6 +100,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3 md:gap-6">
             <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
             <ConnectButton />
+            <LanguageSwitcher />
           </div>
         </nav>
         <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
@@ -127,6 +129,7 @@ export default function DashboardPage() {
               </span>
             )}
             <ConnectButton />
+            <LanguageSwitcher />
           </div>
         </div>
       </nav>

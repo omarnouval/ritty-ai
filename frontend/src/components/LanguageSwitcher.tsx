@@ -14,13 +14,18 @@ export default function LanguageSwitcher() {
       }
     };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
   }, []);
 
   return (
     <div ref={ref} style={{ position: 'relative', zIndex: 9999 }}>
-      <div
-        onMouseDown={(e) => { e.stopPropagation(); setOpen(!open); }}
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -42,7 +47,7 @@ export default function LanguageSwitcher() {
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
         {locale.toUpperCase()}
-      </div>
+      </button>
 
       {open && (
         <div style={{
@@ -58,15 +63,17 @@ export default function LanguageSwitcher() {
           boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
           {SUPPORTED.map((code) => (
-            <div
+            <button
               key={code}
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
+              type="button"
+              onClick={() => {
                 setLocale(code);
                 setOpen(false);
               }}
               style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
                 padding: '10px 16px',
                 background: code === locale ? '#1a1a1a' : 'transparent',
                 color: code === locale ? '#fff' : '#A1A1AA',
@@ -74,6 +81,7 @@ export default function LanguageSwitcher() {
                 cursor: 'pointer',
                 transition: 'background 0.15s',
                 userSelect: 'none',
+                border: 'none',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = '#1a1a1a')}
               onMouseLeave={(e) => (e.currentTarget.style.background = code === locale ? '#1a1a1a' : 'transparent')}
@@ -82,7 +90,7 @@ export default function LanguageSwitcher() {
               {code === locale && (
                 <span style={{ float: 'right', color: '#22c55e' }}>✓</span>
               )}
-            </div>
+            </button>
           ))}
         </div>
       )}

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import { parseEther, formatEther } from 'viem';
 
@@ -251,6 +252,7 @@ function Nav() {
       <div className="flex items-center gap-6">
         <Link href="/agent-rent" className="text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
         <ConnectButton />
+        <LanguageSwitcher />
       </div>
     </nav>
   );
