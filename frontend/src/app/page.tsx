@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
@@ -38,12 +39,12 @@ const PROMPT_PH: Record<string, string> = {
   hi: 'अपने ideal agent का वर्णन करें...',
 };
 
-const NAV_LABELS: Record<string, { marketplace: string; create: string; dashboard: string; launch: string }> = {
-  en: { marketplace: 'Marketplace', create: 'Create', dashboard: 'Dashboard', launch: 'Launch App' },
-  id: { marketplace: 'Marketplace', create: 'Buat Agent', dashboard: 'Dashboard', launch: 'Buka App' },
-  fil: { marketplace: 'Marketplace', create: 'Gumawa ng Agent', dashboard: 'Dashboard', launch: 'Buksan ang App' },
-  ko: { marketplace: '마켓플레이스', create: '에이전트 생성', dashboard: '대시보드', launch: '앱 실행' },
-  hi: { marketplace: 'मार्केटप्लेस', create: 'Agent बनाएं', dashboard: 'डैशबोर्ड', launch: 'ऐप खोलें' },
+const NAV_LABELS: Record<string, { agentRent: string; create: string; dashboard: string }> = {
+  en: { agentRent: 'Agent Rent', create: 'Create', dashboard: 'Dashboard' },
+  id: { agentRent: 'Agent Rent', create: 'Buat Agent', dashboard: 'Dashboard' },
+  fil: { agentRent: 'Agent Rent', create: 'Gumawa ng Agent', dashboard: 'Dashboard' },
+  ko: { agentRent: 'Agent Rent', create: '에이전트 생성', dashboard: '대시보드' },
+  hi: { agentRent: 'Agent Rent', create: 'Agent बनाएं', dashboard: 'डैशबोर्ड' },
 };
 
 const SUGGESTIONS: Record<string, string[]> = {
@@ -55,6 +56,7 @@ const SUGGESTIONS: Record<string, string[]> = {
 };
 
 export default function Home() {
+  const router = useRouter();
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
@@ -77,6 +79,15 @@ export default function Home() {
     { id: 'chatbot', label: 'Chatbot', icon: '💬' },
   ];
 
+  const handleSearch = () => {
+    if (prompt || selectedType) {
+      const params = new URLSearchParams();
+      if (prompt) params.set('q', prompt);
+      if (selectedType) params.set('category', selectedType);
+      router.push(`/agent-rent?${params.toString()}`);
+    }
+  };
+
   return (
     <main className="min-h-screen relative" style={{ background: '#050505' }}>
       {/* ─── Ambient Blobs ─── */}
@@ -92,22 +103,21 @@ export default function Home() {
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
-          {[
-            { href: '/marketplace', label: nav.marketplace },
-            { href: '/create', label: nav.create },
-            { href: '/dashboard', label: nav.dashboard },
-          ].map((link) => (
-            <Link key={link.href} href={link.href} className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
-              {link.label}
+          <Link href="/agent-rent" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
+            {nav.agentRent}
+          </Link>
+          <Link href="/how-it-works" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
+            How It Works
+          </Link>
+          {isConnected && (
+            <Link href="/dashboard" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
+              {nav.dashboard}
             </Link>
-          ))}
+          )}
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
           <LanguageSwitcher />
-          <Link href="/marketplace" className="text-xs md:text-sm font-medium px-3 md:px-5 py-2 md:py-2.5 rounded-xl transition-all hover:shadow-lg" style={{ background: '#40FFAF', color: '#050505', boxShadow: '0 0 20px rgba(64,255,175,0.15)' }}>
-            {nav.launch}
-          </Link>
         </div>
       </nav>
 
@@ -143,18 +153,23 @@ export default function Home() {
                 onChange={(e) => setPrompt(e.target.value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSearch();
+                  }
+                }}
                 placeholder={PROMPT_PH[l] || PROMPT_PH.en}
                 rows={2}
                 className="flex-1 text-white text-sm resize-none outline-none leading-relaxed"
                 style={{ background: 'transparent', fontFamily: 'DM Sans, sans-serif', color: '#fff' }}
               />
-              <Link
-                href={selectedType ? `/dashboard?category=${selectedType}` : prompt ? '/dashboard' : '#'}
-                className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
+              <button
+                onClick={handleSearch}
+                className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer"
                 style={{
                   background: prompt || selectedType ? '#40FFAF' : '#1A1A1A',
                   boxShadow: prompt || selectedType ? '0 0 15px rgba(64,255,175,0.2)' : 'none',
-                  pointerEvents: prompt || selectedType ? 'auto' : 'none',
                   opacity: prompt || selectedType ? 1 : 0.5,
                 }}
               >
@@ -162,7 +177,7 @@ export default function Home() {
                   <line x1="22" y1="2" x2="11" y2="13" />
                   <polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
-              </Link>
+              </button>
             </div>
 
             {/* Type pills */}

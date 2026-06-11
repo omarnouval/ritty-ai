@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { MARKETPLACE_ABI, MARKETPLACE_ADDRESS } from '@/lib/contracts';
 import { formatEther } from 'viem';
 import { useState } from 'react';
@@ -27,12 +28,20 @@ const CAP_COLORS: Record<string, string> = {
 };
 
 export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode?: 'grid' | 'list' | 'compact' }) {
+  const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
   const { writeContractAsync, isPending } = useWriteContract();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash: txHash });
   const [hours, setHours] = useState(1);
 
   const handleRent = async () => {
+    // If not connected, open wallet connect modal
+    if (!isConnected) {
+      openConnectModal?.();
+      return;
+    }
+
     try {
       const hash = await writeContractAsync({
         address: MARKETPLACE_ADDRESS,
@@ -67,8 +76,8 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
         <div className="flex items-center gap-4 shrink-0 ml-4">
           <span className="text-xs text-gray-400">{'★'.repeat(Math.round(rating))} ({agent.ratingCount.toString()})</span>
           <span className="text-xs font-mono text-green-400">{formatEther(agent.pricePerHour)}/hr</span>
-          <button onClick={handleRent} disabled={isPending} className="text-xs text-orange-400 hover:text-orange-300 font-medium">
-            Rent
+          <button onClick={handleRent} disabled={isPending} className="text-xs text-[#40FFAF] hover:text-[#2EF19C] font-medium cursor-pointer">
+            {isConnected ? 'Rent' : 'Connect to Rent'}
           </button>
         </div>
       </div>
@@ -100,10 +109,10 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
         <button
           onClick={handleRent}
           disabled={isPending || isConfirming}
-          className="shrink-0 text-sm font-medium text-white px-5 py-2 rounded-full transition-all"
-          style={{ background: 'rgba(249,115,22,0.8)' }}
+          className="shrink-0 text-sm font-medium text-black px-5 py-2 rounded-full transition-all cursor-pointer"
+          style={{ background: '#40FFAF' }}
         >
-          {isPending ? '…' : 'Rent'}
+          {isPending ? '…' : isConnected ? 'Rent' : 'Connect'}
         </button>
       </div>
     );
@@ -150,6 +159,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           <select
             value={hours}
             onChange={(e) => setHours(Number(e.target.value))}
+            onClick={(e) => e.preventDefault()}
             className="text-xs bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-gray-300 outline-none"
           >
             {[1, 3, 6, 12, 24].map((h) => (
@@ -161,12 +171,15 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           </span>
         </div>
         <button
-          onClick={handleRent}
+          onClick={(e) => {
+            e.preventDefault();
+            handleRent();
+          }}
           disabled={isPending || isConfirming}
-          className="text-xs font-medium text-white px-4 py-2 rounded-full transition-all opacity-0 group-hover:opacity-100"
-          style={{ background: 'rgba(249,115,22,0.85)' }}
+          className="text-xs font-medium text-black px-4 py-2 rounded-full transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+          style={{ background: '#40FFAF' }}
         >
-          {isPending ? 'Confirming…' : isConfirming ? 'Processing…' : 'Rent'}
+          {isPending ? 'Confirming…' : isConfirming ? 'Processing…' : isConnected ? 'Rent' : 'Connect'}
         </button>
       </div>
 
@@ -175,7 +188,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           href={`https://scan.ritual.net/tx/${txHash}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="block mt-2 text-xs text-orange-400/70 hover:text-orange-400 text-center"
+          className="block mt-2 text-xs text-[#40FFAF]/70 hover:text-[#40FFAF] text-center"
         >
           View on RitualScan ↗
         </a>

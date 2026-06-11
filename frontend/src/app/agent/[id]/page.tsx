@@ -76,8 +76,8 @@ export default function AgentDetailPage() {
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <div className="text-5xl mb-4">🔍</div>
           <p className="text-gray-400 text-lg">Agent not found</p>
-          <Link href="/marketplace" className="text-orange-400 text-sm mt-4 inline-block hover:underline">
-            ← Back to Marketplace
+          <Link href="/agent-rent" className="text-orange-400 text-sm mt-4 inline-block hover:underline">
+            ← Back to Agent Rent
           </Link>
         </div>
       </main>
@@ -96,8 +96,8 @@ export default function AgentDetailPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Back link */}
-        <Link href="/marketplace" className="text-gray-500 text-sm hover:text-white transition mb-6 inline-block">
-          ← Back to Marketplace
+        <Link href="/agent-rent" className="text-gray-500 text-sm hover:text-white transition mb-6 inline-block">
+          ← Back to Agent Rent
         </Link>
 
         {/* Agent Header */}
@@ -249,9 +249,7 @@ function Nav() {
         <span className="text-lg font-heavy text-white">Ritty.ai</span>
       </Link>
       <div className="flex items-center gap-6">
-        <Link href="/marketplace" className="text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
-        <Link href="/create" className="text-sm text-gray-400 hover:text-white transition">Create</Link>
-        <Link href="/dashboard" className="text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
+        <Link href="/agent-rent" className="text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
         <ConnectButton />
       </div>
     </nav>

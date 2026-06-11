@@ -50,10 +50,10 @@ export function CreateAgentForm() {
           <div className="glass rounded-2xl p-10 text-center max-w-md">
             <div className="text-5xl mb-4">🎉</div>
             <h3 className="text-xl font-heavy text-white mb-2">Agent Listed!</h3>
-            <p className="text-gray-400 text-sm mb-6">Your agent is now live on the marketplace.</p>
+            <p className="text-gray-400 text-sm mb-6">Your agent is now live on Agent Rent.</p>
             <div className="flex gap-3 justify-center">
-              <Link href="/marketplace" className="text-sm font-medium text-white px-5 py-2.5 rounded-full" style={{ background: 'rgba(249,115,22,0.8)' }}>
-                View Marketplace
+              <Link href="/agent-rent" className="text-sm font-medium text-white px-5 py-2.5 rounded-full" style={{ background: 'rgba(249,115,22,0.8)' }}>
+                View Agent Rent
               </Link>
               <a href={`https://scan.ritual.net/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-400 hover:text-white px-5 py-2.5 rounded-full transition" style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
                 RitualScan ↗
@@ -71,7 +71,7 @@ export function CreateAgentForm() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12">
       <form onSubmit={handleSubmit} className="glass rounded-2xl p-8 w-full max-w-lg">
           <h2 className="text-2xl font-heavy text-white mb-1">List Your Agent</h2>
-          <p className="text-sm text-gray-500 mb-8">Deploy an agent to the Ritual marketplace</p>
+          <p className="text-sm text-gray-500 mb-8">Deploy an agent to Ritual Chain</p>
 
           <div className="space-y-5">
             <div>

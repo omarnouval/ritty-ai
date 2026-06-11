@@ -97,9 +97,7 @@ export default function DashboardPage() {
             <span className="text-lg font-heavy text-white">Ritty.ai</span>
           </Link>
           <div className="flex items-center gap-3 md:gap-6">
-            <Link href="/marketplace" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
-            <Link href="/create" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Create</Link>
-            <Link href="/dashboard" className="hidden md:block text-sm text-[#40FFAF] font-medium">Dashboard</Link>
+            <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
             <ConnectButton />
           </div>
         </nav>
@@ -120,8 +118,7 @@ export default function DashboardPage() {
           <span className="text-lg font-heavy text-white">Ritty.ai</span>
         </Link>
         <div className="flex items-center gap-3 md:gap-6">
-          <Link href="/marketplace" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
-          <Link href="/create" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Create</Link>
+          <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
           <Link href="/dashboard" className="hidden md:block text-sm text-[#40FFAF] font-medium">Dashboard</Link>
           <div className="flex items-center gap-2">
             {username && (

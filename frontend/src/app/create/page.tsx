@@ -13,9 +13,8 @@ export default function CreatePage() {
           <span className="text-lg font-heavy text-white">Ritty.ai</span>
         </Link>
         <div className="flex items-center gap-3 md:gap-6">
-          <Link href="/marketplace" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Marketplace</Link>
+          <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
           <Link href="/create" className="hidden md:block text-sm text-orange-400 font-medium">Create</Link>
-          <Link href="/dashboard" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
           <ConnectButton />
         </div>
       </nav>

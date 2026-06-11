@@ -37,7 +37,7 @@ const EN_DICT: Record<string, string> = {
   "example.imageGenerator": "Generate images from text prompts using AI",
   "buttons.launchApp": "Launch App",
   "buttons.create": "Create Agent",
-  "buttons.marketplace": "Marketplace",
+  "buttons.marketplace": "Agent Rent",
   "buttons.deploy": "Deploy",
   "nav.features": "Features",
   "nav.agents": "Agents",
