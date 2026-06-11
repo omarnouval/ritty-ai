@@ -7,12 +7,12 @@ import { useState, useEffect } from 'react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 
-const HERO_LINES: Record<string, { line1: string; boldWord: string }> = {
-  en: { line1: "You Don't Need", boldWord: 'Code' },
-  id: { line1: 'Kamu Gak Perlu', boldWord: 'Code' },
-  fil: { line1: 'Hindi Mo Kailangan ng', boldWord: 'Code' },
-  ko: { line1: '코딩은 필요', boldWord: '없어요' },
-  hi: { line1: 'आपको Code करने', boldWord: 'की ज़रूरत नहीं है' },
+const HERO_LINES: Record<string, { line1: string; prefix: string; boldWord: string }> = {
+  en: { line1: "You Don't Need", prefix: 'to', boldWord: 'Code' },
+  id: { line1: 'Kamu Gak Perlu', prefix: 'untuk', boldWord: 'Coding' },
+  fil: { line1: 'Hindi Mo Kailangan ng', prefix: 'mag', boldWord: 'Code' },
+  ko: { line1: '코딩은 필요', prefix: '', boldWord: '없어요' },
+  hi: { line1: 'आपको', prefix: '', boldWord: 'Code करने की ज़रूरत नहीं है' },
 };
 
 const HERO_SUB: Record<string, string> = {
@@ -136,7 +136,7 @@ export default function Home() {
           {/* Heading */}
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-5 tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             {hero.line1}<br />
-            to <span style={{ color: '#40FFAF' }}>{hero.boldWord}</span><span style={{ color: '#40FFAF', fontSize: '0.5em', verticalAlign: 'super' }}>.</span>
+            {hero.prefix && <>{hero.prefix} </>}<span style={{ color: '#40FFAF' }}>{hero.boldWord}</span><span style={{ color: '#40FFAF', fontSize: '0.5em', verticalAlign: 'super' }}>.</span>
           </h1>
 
           <p className="text-base md:text-lg mb-3 font-light" style={{ color: '#FFFFFF', opacity: 0.7, fontFamily: 'DM Sans, sans-serif' }}>
