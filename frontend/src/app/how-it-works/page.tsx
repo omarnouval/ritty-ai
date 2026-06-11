@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 export default function HowItWorksPage() {
   const { isConnected } = useAccount();
+  const { t } = useTranslations();
 
   return (
     <main className="min-h-screen" style={{ background: '#050505' }}>
@@ -17,10 +19,10 @@ export default function HowItWorksPage() {
           <span className="text-lg md:text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
         </Link>
         <div className="hidden md:flex items-center gap-10">
-          <Link href="/agent-rent" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>Agent Rent</Link>
-          <Link href="/how-it-works" className="text-sm transition-colors hover:text-white" style={{ color: '#40FFAF' }}>How It Works</Link>
+          <Link href="/agent-rent" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>{t('buttons.marketplace')}</Link>
+          <Link href="/how-it-works" className="text-sm transition-colors hover:text-white" style={{ color: '#40FFAF' }}>{t('nav.howItWorks')}</Link>
           {isConnected && (
-            <Link href="/dashboard" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>Dashboard</Link>
+            <Link href="/dashboard" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>{t('nav.dashboard')}</Link>
           )}
         </div>
         <div className="flex items-center gap-2 md:gap-3">
@@ -34,10 +36,10 @@ export default function HowItWorksPage() {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
-            How It Works
+            {t('howItWorks.title')}
           </h1>
           <p className="text-sm md:text-base" style={{ color: '#fff', opacity: 0.7 }}>
-            Three steps. No code. Start using AI agents in minutes.
+            {t('howItWorks.subtitle')}
           </p>
         </div>
 
@@ -47,23 +49,23 @@ export default function HowItWorksPage() {
             {
               step: '01',
               icon: '🔍',
-              title: 'Browse Agents',
-              desc: 'Explore AI agents built for research, trading, content, and more. Each agent has clear pricing and capabilities listed on the Agent Rent page.',
-              detail: 'Use the search bar or category pills to filter agents by type. Every agent card shows its name, description, rating, rental count, and hourly price in RITUAL tokens.',
+              title: t('howItWorks.step1Title'),
+              desc: t('howItWorks.step1Desc'),
+              detail: t('howItWorks.step1Detail'),
             },
             {
               step: '02',
               icon: '🔗',
-              title: 'Connect & Rent',
-              desc: 'Connect your wallet, pick a rental duration, and confirm the transaction on-chain.',
-              detail: 'Click "Rent" on any agent card. If you haven\'t connected a wallet yet, the connect modal will appear automatically. Choose your duration (1h, 3h, 6h, 12h, or 24h) and confirm. Your first rental is free on testnet.',
+              title: t('howItWorks.step2Title'),
+              desc: t('howItWorks.step2Desc'),
+              detail: t('howItWorks.step2Detail'),
             },
             {
               step: '03',
               icon: '🚀',
-              title: 'Use Your Agent',
-              desc: 'Your rented agent appears in the dashboard. Chat with it, give it tasks, and get results instantly.',
-              detail: 'After renting, go to your Dashboard to see all active rentals. Each agent has a countdown timer showing remaining time. Click on any active rental to start chatting. You can extend your rental before it expires.',
+              title: t('howItWorks.step3Title'),
+              desc: t('howItWorks.step3Desc'),
+              detail: t('howItWorks.step3Detail'),
             },
           ].map((item, i) => (
             <div
@@ -94,29 +96,29 @@ export default function HowItWorksPage() {
         {/* Requirements */}
         <div className="mb-20">
           <h2 className="text-xl md:text-2xl font-bold mb-8 text-center" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
-            What You Need
+            {t('howItWorks.needTitle')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               {
                 icon: '🦊',
-                title: 'EVM Wallet',
-                desc: 'MetaMask, Rainbow, Coinbase Wallet, or any WalletConnect-compatible wallet.',
+                title: t('howItWorks.needEvmTitle'),
+                desc: t('howItWorks.needEvmDesc'),
               },
               {
                 icon: '⛽',
-                title: 'RITUAL Tokens',
-                desc: 'Used to pay for agent rentals and gas fees. Get free testnet tokens from the Ritual faucet.',
+                title: t('howItWorks.needTokensTitle'),
+                desc: t('howItWorks.needTokensDesc'),
               },
               {
                 icon: '🌐',
-                title: 'Ritual Chain Network',
-                desc: 'Add Ritual Chain (ID 1979) to your wallet. RPC details available on the Ritual docs.',
+                title: t('howItWorks.needNetworkTitle'),
+                desc: t('howItWorks.needNetworkDesc'),
               },
               {
                 icon: '💡',
-                title: 'An Idea',
-                desc: 'Describe what you want your agent to do in plain language. No technical knowledge needed.',
+                title: t('howItWorks.needIdeaTitle'),
+                desc: t('howItWorks.needIdeaDesc'),
               },
             ].map((item, i) => (
               <div
@@ -146,28 +148,28 @@ export default function HowItWorksPage() {
           <div className="space-y-3">
             {[
               {
-                q: 'Do I need to code?',
-                a: 'No. Describe what you want in plain language. The platform matches you with the right agent.',
+                q: t('howItWorks.faq1q'),
+                a: t('howItWorks.faq1a'),
               },
               {
-                q: 'What wallet do I need?',
-                a: 'Any EVM-compatible wallet (MetaMask, Rainbow, etc.) connected to Ritual Chain testnet.',
+                q: t('howItWorks.faq2q'),
+                a: t('howItWorks.faq2a'),
               },
               {
-                q: 'How much does it cost?',
-                a: 'Agents are priced per hour in RITUAL tokens. Your first rental is free on testnet.',
+                q: t('howItWorks.faq3q'),
+                a: t('howItWorks.faq3a'),
               },
               {
-                q: 'Can I extend my rental?',
-                a: 'Yes. Extend anytime from the dashboard before your rental expires.',
+                q: t('howItWorks.faq4q'),
+                a: t('howItWorks.faq4a'),
               },
               {
-                q: 'What happens when my rental expires?',
-                a: 'The agent becomes unavailable in your dashboard. You can re-rent it anytime from the Agent Rent page.',
+                q: t('howItWorks.faq5q'),
+                a: t('howItWorks.faq5a'),
               },
               {
-                q: 'Can I rent multiple agents at once?',
-                a: 'Yes. Rent as many agents as you need. Each one appears as a separate card in your dashboard.',
+                q: t('howItWorks.faq6q'),
+                a: t('howItWorks.faq6a'),
               },
             ].map((faq, i) => (
               <div
@@ -193,7 +195,7 @@ export default function HowItWorksPage() {
             className="inline-flex items-center gap-2 text-sm font-medium px-8 py-3 rounded-xl transition-all hover:shadow-lg"
             style={{ background: '#40FFAF', color: '#050505', boxShadow: '0 0 20px rgba(64,255,175,0.15)' }}
           >
-            Browse Agents →
+            {t('howItWorks.browseAgents')}
           </Link>
         </div>
       </div>

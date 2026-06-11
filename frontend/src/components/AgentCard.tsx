@@ -6,6 +6,7 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { MARKETPLACE_ABI, MARKETPLACE_ADDRESS } from '@/lib/contracts';
 import { formatEther } from 'viem';
 import { useState } from 'react';
+import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 interface Agent {
   id: bigint;
@@ -30,6 +31,7 @@ const CAP_COLORS: Record<string, string> = {
 export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode?: 'grid' | 'list' | 'compact' }) {
   const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
+  const { t } = useTranslations();
   const { writeContractAsync, isPending } = useWriteContract();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash: txHash });
@@ -57,7 +59,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
   };
 
   const rating = agent.ratingCount > BigInt(0) ? Number(agent.rating) / 100 : 0;
-  const typeLabel = 'AI Agent';
+  const typeLabel = t('agent.aiAgent');
   const typeColor = 'green';
   const caps = ['research', 'monitoring']; // In production, fetch from contract metadata
 
@@ -77,7 +79,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           <span className="text-xs text-gray-400">{'★'.repeat(Math.round(rating))} ({agent.ratingCount.toString()})</span>
           <span className="text-xs font-mono text-green-400">{formatEther(agent.pricePerHour)}/hr</span>
           <button onClick={handleRent} disabled={isPending} className="text-xs text-[#40FFAF] hover:text-[#2EF19C] font-medium cursor-pointer">
-            {isConnected ? 'Rent' : 'Connect to Rent'}
+            {isConnected ? t('agent.rent') : t('agent.connectToRent')}
           </button>
         </div>
       </div>
@@ -104,7 +106,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
         </div>
         <div className="text-right shrink-0">
           <div className="text-sm font-mono text-green-400 font-medium">{formatEther(agent.pricePerHour)} RITUAL/hr</div>
-          <div className="text-xs text-gray-500 mt-1">{'★'.repeat(Math.round(rating))} · {agent.totalRentals.toString()} rentals</div>
+          <div className="text-xs text-gray-500 mt-1">{'★'.repeat(Math.round(rating))} · {agent.totalRentals.toString()} {t('agent.rentals')}</div>
         </div>
         <button
           onClick={handleRent}
@@ -112,7 +114,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           className="shrink-0 text-sm font-medium text-black px-5 py-2 rounded-full transition-all cursor-pointer"
           style={{ background: '#40FFAF' }}
         >
-          {isPending ? '…' : isConnected ? 'Rent' : 'Connect'}
+          {isPending ? '…' : isConnected ? t('agent.rent') : t('agent.connect')}
         </button>
       </div>
     );
@@ -150,7 +152,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
         <span className="text-yellow-400">{'★'.repeat(Math.round(rating))}{'☆'.repeat(5 - Math.round(rating))}</span>
         <span>({agent.ratingCount.toString()})</span>
         <span>·</span>
-        <span>{agent.totalRentals.toString()} rentals</span>
+        <span>{agent.totalRentals.toString()} {t('agent.rentals')}</span>
       </div>
 
       {/* Footer */}
@@ -179,7 +181,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           className="text-xs font-medium text-black px-4 py-2 rounded-full transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
           style={{ background: '#40FFAF' }}
         >
-          {isPending ? 'Confirming…' : isConfirming ? 'Processing…' : isConnected ? 'Rent' : 'Connect'}
+          {isPending ? t('agent.confirming') : isConfirming ? t('agent.processing') : isConnected ? t('agent.rent') : t('agent.connect')}
         </button>
       </div>
 

@@ -9,7 +9,7 @@ import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 const HERO_LINES: Record<string, { line1: string; prefix: string; boldWord: string }> = {
   en: { line1: "You Don't Need", prefix: 'to', boldWord: 'Code' },
-  id: { line1: 'Kamu Gak Perlu', prefix: 'untuk', boldWord: 'Coding' },
+  id: { line1: 'Kamu Gak Perlu', prefix: '', boldWord: 'Coding' },
   fil: { line1: 'Hindi Mo Kailangan ng', prefix: 'mag', boldWord: 'Code' },
   ko: { line1: '코딩은 필요', prefix: '', boldWord: '없어요' },
   hi: { line1: 'आपको', prefix: '', boldWord: 'Code करने की ज़रूरत नहीं है' },

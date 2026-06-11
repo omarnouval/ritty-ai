@@ -8,11 +8,13 @@ import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 const VIEW_MODES = ['grid', 'list', 'compact'] as const;
 
 export default function AgentRentPage() {
   const { isConnected } = useAccount();
+  const { t } = useTranslations();
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'compact'>('grid');
@@ -34,10 +36,10 @@ export default function AgentRentPage() {
           <span className="text-base md:text-lg font-heavy text-white">Ritty.ai</span>
         </Link>
         <div className="flex items-center gap-3 md:gap-6">
-          <Link href="/agent-rent" className="hidden md:block text-sm text-[#40FFAF] font-medium">Agent Rent</Link>
-          <Link href="/how-it-works" className="hidden md:block text-sm text-gray-400 hover:text-white transition">How It Works</Link>
+          <Link href="/agent-rent" className="hidden md:block text-sm text-[#40FFAF] font-medium">{t('buttons.marketplace')}</Link>
+          <Link href="/how-it-works" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('nav.howItWorks')}</Link>
           {isConnected && (
-            <Link href="/dashboard" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Dashboard</Link>
+            <Link href="/dashboard" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('nav.dashboard')}</Link>
           )}
           <ConnectButton />
           <LanguageSwitcher />
@@ -48,8 +50,8 @@ export default function AgentRentPage() {
         {/* Header + Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-heavy text-white">Agent Rent</h1>
-            <p className="text-sm text-gray-500 mt-1">Discover & rent autonomous AI agents on Ritual Chain</p>
+            <h1 className="text-3xl font-heavy text-white">{t('agentRent.title')}</h1>
+            <p className="text-sm text-gray-500 mt-1">{t('agentRent.subtitle')}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -62,7 +64,7 @@ export default function AgentRentPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search agents…"
+                placeholder={t('agentRent.search')}
                 className="pl-10 pr-4 py-2 rounded-xl text-sm text-white placeholder-gray-500 outline-none w-full md:w-64"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
               />
@@ -87,15 +89,15 @@ export default function AgentRentPage() {
         {isLoading ? (
           <div className="text-center py-20">
             <div className="animate-spin w-6 h-6 border-2 border-[#40FFAF] border-t-transparent rounded-full mx-auto" />
-            <p className="text-gray-500 text-sm mt-4">Loading agents…</p>
+            <p className="text-gray-500 text-sm mt-4">{t('agentRent.loading')}</p>
           </div>
         ) : !agentIds || agentIds.length === 0 ? (
           <div className="text-center py-24 glass rounded-2xl">
             <div className="text-5xl mb-4">🏜️</div>
-            <p className="text-gray-400 text-lg font-heavy mb-2">No agents yet</p>
-            <p className="text-gray-500 text-sm mb-6">Be the first to list an agent on Ritual</p>
+            <p className="text-gray-400 text-lg font-heavy mb-2">{t('agentRent.empty')}</p>
+            <p className="text-gray-500 text-sm mb-6">{t('agentRent.emptyDesc')}</p>
             <Link href="/create" className="inline-flex items-center gap-2 text-sm font-medium text-black px-6 py-2.5 rounded-full" style={{ background: '#40FFAF' }}>
-              List your agent →
+              {t('agentRent.listAgent')}
             </Link>
           </div>
         ) : (
@@ -119,15 +121,15 @@ export default function AgentRentPage() {
                 disabled={page === 0}
                 className="text-sm text-gray-400 hover:text-white disabled:opacity-30 transition"
               >
-                ← Previous
+                {t('agentRent.prev')}
               </button>
-              <span className="text-xs text-gray-600 font-mono">Page {page + 1}</span>
+              <span className="text-xs text-gray-600 font-mono">{t('agentRent.page')} {page + 1}</span>
               <button
                 onClick={() => setPage((p) => p + 1)}
                 disabled={!agentIds || agentIds.length < limit}
                 className="text-sm text-gray-400 hover:text-white disabled:opacity-30 transition"
               >
-                Next →
+                {t('agentRent.next')}
               </button>
             </div>
           </>

@@ -8,18 +8,20 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import { parseEther, formatEther } from 'viem';
-
-const DURATIONS = [
-  { label: '1 jam', hours: 1 },
-  { label: '8 jam', hours: 8 },
-  { label: '24 jam', hours: 24 },
-  { label: '1 minggu', hours: 168 },
-];
+import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 export default function AgentDetailPage() {
   const params = useParams();
   const agentId = params?.id ? BigInt(params.id as string) : BigInt(0);
   const { address, isConnected } = useAccount();
+  const { t } = useTranslations();
+
+  const DURATIONS = [
+    { label: t('agent.duration1h'), hours: 1 },
+    { label: t('agent.duration8h'), hours: 8 },
+    { label: t('agent.duration24h'), hours: 24 },
+    { label: t('agent.duration1w'), hours: 168 },
+  ];
 
   const [selectedHours, setSelectedHours] = useState(1);
   const [customHours, setCustomHours] = useState('');
@@ -64,7 +66,7 @@ export default function AgentDetailPage() {
       <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
         <Nav />
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-          <div className="text-gray-500 text-lg">Loading agent...</div>
+          <div className="text-gray-500 text-lg">{t('agent.loading')}</div>
         </div>
       </main>
     );
@@ -76,9 +78,9 @@ export default function AgentDetailPage() {
         <Nav />
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <div className="text-5xl mb-4">🔍</div>
-          <p className="text-gray-400 text-lg">Agent not found</p>
+          <p className="text-gray-400 text-lg">{t('agent.notFound')}</p>
           <Link href="/agent-rent" className="text-orange-400 text-sm mt-4 inline-block hover:underline">
-            ← Back to Agent Rent
+            {t('agent.backToRent')}
           </Link>
         </div>
       </main>
@@ -98,7 +100,7 @@ export default function AgentDetailPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Back link */}
         <Link href="/agent-rent" className="text-gray-500 text-sm hover:text-white transition mb-6 inline-block">
-          ← Back to Agent Rent
+          {t('agent.backToRent')}
         </Link>
 
         {/* Agent Header */}
@@ -108,17 +110,17 @@ export default function AgentDetailPage() {
               <div className="flex items-center gap-3 mb-2">
                 <h1 className="text-3xl font-heavy text-white">{name}</h1>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                  {isActive ? 'Active' : 'Inactive'}
+                  {isActive ? t('agent.active') : t('agent.inactive')}
                 </span>
               </div>
-              <p className="text-gray-400 text-sm">AI Agent</p>
+              <p className="text-gray-400 text-sm">{t('agent.aiAgent')}</p>
             </div>
             <div className="text-right">
               <div className="text-2xl font-heavy text-white">{pricePerHourEth} <span className="text-sm text-gray-500">RITUAL/hr</span></div>
               <div className="flex items-center gap-1 justify-end mt-1">
                 <span className="text-yellow-400">★</span>
                 <span className="text-white text-sm">{avgRating.toFixed(1)}</span>
-                <span className="text-gray-600 text-xs">({Number(ratingCount)} reviews)</span>
+                <span className="text-gray-600 text-xs">({Number(ratingCount)} {t('agent.reviews')})</span>
               </div>
             </div>
           </div>
@@ -128,15 +130,15 @@ export default function AgentDetailPage() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div className="text-gray-500 text-xs mb-1">Total Rentals</div>
+              <div className="text-gray-500 text-xs mb-1">{t('agent.totalRentals')}</div>
               <div className="text-white text-xl font-heavy">{Number(totalRentals)}</div>
             </div>
             <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div className="text-gray-500 text-xs mb-1">Total Earnings</div>
+              <div className="text-gray-500 text-xs mb-1">{t('agent.totalEarnings')}</div>
               <div className="text-white text-xl font-heavy">{formatEther(totalEarnings)} <span className="text-xs text-gray-500">RITUAL</span></div>
             </div>
             <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div className="text-gray-500 text-xs mb-1">Contract</div>
+              <div className="text-gray-500 text-xs mb-1">{t('agent.contract')}</div>
               <div className="text-white text-xs font-mono truncate">{agentContract}</div>
             </div>
           </div>
@@ -144,11 +146,11 @@ export default function AgentDetailPage() {
 
         {/* Rental Section */}
         <div className="glass rounded-2xl p-8">
-          <h2 className="text-xl font-heavy text-white mb-6">Rent this Agent</h2>
+          <h2 className="text-xl font-heavy text-white mb-6">{t('agent.rentTitle')}</h2>
 
           {/* Duration Presets */}
           <div className="mb-4">
-            <label className="text-gray-400 text-sm mb-2 block">Duration</label>
+            <label className="text-gray-400 text-sm mb-2 block">{t('agent.duration')}</label>
             <div className="flex flex-wrap gap-2">
               {DURATIONS.map((d) => (
                 <button
@@ -175,7 +177,7 @@ export default function AgentDetailPage() {
                   border: '1px solid ' + (useCustom ? '#40FFAF' : 'rgba(255,255,255,0.08)')
                 }}
               >
-                Custom
+                {t('agent.custom')}
               </button>
             </div>
           </div>
@@ -188,7 +190,7 @@ export default function AgentDetailPage() {
                 min="1"
                 value={customHours}
                 onChange={(e) => setCustomHours(e.target.value)}
-                placeholder="Enter hours..."
+                placeholder={t('agent.enterHours')}
                 className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 outline-none"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
               />
@@ -198,12 +200,12 @@ export default function AgentDetailPage() {
           {/* Cost Summary */}
           <div className="rounded-xl p-4 mb-6" style={{ background: 'rgba(64,255,175,0.05)', border: '1px solid rgba(64,255,175,0.15)' }}>
             <div className="flex justify-between items-center">
-              <span className="text-gray-400 text-sm">Total Cost</span>
+              <span className="text-gray-400 text-sm">{t('agent.totalCost')}</span>
               <span className="text-white text-xl font-heavy">{costEth} <span className="text-sm text-gray-500">RITUAL</span></span>
             </div>
             <div className="flex justify-between items-center mt-1">
-              <span className="text-gray-500 text-xs">Duration</span>
-              <span className="text-gray-400 text-xs">{useCustom ? (customHours || '1') : selectedHours} hour(s)</span>
+              <span className="text-gray-500 text-xs">{t('agent.duration')}</span>
+              <span className="text-gray-400 text-xs">{useCustom ? (customHours || '1') : selectedHours} {t('agent.hour')}</span>
             </div>
           </div>
 
@@ -212,10 +214,10 @@ export default function AgentDetailPage() {
             <ConnectButton />
           ) : isRentSuccess ? (
             <div className="text-center">
-              <div className="text-green-400 text-lg font-heavy mb-2">✅ Rental Successful!</div>
-              <p className="text-gray-500 text-sm">Your agent is now active. Check your dashboard.</p>
+              <div className="text-green-400 text-lg font-heavy mb-2">✅ {t('agent.rentalSuccess')}</div>
+              <p className="text-gray-500 text-sm">{t('agent.rentalSuccessDesc')}</p>
               <Link href="/dashboard" className="text-orange-400 text-sm mt-2 inline-block hover:underline">
-                Go to Dashboard →
+                {t('agent.goToDashboard')}
               </Link>
             </div>
           ) : (
@@ -225,7 +227,7 @@ export default function AgentDetailPage() {
               className="w-full py-3 rounded-xl text-sm font-heavy text-black transition disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ background: '#40FFAF' }}
             >
-              {isRenting ? 'Confirm in wallet...' : isRentConfirming ? 'Processing...' : `Rent for ${costEth} RITUAL`}
+              {isRenting ? t('agent.confirmWallet') : isRentConfirming ? t('agent.processing') : `${t('agent.rentFor')} ${costEth} RITUAL`}
             </button>
           )}
         </div>
@@ -243,6 +245,7 @@ export default function AgentDetailPage() {
 }
 
 function Nav() {
+  const { t } = useTranslations();
   return (
     <nav className="flex justify-between items-center px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
       <Link href="/" className="flex items-center gap-2.5">
@@ -250,7 +253,7 @@ function Nav() {
         <span className="text-lg font-heavy text-white">Ritty.ai</span>
       </Link>
       <div className="flex items-center gap-6">
-        <Link href="/agent-rent" className="text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
+        <Link href="/agent-rent" className="text-sm text-gray-400 hover:text-white transition">{t('buttons.marketplace')}</Link>
         <ConnectButton />
         <LanguageSwitcher />
       </div>
