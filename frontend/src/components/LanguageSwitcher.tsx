@@ -24,9 +24,11 @@ export default function LanguageSwitcher() {
 
   return (
     <div ref={ref} style={{ position: 'relative', zIndex: 9999 }}>
-      <button
-        type="button"
-        onPointerDown={(e) => { e.stopPropagation(); setOpen(!open); }}
+      <div
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -48,7 +50,7 @@ export default function LanguageSwitcher() {
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
         {locale.toUpperCase()}
-      </button>
+      </div>
 
       {open && (
         <div style={{
@@ -69,10 +71,10 @@ export default function LanguageSwitcher() {
               role="button"
               tabIndex={0}
               onPointerDown={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
                 handleSelect(code);
               }}
+              onClick={() => handleSelect(code)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleSelect(code); }}
               style={{
                 padding: '10px 16px',
