@@ -7,15 +7,21 @@ export default function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  // Close on outside click — mousedown fires BEFORE click, so items still work
   useEffect(() => {
-    const handler = (e: Event) => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     };
-    document.addEventListener('pointerdown', handler);
-    return () => document.removeEventListener('pointerdown', handler);
-  }, []);
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, [open]);
 
   const handleSelect = useCallback((code: Locale) => {
     setLocale(code);
@@ -24,11 +30,9 @@ export default function LanguageSwitcher() {
 
   return (
     <div ref={ref} style={{ position: 'relative', zIndex: 9999 }}>
+      {/* Trigger */}
       <div
-        onPointerDown={(e) => {
-          e.stopPropagation();
-          setOpen((v) => !v);
-        }}
+        onClick={() => setOpen((v) => !v)}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -42,6 +46,8 @@ export default function LanguageSwitcher() {
           fontWeight: 500,
           cursor: 'pointer',
           userSelect: 'none',
+          WebkitTapHighlightColor: 'transparent',
+          touchAction: 'manipulation',
         }}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -52,6 +58,7 @@ export default function LanguageSwitcher() {
         {locale.toUpperCase()}
       </div>
 
+      {/* Dropdown */}
       {open && (
         <div style={{
           position: 'absolute',
@@ -64,18 +71,12 @@ export default function LanguageSwitcher() {
           minWidth: 140,
           zIndex: 99999,
           boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+          touchAction: 'manipulation',
         }}>
           {SUPPORTED.map((code) => (
             <div
               key={code}
-              role="button"
-              tabIndex={0}
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                handleSelect(code);
-              }}
               onClick={() => handleSelect(code)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleSelect(code); }}
               style={{
                 padding: '10px 16px',
                 background: code === locale ? '#1a1a1a' : 'transparent',
@@ -84,6 +85,8 @@ export default function LanguageSwitcher() {
                 cursor: 'pointer',
                 transition: 'background 0.15s',
                 userSelect: 'none',
+                WebkitTapHighlightColor: 'transparent',
+                touchAction: 'manipulation',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = '#1a1a1a')}
               onMouseLeave={(e) => (e.currentTarget.style.background = code === locale ? '#1a1a1a' : 'transparent')}
