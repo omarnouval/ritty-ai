@@ -1,38 +1,42 @@
 'use client';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslations, FULL_LABELS, SUPPORTED, type Locale } from '@/lib/i18n/LanguageContext';
 
 export default function LanguageSwitcher() {
   const { locale, setLocale } = useTranslations();
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close on outside click — mousedown fires BEFORE click, so items still work
+  // Close when clicking outside
   useEffect(() => {
     if (!open) return;
-    const handler = (e: Event) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    document.addEventListener('touchstart', handler);
+
+    const close = () => setOpen(false);
+    // Delay adding listener so the opening click doesn't immediately close
+    const timer = setTimeout(() => {
+      document.addEventListener('click', close, { once: true });
+    }, 10);
+
     return () => {
-      document.removeEventListener('mousedown', handler);
-      document.removeEventListener('touchstart', handler);
+      clearTimeout(timer);
+      document.removeEventListener('click', close);
     };
   }, [open]);
 
-  const handleSelect = useCallback((code: Locale) => {
+  const handleSelect = (code: Locale) => {
     setLocale(code);
     setOpen(false);
-  }, [setLocale]);
+  };
 
   return (
-    <div ref={ref} style={{ position: 'relative', zIndex: 9999 }}>
+    <div ref={containerRef} style={{ position: 'relative', zIndex: 9999 }}>
       {/* Trigger */}
-      <div
-        onClick={() => setOpen((v) => !v)}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -56,7 +60,7 @@ export default function LanguageSwitcher() {
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
         {locale.toUpperCase()}
-      </div>
+      </button>
 
       {/* Dropdown */}
       {open && (
@@ -74,10 +78,17 @@ export default function LanguageSwitcher() {
           touchAction: 'manipulation',
         }}>
           {SUPPORTED.map((code) => (
-            <div
+            <button
               key={code}
-              onClick={() => handleSelect(code)}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelect(code);
+              }}
               style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
                 padding: '10px 16px',
                 background: code === locale ? '#1a1a1a' : 'transparent',
                 color: code === locale ? '#fff' : '#A1A1AA',
@@ -85,6 +96,7 @@ export default function LanguageSwitcher() {
                 cursor: 'pointer',
                 transition: 'background 0.15s',
                 userSelect: 'none',
+                border: 'none',
                 WebkitTapHighlightColor: 'transparent',
                 touchAction: 'manipulation',
               }}
@@ -95,7 +107,7 @@ export default function LanguageSwitcher() {
               {code === locale && (
                 <span style={{ float: 'right', color: '#22c55e' }}>✓</span>
               )}
-            </div>
+            </button>
           ))}
         </div>
       )}
