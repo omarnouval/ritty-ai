@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslations, FULL_LABELS, SUPPORTED, type Locale } from '@/lib/i18n/LanguageContext';
 
 export default function LanguageSwitcher() {
@@ -13,19 +13,20 @@ export default function LanguageSwitcher() {
         setOpen(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    document.addEventListener('touchstart', handler);
-    return () => {
-      document.removeEventListener('mousedown', handler);
-      document.removeEventListener('touchstart', handler);
-    };
+    document.addEventListener('pointerdown', handler);
+    return () => document.removeEventListener('pointerdown', handler);
   }, []);
+
+  const handleSelect = useCallback((code: Locale) => {
+    setLocale(code);
+    setOpen(false);
+  }, [setLocale]);
 
   return (
     <div ref={ref} style={{ position: 'relative', zIndex: 9999 }}>
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onPointerDown={(e) => { e.stopPropagation(); setOpen(!open); }}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -63,17 +64,17 @@ export default function LanguageSwitcher() {
           boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
           {SUPPORTED.map((code) => (
-            <button
+            <div
               key={code}
-              type="button"
-              onClick={() => {
-                setLocale(code);
-                setOpen(false);
+              role="button"
+              tabIndex={0}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSelect(code);
               }}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSelect(code); }}
               style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
                 padding: '10px 16px',
                 background: code === locale ? '#1a1a1a' : 'transparent',
                 color: code === locale ? '#fff' : '#A1A1AA',
@@ -81,7 +82,6 @@ export default function LanguageSwitcher() {
                 cursor: 'pointer',
                 transition: 'background 0.15s',
                 userSelect: 'none',
-                border: 'none',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = '#1a1a1a')}
               onMouseLeave={(e) => (e.currentTarget.style.background = code === locale ? '#1a1a1a' : 'transparent')}
@@ -90,7 +90,7 @@ export default function LanguageSwitcher() {
               {code === locale && (
                 <span style={{ float: 'right', color: '#22c55e' }}>✓</span>
               )}
-            </button>
+            </div>
           ))}
         </div>
       )}
