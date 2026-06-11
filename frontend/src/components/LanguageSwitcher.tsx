@@ -1,47 +1,36 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslations, FULL_LABELS, SUPPORTED, type Locale } from '@/lib/i18n/LanguageContext';
 
 export default function LanguageSwitcher() {
   const { locale, setLocale } = useTranslations();
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close when clicking outside
-  useEffect(() => {
-    if (!open) return;
-
-    const close = () => setOpen(false);
-    // Delay adding listener so the opening click doesn't immediately close
-    const timer = setTimeout(() => {
-      document.addEventListener('click', close, { once: true });
-    }, 10);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('click', close);
-    };
-  }, [open]);
-
-  const handleSelect = (code: Locale) => {
-    setLocale(code);
-    setOpen(false);
-  };
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLocale(e.target.value as Locale);
+  }, [setLocale]);
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', zIndex: 9999 }}>
-      {/* Trigger */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpen((v) => !v);
-        }}
+    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
+      {/* Globe icon */}
+      <svg
+        width="14" height="14" viewBox="0 0 24 24"
+        fill="none" stroke="#A1A1AA" strokeWidth="2"
+        strokeLinecap="round" strokeLinejoin="round"
+        style={{ position: 'absolute', left: 10, pointerEvents: 'none' }}
+      >
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+      </svg>
+
+      <select
+        value={locale}
+        onChange={handleChange}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          padding: '6px 12px',
+          appearance: 'none',
+          WebkitAppearance: 'none',
+          MozAppearance: 'none',
+          padding: '6px 28px 6px 30px',
           borderRadius: 12,
           background: '#111',
           border: '1px solid #222',
@@ -49,68 +38,28 @@ export default function LanguageSwitcher() {
           fontSize: 12,
           fontWeight: 500,
           cursor: 'pointer',
+          outline: 'none',
           userSelect: 'none',
           WebkitTapHighlightColor: 'transparent',
           touchAction: 'manipulation',
         }}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        </svg>
-        {locale.toUpperCase()}
-      </button>
+        {SUPPORTED.map((code) => (
+          <option key={code} value={code} style={{ background: '#111', color: '#fff' }}>
+            {FULL_LABELS[code]}
+          </option>
+        ))}
+      </select>
 
-      {/* Dropdown */}
-      {open && (
-        <div style={{
-          position: 'absolute',
-          top: '110%',
-          right: 0,
-          background: '#111',
-          border: '1px solid #222',
-          borderRadius: 12,
-          overflow: 'hidden',
-          minWidth: 140,
-          zIndex: 99999,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-          touchAction: 'manipulation',
-        }}>
-          {SUPPORTED.map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleSelect(code);
-              }}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: '10px 16px',
-                background: code === locale ? '#1a1a1a' : 'transparent',
-                color: code === locale ? '#fff' : '#A1A1AA',
-                fontSize: 13,
-                cursor: 'pointer',
-                transition: 'background 0.15s',
-                userSelect: 'none',
-                border: 'none',
-                WebkitTapHighlightColor: 'transparent',
-                touchAction: 'manipulation',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#1a1a1a')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = code === locale ? '#1a1a1a' : 'transparent')}
-            >
-              {FULL_LABELS[code]}
-              {code === locale && (
-                <span style={{ float: 'right', color: '#22c55e' }}>✓</span>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Chevron */}
+      <svg
+        width="10" height="10" viewBox="0 0 24 24"
+        fill="none" stroke="#A1A1AA" strokeWidth="2"
+        strokeLinecap="round" strokeLinejoin="round"
+        style={{ position: 'absolute', right: 10, pointerEvents: 'none' }}
+      >
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
     </div>
   );
 }
