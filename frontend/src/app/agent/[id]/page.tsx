@@ -211,7 +211,22 @@ export default function AgentDetailPage() {
 
           {/* Rent Button */}
           {!isConnected ? (
-            <ConnectButton />
+            <div>
+              <ConnectButton.Custom>
+                {({ openConnectModal }) => (
+                  <button
+                    onClick={openConnectModal}
+                    className="w-full py-3 rounded-xl text-sm font-heavy text-black transition"
+                    style={{ background: '#40FFAF' }}
+                  >
+                    {t('agent.connectWallet') || 'Connect Wallet'}
+                  </button>
+                )}
+              </ConnectButton.Custom>
+              <p className="text-gray-500 text-xs text-center mt-3">
+                📱 Mobile? Open in MetaMask / Trust Wallet browser
+              </p>
+            </div>
           ) : isRentSuccess ? (
             <div className="text-center">
               <div className="text-green-400 text-lg font-heavy mb-2">✅ {t('agent.rentalSuccess')}</div>
