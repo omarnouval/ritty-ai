@@ -52,6 +52,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
         args: [agent.id, BigInt(hours)],
         value: agent.pricePerHour * BigInt(hours),
         type: 'legacy' as const,
+        gasPrice: BigInt(1000000000), // 1 gwei - force legacy tx
       });
       setTxHash(hash);
     } catch (err) {

@@ -26,6 +26,7 @@ export function AgentDashboard() {
         abi: MARKETPLACE_ABI,
         functionName: 'withdrawEarnings',
         type: 'legacy' as const,
+        gasPrice: BigInt(1000000000), // 1 gwei - force legacy tx
       });
       setTxHash(hash);
     } catch (err) {

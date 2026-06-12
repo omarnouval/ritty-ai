@@ -59,6 +59,7 @@ export default function AgentDetailPage() {
       args: [agentId, BigInt(hours)],
       value: rentalCost,
       type: 'legacy' as const,
+      gasPrice: BigInt(1000000000), // 1 gwei - force legacy tx
     });
   };
 
