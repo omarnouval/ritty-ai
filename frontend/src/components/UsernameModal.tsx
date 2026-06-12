@@ -118,6 +118,7 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
         abi: PROFILE_ABI,
         functionName: 'createProfile',
         args: [username, bio || 'Ritty.ai user'],
+        type: 'legacy' as const,
       });
       setTxHash(hash);
     } catch (err: any) {

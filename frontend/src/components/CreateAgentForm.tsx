@@ -36,6 +36,7 @@ export function CreateAgentForm() {
           parseEther(form.pricePerHour),
           form.agentType,
         ],
+        type: 'legacy' as const,
       });
       setTxHash(hash);
     } catch (err) {

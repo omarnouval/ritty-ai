@@ -51,6 +51,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
         functionName: 'rentAgent',
         args: [agent.id, BigInt(hours)],
         value: agent.pricePerHour * BigInt(hours),
+        type: 'legacy' as const,
       });
       setTxHash(hash);
     } catch (err) {

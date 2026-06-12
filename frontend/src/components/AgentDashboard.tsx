@@ -25,6 +25,7 @@ export function AgentDashboard() {
         address: MARKETPLACE_ADDRESS,
         abi: MARKETPLACE_ABI,
         functionName: 'withdrawEarnings',
+        type: 'legacy' as const,
       });
       setTxHash(hash);
     } catch (err) {

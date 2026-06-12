@@ -20,6 +20,10 @@ export const ritual = defineChain({
       url: 'https://explorer.ritualfoundation.org',
     },
   },
+  fees: {
+    // Ritual chain only supports legacy (type 0) transactions
+    defaultPriorityFee: 0n,
+  },
 });
 
 export const config = getDefaultConfig({
