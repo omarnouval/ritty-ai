@@ -6,6 +6,7 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
+import ColorBends from '@/components/reactbits/ColorBends';
 
 const HERO_LINES: Record<string, { line1: string; prefix: string; boldWord: string }> = {
   en: { line1: "You Don't Need", prefix: 'to', boldWord: 'Code' },
@@ -99,10 +100,20 @@ export default function Home() {
 
   return (
     <main className="min-h-screen relative" style={{ background: '#050505' }}>
-      {/* ─── Ambient Blobs ─── */}
-      <div className="blob" style={{ width: 600, height: 600, background: '#40FFAF', top: '-200px', right: '-100px', animationDelay: '0s' }} />
-      <div className="blob" style={{ width: 400, height: 400, background: '#40FFAF', bottom: '-150px', left: '-100px', animationDelay: '-5s' }} />
-      <div className="blob" style={{ width: 300, height: 300, background: '#2EF19C', top: '40%', left: '60%', animationDelay: '-10s' }} />
+      {/* ─── ColorBends Background ─── */}
+      <div className="absolute inset-0 z-0" style={{ opacity: 0.4 }}>
+        <ColorBends
+          color="#40FFAF"
+          speed={0.15}
+          frequency={0.8}
+          noise={0.1}
+          bandWidth={0.12}
+          rotation={45}
+          fadeTop={0.8}
+          iterations={2}
+          intensity={1.0}
+        />
+      </div>
 
       {/* ─── Nav ─── */}
       <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 lg:px-12 py-4" style={{ borderBottom: '1px solid #161616' }}>
