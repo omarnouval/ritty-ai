@@ -4,21 +4,18 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 /**
- * Ritual Chain (1979) supports legacy (type 0) and EIP-1559 (type 2),
- * but does NOT support EIP-4844 (type 3) or EIP-7702 (type 4).
- *
- * Some wallets (Rabby) auto-send newer tx types that the chain rejects.
- * This provider strips unsupported tx type fields while keeping EIP-1559 intact.
+ * Ritual Chain (1979) only supports type 0 (legacy) and type 2 (EIP-1559).
+ * Some wallets send type 3/4 which the chain rejects.
+ * 
+ * This provider intercepts eth_sendTransaction and downgrades
+ * unsupported transaction types to type 0 (legacy).
  */
 
-if (typeof window !== 'undefined') {
-  patchProvider((window as any).ethereum);
-  patchProvider((window as any).rabby);
-}
+let patched = false;
 
-function patchProvider(provider: any) {
-  if (!provider || provider.__legacyPatched) return;
-  if (typeof provider.request !== 'function') return;
+function patchProvider(provider: any, label: string): boolean {
+  if (!provider || provider.__legacyPatched) return false;
+  if (typeof provider.request !== 'function') return false;
 
   const originalRequest = provider.request.bind(provider);
 
@@ -30,58 +27,82 @@ function patchProvider(provider: any) {
     ) {
       const tx = { ...args.params[0] };
 
-      // Strip EIP-4844 (blob) fields — type 3
+      // Strip ALL fields that newer tx types add
       delete tx.maxFeePerBlobGas;
       delete tx.blobVersionedHashes;
       delete tx.blobs;
-
-      // Strip EIP-7702 (authorization) fields — type 4
       delete tx.authorizationList;
 
-      // If wallet sent type 3 or 4, downgrade to type 2 (EIP-1559)
-      if (tx.type === '0x3' || tx.type === '0x4' || tx.type === 3 || tx.type === 4) {
-        tx.type = '0x2';
-        // Ensure EIP-1559 fields exist
-        if (!tx.maxFeePerGas) {
-          tx.maxFeePerGas = '0x3B9ACA00'; // 1 gwei
-        }
-        if (!tx.maxPriorityFeePerGas) {
-          tx.maxPriorityFeePerGas = '0x3B9ACA00'; // 1 gwei
+      // Check the type
+      const txType = typeof tx.type === 'string' ? parseInt(tx.type, 16) : tx.type;
+
+      // If type > 2 (EIP-4844 or EIP-7702), downgrade to legacy
+      if (txType > 2) {
+        tx.type = '0x0';
+        // Remove EIP-1559 fields, add gasPrice
+        delete tx.maxFeePerGas;
+        delete tx.maxPriorityFeePerGas;
+        if (!tx.gasPrice) {
+          tx.gasPrice = '0x3B9ACA00'; // 1 gwei
         }
       }
 
       return originalRequest({ method: args.method, params: [tx] });
     }
-
     return originalRequest(args);
   };
 
   provider.__legacyPatched = true;
+  patched = true;
+  return true;
 }
 
-function detectWallet(): string {
-  if (typeof window === 'undefined') return 'unknown';
+function tryPatchAll(): boolean {
+  let result = false;
   const eth = (window as any).ethereum;
-  if (!eth) return 'none';
-  if (eth.isRabby) return 'rabby';
-  if (eth.isMetaMask) return 'metamask';
-  if (eth.isOkxWallet || eth.isOKExWallet) return 'okx';
-  if (eth.isTrust) return 'trust';
-  return 'other';
+  if (eth) {
+    if (Array.isArray(eth.providers)) {
+      eth.providers.forEach((p: any) => {
+        if (patchProvider(p, 'multi-provider')) result = true;
+      });
+    }
+    if (patchProvider(eth, 'window.ethereum')) result = true;
+  }
+  if (patchProvider((window as any).rabby, 'window.rabby')) result = true;
+  return result;
 }
 
 export function LegacyTxProvider({ children }: { children: React.ReactNode }) {
-  const { isConnected } = useAccount();
+  const { isConnected, connector } = useAccount();
+  const [debug, setDebug] = useState('');
 
   useEffect(() => {
-    patchProvider((window as any).ethereum);
-    patchProvider((window as any).rabby);
+    // Try patching immediately
+    tryPatchAll();
 
-    const eth = (window as any).ethereum;
-    if (eth?.providers && Array.isArray(eth.providers)) {
-      eth.providers.forEach(patchProvider);
+    // Also try via connector
+    if (connector?.getProvider) {
+      connector.getProvider().then((p: any) => {
+        patchProvider(p, 'connector-provider');
+      }).catch(() => {});
     }
-  }, []);
+
+    // Poll every 200ms for up to 5 seconds until patched
+    const interval = setInterval(() => {
+      if (patched) {
+        clearInterval(interval);
+        return;
+      }
+      tryPatchAll();
+    }, 200);
+
+    const timeout = setTimeout(() => clearInterval(interval), 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [isConnected, connector]);
 
   return <>{children}</>;
 }
