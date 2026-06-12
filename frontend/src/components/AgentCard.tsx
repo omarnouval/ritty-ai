@@ -5,6 +5,7 @@ import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadCont
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { MARKETPLACE_ABI, MARKETPLACE_ADDRESS } from '@/lib/contracts';
 import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
+import { sendDirectTx } from '@/lib/directTx';
 import { formatEther } from 'viem';
 import { useState, useCallback } from 'react';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
@@ -39,6 +40,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash: txHash });
   const [hours, setHours] = useState(1);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [isRenting, setIsRenting] = useState(false);
 
   const { data: hasProfile } = useReadContract({
     address: PROFILE_ADDRESS,
@@ -50,17 +52,19 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
 
   const doRent = async () => {
     try {
-      const hash = await writeContractAsync({
-        address: MARKETPLACE_ADDRESS,
-        abi: MARKETPLACE_ABI,
+      setIsRenting(true);
+      const hash = await sendDirectTx({
+        to: MARKETPLACE_ADDRESS,
+        abi: MARKETPLACE_ABI as any,
         functionName: 'rentAgent',
         args: [agent.id, BigInt(hours)],
         value: agent.pricePerHour * BigInt(hours),
-        type: 'legacy' as const,
       });
       setTxHash(hash);
     } catch (err) {
       console.error('Rent failed:', err);
+    } finally {
+      setIsRenting(false);
     }
   };
 

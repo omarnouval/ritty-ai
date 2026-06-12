@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
+import { sendDirectTx } from '@/lib/directTx';
 
 interface UsernameModalProps {
   onComplete: (username: string) => void;
@@ -15,8 +16,8 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
   const [error, setError] = useState('');
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const [isPending, setIsPending] = useState(false);
 
-  const { writeContractAsync, isPending } = useWriteContract();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
@@ -51,17 +52,19 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
     if (!username || !isAvailable || !address) return;
     try {
       setError('');
-      const hash = await writeContractAsync({
-        address: PROFILE_ADDRESS,
-        abi: PROFILE_ABI,
+      setIsPending(true);
+      const hash = await sendDirectTx({
+        to: PROFILE_ADDRESS,
+        abi: PROFILE_ABI as any,
         functionName: 'createProfile',
         args: [username, bio || 'Ritty.ai user'],
-        type: 'legacy' as const,
       });
       setTxHash(hash);
     } catch (err: any) {
       if (err.message?.includes('Username taken')) setError('Username already taken');
       else setError(err.message || 'Transaction failed');
+    } finally {
+      setIsPending(false);
     }
   };
 
