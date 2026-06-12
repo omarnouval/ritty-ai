@@ -103,15 +103,15 @@ export default function Home() {
       {/* ─── ColorBends Background ─── */}
       <div className="absolute inset-0 z-0" style={{ opacity: 0.4 }}>
         <ColorBends
-          color="#40FFAF"
+          colors={['#40FFAF', '#0D9373', '#0A7558']}
           speed={0.15}
           frequency={0.8}
           noise={0.1}
-          bandWidth={0.12}
           rotation={45}
-          fadeTop={0.8}
-          iterations={2}
-          intensity={1.0}
+          transparent={true}
+          warpStrength={1}
+          mouseInfluence={1}
+          parallax={0.5}
         />
       </div>
 
