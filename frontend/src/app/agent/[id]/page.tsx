@@ -70,6 +70,7 @@ export default function AgentDetailPage() {
       functionName: 'rentAgent',
       args: [agentId, BigInt(hours)],
       value: rentalCost,
+      type: 'legacy' as const,
     });
   };
 
