@@ -26,8 +26,12 @@ export async function sendDirectTx({
   // Encode function call using viem
   const data = encodeFunctionData({ abi, functionName, args });
 
-  // Get connected account
-  const accounts = await provider.request({ method: 'eth_accounts' });
+  // Get connected account — request if not connected
+  let accounts = await provider.request({ method: 'eth_accounts' });
+  if (!accounts?.[0]) {
+    // Request accounts (triggers wallet popup if not connected)
+    accounts = await provider.request({ method: 'eth_requestAccounts' });
+  }
   if (!accounts?.[0]) throw new Error('No account connected');
 
   // Build minimal tx — NO type, NO gasPrice, NO maxFeePerGas
