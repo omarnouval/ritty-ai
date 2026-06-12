@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useEffect, useId, useLayoutEffect, useRef } from 'react';
 

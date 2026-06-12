@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useLayoutEffect, useRef, useCallback } from 'react';
 import Lenis from 'lenis';

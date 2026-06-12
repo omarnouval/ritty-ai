@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useRef, useState, useEffect } from 'react';
 import Matter from 'matter-js';

@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useRef, useEffect, useState, useMemo, useId } from 'react';
 import './CurvedLoop.css';

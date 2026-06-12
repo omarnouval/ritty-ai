@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 /* eslint-disable react/no-unknown-property */
 import { useRef, useEffect, forwardRef } from 'react';

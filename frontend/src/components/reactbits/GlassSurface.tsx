@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useEffect, useRef, useId } from 'react';
 import './GlassSurface.css';

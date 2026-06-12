@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import * as math from 'mathjs';

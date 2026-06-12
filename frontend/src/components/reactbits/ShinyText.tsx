@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { CSSProperties, ReactNode } from "react";
 

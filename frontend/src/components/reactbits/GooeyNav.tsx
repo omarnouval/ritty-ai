@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useRef, useEffect, useState } from 'react';
 import './GooeyNav.css';

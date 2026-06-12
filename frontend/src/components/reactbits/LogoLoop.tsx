@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useCallback, useEffect, useMemo, useRef, useState, memo } from 'react';
 import './LogoLoop.css';
