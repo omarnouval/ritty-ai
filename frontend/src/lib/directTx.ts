@@ -34,16 +34,28 @@ export async function sendDirectTx({
   }
   if (!accounts?.[0]) throw new Error('No account connected');
 
-  // Build minimal tx — NO type, NO gasPrice, NO maxFeePerGas
-  // Let the wallet handle everything
+  // Build minimal tx — NO type, let the wallet handle everything
   const tx: Record<string, string> = {
     from: accounts[0],
     to,
     data,
   };
 
-  if (value && value > 0n) {
+  if (value && value > BigInt(0)) {
     tx.value = '0x' + value.toString(16);
+  }
+
+  // Rabby workaround: force legacy tx by setting gasPrice
+  // Rabby constructs EIP-7702 (type 4) by default, Ritual RPC rejects it
+  const isRabby = provider.isRabby || provider.providers?.some((p: any) => p.isRabby);
+  if (isRabby) {
+    try {
+      const gasPrice = await provider.request({ method: 'eth_gasPrice' });
+      if (gasPrice) tx.gasPrice = gasPrice;
+    } catch {
+      // fallback: use a reasonable gas price
+      tx.gasPrice = '0x3B9ACA00'; // 1 gwei
+    }
   }
 
   // Send directly to wallet provider
