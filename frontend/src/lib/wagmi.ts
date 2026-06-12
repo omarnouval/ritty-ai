@@ -22,8 +22,11 @@ export const ritual: Chain = defineChain({
   },
 });
 
-// Patch ALL providers BEFORE wagmi config is created
-// This ensures the connector captures the patched provider
+/**
+ * Patch wallet provider to intercept eth_sendTransaction.
+ * For Rabby: try eth_signTransaction + eth_sendRawTransaction
+ * to bypass Rabby's internal tx reconstruction.
+ */
 if (typeof window !== 'undefined') {
   const patch = (p: any) => {
     if (!p || p.__ritualPatched || typeof p.request !== 'function') return;
@@ -35,42 +38,67 @@ if (typeof window !== 'undefined') {
         args.params?.[0]
       ) {
         const tx = { ...args.params[0] };
+
         // Strip blob/auth fields
         delete tx.maxFeePerBlobGas;
         delete tx.blobVersionedHashes;
         delete tx.blobs;
         delete tx.authorizationList;
-        // Downgrade type 3/4 to legacy
+
+        // Parse type
         const t = typeof tx.type === 'string' ? parseInt(tx.type, 16) : tx.type;
+
+        // Downgrade type 3/4 to legacy
         if (t > 2) {
           tx.type = '0x0';
           delete tx.maxFeePerGas;
           delete tx.maxPriorityFeePerGas;
           if (!tx.gasPrice) tx.gasPrice = '0x3B9ACA00';
         }
-        return orig({ method: args.method, params: [tx] });
+
+        // Try normal send first
+        try {
+          return await orig({ method: args.method, params: [tx] });
+        } catch (err: any) {
+          const msg = (err?.message || '').toLowerCase();
+          // If chain rejects tx type, try sign-then-send
+          if (msg.includes('type not supported') || msg.includes('not supported')) {
+            try {
+              // Step 1: Ask wallet to sign the transaction (legacy format)
+              const signed = await orig({
+                method: 'eth_signTransaction',
+                params: [{ ...tx, type: '0x0' }],
+              });
+              // Step 2: Broadcast the raw signed transaction
+              return await orig({
+                method: 'eth_sendRawTransaction',
+                params: [signed],
+              });
+            } catch {
+              // eth_signTransaction not supported, re-throw original
+              throw err;
+            }
+          }
+          throw err;
+        }
       }
       return orig(args);
     };
     p.__ritualPatched = true;
   };
 
-  // Immediate patch
+  // Patch immediately
   patch((window as any).ethereum);
   patch((window as any).rabby);
 
-  // Patch when provider appears (wallet injects async)
-  const observer = setInterval(() => {
+  // Poll for provider (wallet injects async)
+  const poll = setInterval(() => {
     patch((window as any).ethereum);
     patch((window as any).rabby);
     const eth = (window as any).ethereum;
-    if (eth?.providers && Array.isArray(eth.providers)) {
-      eth.providers.forEach(patch);
-    }
+    if (eth?.providers?.forEach) eth.providers.forEach(patch);
   }, 100);
-
-  // Stop polling after 10s
-  setTimeout(() => clearInterval(observer), 10000);
+  setTimeout(() => clearInterval(poll), 10000);
 }
 
 export const config = getDefaultConfig({
