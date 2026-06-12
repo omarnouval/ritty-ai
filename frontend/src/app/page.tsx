@@ -6,7 +6,8 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
-import ColorBends from '@/components/reactbits/ColorBends';
+import dynamic from 'next/dynamic';
+const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false });
 
 const HERO_LINES: Record<string, { line1: string; prefix: string; boldWord: string }> = {
   en: { line1: "You Don't Need", prefix: 'to', boldWord: 'Code' },

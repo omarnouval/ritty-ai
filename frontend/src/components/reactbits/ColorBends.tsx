@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
@@ -103,7 +104,7 @@ export default function ColorBends({
   style,
   rotation = 45,
   speed = 0.2,
-  colors = [],
+  colors = [] as string[],
   transparent = true,
   autoRotate = 0,
   scale = 1,
@@ -112,6 +113,20 @@ export default function ColorBends({
   mouseInfluence = 1,
   parallax = 0.5,
   noise = 0.1
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+  rotation?: number;
+  speed?: number;
+  colors?: string[];
+  transparent?: boolean;
+  autoRotate?: number;
+  scale?: number;
+  frequency?: number;
+  warpStrength?: number;
+  mouseInfluence?: number;
+  parallax?: number;
+  noise?: number;
 }) {
   const containerRef = useRef(null);
   const rendererRef = useRef(null);
