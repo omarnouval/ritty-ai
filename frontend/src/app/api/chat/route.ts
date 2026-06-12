@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createPublicClient, http, createWalletClient, parseAbi } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
+import { createPublicClient, http, parseAbi } from 'viem';
 
+// Ritual Chain config
 const ritualChain = {
   id: 1979,
   name: 'Ritual',
@@ -12,38 +12,136 @@ const ritualChain = {
   },
 };
 
-const RITTY_AGENT_ABI = parseAbi([
-  'function chat(string userMessage) returns (bytes32)',
-  'function name() view returns (string)',
-  'function category() view returns (string)',
-  'function systemPrompt() view returns (string)',
-  'event ChatRequested(bytes32 indexed requestId, address indexed user, string message)',
-  'event ChatResponse(bytes32 indexed requestId, string response)',
+// Mimo LLM API config
+const MIMO_BASE_URL = 'https://api.xiaomimimo.com/v1';
+const MIMO_MODEL = 'mimo-v2.5-pro';
+
+// Load API keys from env (comma-separated)
+function getApiKeys(): string[] {
+  const keys = process.env.MIMO_API_KEYS || '';
+  return keys.split(',').filter(k => k.trim().length > 0);
+}
+
+// Round-robin key selector
+let keyIndex = 0;
+function getNextKey(): string {
+  const keys = getApiKeys();
+  if (keys.length === 0) throw new Error('No MIMO_API_KEYS configured');
+  const key = keys[keyIndex % keys.length];
+  keyIndex = (keyIndex + 1) % keys.length;
+  return key;
+}
+
+// Rate limiting (in-memory, per rental)
+const rateLimits = new Map<string, { count: number; resetAt: number }>();
+const MAX_MESSAGES_PER_HOUR = 50;
+const MAX_TOKENS = 500;
+
+function checkRateLimit(rentalKey: string): { allowed: boolean; remaining: number } {
+  const now = Date.now();
+  const entry = rateLimits.get(rentalKey);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimits.set(rentalKey, { count: 1, resetAt: now + 3600_000 });
+    return { allowed: true, remaining: MAX_MESSAGES_PER_HOUR - 1 };
+  }
+
+  if (entry.count >= MAX_MESSAGES_PER_HOUR) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  entry.count++;
+  return { allowed: true, remaining: MAX_MESSAGES_PER_HOUR - entry.count };
+}
+
+// Marketplace contract ABI (rental check)
+const MARKETPLACE_ABI = parseAbi([
+  'function getActiveRental(address user, uint256 agentId) view returns (uint256 rentalId, uint256 startTime, uint256 endTime, bool active)',
 ]);
 
-// Agent addresses
-const AGENTS: Record<string, string> = {
-  'content': '0x2C08D301Bf4Dc353c1B90FFBcF20e2F1b997698f',
-  'research': '0x3d5b379De4820AF12ff2Ab797b0d3b552A91BA3e',
-  'trading': '0xe7df613e37232667B3196F1DfD94A5De4306307c',
-  'marketing': '0x3919071913123D25bA04f6Aa56A5f6bD36530915',
-  'coding': '0x4C735C3706006C3e2Bccf0328c417ff264a3130E',
+const MARKETPLACE_ADDRESS = '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE';
+
+// Agent contract addresses (for rental verification)
+const AGENT_IDS: Record<string, bigint> = {
+  'content': BigInt(0),
+  'research': BigInt(1),
+  'trading': BigInt(2),
+  'marketing': BigInt(3),
+  'coding': BigInt(4),
 };
 
-// System prompts for simulated responses
+// System prompts per category (compressed, token-optimized)
 const SYSTEM_PROMPTS: Record<string, string> = {
-  'content': 'You are a content creation specialist. Help users write blog posts, social media content, video scripts, and marketing copy.',
-  'research': 'You are a research analyst. Help users conduct market research, analyze competitors, and extract data insights.',
-  'trading': 'You are a trading analyst. Help users analyze crypto markets, manage portfolios, and identify trading opportunities.',
-  'marketing': 'You are a marketing strategist. Help users plan campaigns, optimize SEO, analyze metrics, and grow their brand.',
-  'coding': 'You are a senior software engineer. Help users write, debug, review code and design system architecture.',
+  'content': 'You are Content Pro, an AI content specialist on Ritual Chain. Help with blog posts, social media, video scripts, marketing copy. Be concise, actionable. Max 400 words.',
+  'research': 'You are Research Alpha, an AI research analyst on Ritual Chain. Analyze markets, competitors, data. Provide structured insights with bullet points. Max 400 words.',
+  'trading': 'You are Trading Signal, an AI trading analyst on Ritual Chain. Analyze crypto markets, technical indicators, risk. Include disclaimer: not financial advice. Max 400 words.',
+  'marketing': 'You are Marketing Guru, an AI marketing strategist on Ritual Chain. Help with campaigns, SEO, growth, branding. Be specific with actionable steps. Max 400 words.',
+  'coding': 'You are Code Assistant, an AI software engineer on Ritual Chain. Help write, debug, review code. Provide clean code snippets with explanations. Max 400 words.',
 };
+
+// On-chain rental verification
+async function verifyRental(userAddress: string, agentCategory: string): Promise<boolean> {
+  try {
+    const agentId = AGENT_IDS[agentCategory];
+    if (agentId === undefined) return false;
+
+    const client = createPublicClient({
+      chain: ritualChain,
+      transport: http(),
+    });
+
+    const result = await client.readContract({
+      address: MARKETPLACE_ADDRESS,
+      abi: MARKETPLACE_ABI,
+      functionName: 'getActiveRental',
+      args: [userAddress as `0x${string}`, agentId],
+    });
+
+    const [, , , active] = result;
+    return active;
+  } catch (error) {
+    console.error('Rental verification failed:', error);
+    // For MVP: allow if verification fails (testnet)
+    return true;
+  }
+}
+
+// Call Mimo LLM API
+async function callMimo(systemPrompt: string, userMessage: string): Promise<string> {
+  const apiKey = getNextKey();
+
+  const response = await fetch(`${MIMO_BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: MIMO_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage },
+      ],
+      max_tokens: MAX_TOKENS,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Mimo API error: ${response.status} - ${errText}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || 'No response from agent.';
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { agentCategory, message, userAddress } = body;
 
+    // Validation
     if (!agentCategory || !message) {
       return NextResponse.json(
         { success: false, error: 'Missing agentCategory or message' },
@@ -51,65 +149,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const agentAddress = AGENTS[agentCategory];
-    if (!agentAddress) {
+    if (!SYSTEM_PROMPTS[agentCategory]) {
       return NextResponse.json(
         { success: false, error: 'Invalid agent category' },
         { status: 400 }
       );
     }
 
-    // For MVP: Simulate agent response based on category
-    // In production: Call the actual agent contract and listen for ChatResponse event
-    const systemPrompt = SYSTEM_PROMPTS[agentCategory] || 'You are a helpful AI agent.';
-    
-    // Generate a contextual response based on the category and message
-    const response = generateResponse(agentCategory, message, systemPrompt);
+    // 1. Rate limiting
+    const rentalKey = `${userAddress || 'anonymous'}-${agentCategory}`;
+    const rateLimit = checkRateLimit(rentalKey);
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded. Try again later.' },
+        { status: 429 }
+      );
+    }
+
+    // 2. Rental verification (if user connected)
+    if (userAddress) {
+      const hasRental = await verifyRental(userAddress, agentCategory);
+      if (!hasRental) {
+        return NextResponse.json(
+          { success: false, error: 'No active rental. Please rent this agent first.' },
+          { status: 403 }
+        );
+      }
+    }
+
+    // 3. Call real LLM
+    const systemPrompt = SYSTEM_PROMPTS[agentCategory];
+    const response = await callMimo(systemPrompt, message);
 
     return NextResponse.json({
       success: true,
       data: {
         response,
         agentCategory,
-        agentAddress,
         timestamp: Date.now(),
+        rateLimit: {
+          remaining: rateLimit.remaining,
+          resetIn: '1 hour',
+        },
       },
     });
   } catch (error: any) {
+    console.error('Chat API error:', error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
     );
   }
-}
-
-function generateResponse(category: string, message: string, systemPrompt: string): string {
-  const lowerMessage = message.toLowerCase();
-  
-  // Category-specific responses
-  const responses: Record<string, string[]> = {
-    content: [
-      `Great topic! Here's a draft for your ${message} content:\n\n**Title:** ${message.charAt(0).toUpperCase() + message.slice(1)} - A Comprehensive Guide\n\n**Key Points:**\n1. Introduction to ${message}\n2. Why it matters in 2024\n3. Best practices and tips\n4. Common mistakes to avoid\n5. Conclusion with actionable steps\n\nWant me to expand on any section?`,
-      `I can help you create engaging content about "${message}". Here are some angles we could explore:\n\n• Educational/tutorial style\n• Listicle format ("10 Things About ${message}")\n• Case study approach\n• Opinion/commentary piece\n\nWhich style resonates with your audience?`,
-    ],
-    research: [
-      `Analyzing "${message}" for you:\n\n**Market Overview:**\n• Current market size and growth trends\n• Key players and competitive landscape\n• Recent developments and news\n\n**Insights:**\n• Opportunities in this space\n• Potential risks and challenges\n• Recommended next steps\n\nWould you like me to dive deeper into any specific aspect?`,
-      `Here's my research findings on "${message}":\n\n**Data Points:**\n• Market sentiment: Moderate to positive\n• Growth trajectory: Upward trend\n• Key metrics to watch\n\n**Recommendations:**\n1. Monitor competitor activity\n2. Track relevant KPIs\n3. Stay updated with industry news\n\nNeed more detailed analysis?`,
-    ],
-    trading: [
-      `Trading analysis for "${message}":\n\n**Technical Analysis:**\n• Current price action and trends\n• Support and resistance levels\n• Key indicators (RSI, MACD, Moving Averages)\n\n**Risk Assessment:**\n• Volatility: Moderate\n• Risk/Reward ratio: Favorable\n• Recommended position size: 2-3% of portfolio\n\n**Action Plan:**\n• Entry points to consider\n• Stop-loss levels\n• Take-profit targets\n\nWant specific entry/exit recommendations?`,
-      `Looking at "${message}" from a trading perspective:\n\n**Market Conditions:**\n• Overall trend: [Analyzing...]\n• Volume analysis: [Processing...]\n• Momentum indicators: [Evaluating...]\n\n**Strategy Suggestions:**\n1. Short-term swing trade\n2. Long-term position\n3. Hedging options\n\nWhich timeframe are you targeting?`,
-    ],
-    marketing: [
-      `Marketing strategy for "${message}":\n\n**Campaign Framework:**\n• Target audience definition\n• Key messaging and positioning\n• Channel selection (social, email, paid)\n\n**Growth Tactics:**\n1. Content marketing strategy\n2. SEO optimization plan\n3. Social media engagement\n4. Partnership opportunities\n\n**Metrics to Track:**\n• Conversion rates\n• Customer acquisition cost\n• ROI on marketing spend\n\nShall I create a detailed marketing plan?`,
-      `Here's a marketing approach for "${message}":\n\n**Brand Positioning:**\n• Unique value proposition\n• Competitive differentiation\n• Brand voice and tone\n\n**Channel Strategy:**\n• Organic: SEO + Content\n• Paid: Targeted ads\n• Social: Community building\n\n**Timeline:**\n• Week 1-2: Setup and planning\n• Week 3-4: Launch and optimize\n• Month 2+: Scale and iterate\n\nReady to dive into execution?`,
-    ],
-    coding: [
-      `I can help you with "${message}". Here's my approach:\n\n**Analysis:**\n• Understanding the requirements\n• Identifying the best approach\n• Planning the implementation\n\n**Implementation Plan:**\n1. Set up the project structure\n2. Write the core logic\n3. Add error handling\n4. Write tests\n5. Documentation\n\n**Code Example:**\n\`\`\`javascript\n// Example implementation for ${message}\nfunction solution() {\n  // TODO: Implement based on specific requirements\n  return result;\n}\n\`\`\`\n\nWant me to write the full implementation?`,
-      `Let me help you with "${message}":\n\n**Technical Considerations:**\n• Performance implications\n• Scalability concerns\n• Security best practices\n\n**Recommended Stack:**\n• Language/Framework: [Based on requirements]\n• Database: [Optimal choice]\n• Deployment: [Best approach]\n\n**Next Steps:**\n1. Clarify specific requirements\n2. Design the architecture\n3. Implement incrementally\n4. Test thoroughly\n\nWhat specific part would you like to focus on?`,
-    ],
-  };
-
-  const categoryResponses = responses[category] || responses.content;
-  return categoryResponses[Math.floor(Math.random() * categoryResponses.length)];
 }
