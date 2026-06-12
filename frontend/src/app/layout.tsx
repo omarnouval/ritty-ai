@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Ritty.ai — Deploy Autonomous AI Agents On-Chain",
+  title: "Ritty.ai — Rent AI Agents. Instantly.",
   description: "The future is agent-native. Build yours on Ritual Chain.",
 };
 
