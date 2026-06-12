@@ -83,8 +83,6 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
         abi: PROFILE_ABI,
         functionName: 'createProfile',
         args: [username, bio || 'Ritty.ai user'],
-        type: 'legacy' as const,
-        gasPrice: BigInt(1000000000), // 1 gwei - force legacy tx
       });
       setTxHash(hash);
     } catch (err: any) {

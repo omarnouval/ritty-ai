@@ -36,8 +36,6 @@ export function CreateAgentForm() {
           parseEther(form.pricePerHour),
           form.agentType,
         ],
-        type: 'legacy' as const,
-        gasPrice: BigInt(1000000000), // 1 gwei - force legacy tx
       });
       setTxHash(hash);
     } catch (err) {

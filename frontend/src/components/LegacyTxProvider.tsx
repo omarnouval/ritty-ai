@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 /**
- * Forces legacy (type 0) transactions for Ritual Chain (1979).
- * 
- * Rabby wallet auto-upgrades transactions to EIP-1559 (type 2),
- * but Ritual Chain's RPC rejects type 2 transactions.
+ * Ritual Chain (1979) supports legacy (type 0) and EIP-1559 (type 2),
+ * but does NOT support EIP-4844 (type 3) or EIP-7702 (type 4).
+ *
+ * Some wallets (Rabby) auto-send newer tx types that the chain rejects.
+ * This provider strips unsupported tx type fields while keeping EIP-1559 intact.
  */
 
 if (typeof window !== 'undefined') {
@@ -29,53 +30,35 @@ function patchProvider(provider: any) {
     ) {
       const tx = { ...args.params[0] };
 
-      // Strip EIP-1559 fields
-      delete tx.maxFeePerGas;
-      delete tx.maxPriorityFeePerGas;
+      // Strip EIP-4844 (blob) fields — type 3
       delete tx.maxFeePerBlobGas;
-      delete tx.accessList;
-      delete tx.authorizationList;
-      delete tx.blobs;
       delete tx.blobVersionedHashes;
+      delete tx.blobs;
 
-      // Force legacy
-      tx.type = '0x0';
-      if (!tx.gasPrice) {
-        tx.gasPrice = '0x3B9ACA00';
-      }
+      // Strip EIP-7702 (authorization) fields — type 4
+      delete tx.authorizationList;
 
-      try {
-        return await originalRequest({ method: args.method, params: [tx] });
-      } catch (err: any) {
-        const errMsg = err?.message || err?.data?.message || '';
-        if (
-          errMsg.includes('transaction type not supported') ||
-          errMsg.includes('type not supported')
-        ) {
-          // Try eth_signTransaction + eth_sendRawTransaction
-          try {
-            const signed = await originalRequest({
-              method: 'eth_signTransaction',
-              params: [tx],
-            });
-            return await originalRequest({
-              method: 'eth_sendRawTransaction',
-              params: [signed],
-            });
-          } catch {
-            throw err;
-          }
+      // If wallet sent type 3 or 4, downgrade to type 2 (EIP-1559)
+      if (tx.type === '0x3' || tx.type === '0x4' || tx.type === 3 || tx.type === 4) {
+        tx.type = '0x2';
+        // Ensure EIP-1559 fields exist
+        if (!tx.maxFeePerGas) {
+          tx.maxFeePerGas = '0x3B9ACA00'; // 1 gwei
         }
-        throw err;
+        if (!tx.maxPriorityFeePerGas) {
+          tx.maxPriorityFeePerGas = '0x3B9ACA00'; // 1 gwei
+        }
       }
+
+      return originalRequest({ method: args.method, params: [tx] });
     }
+
     return originalRequest(args);
   };
 
   provider.__legacyPatched = true;
 }
 
-// Detect wallet type
 function detectWallet(): string {
   if (typeof window === 'undefined') return 'unknown';
   const eth = (window as any).ethereum;
@@ -89,8 +72,6 @@ function detectWallet(): string {
 
 export function LegacyTxProvider({ children }: { children: React.ReactNode }) {
   const { isConnected } = useAccount();
-  const [walletName, setWalletName] = useState<string>('unknown');
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     patchProvider((window as any).ethereum);
@@ -100,56 +81,7 @@ export function LegacyTxProvider({ children }: { children: React.ReactNode }) {
     if (eth?.providers && Array.isArray(eth.providers)) {
       eth.providers.forEach(patchProvider);
     }
+  }, []);
 
-    if (isConnected) {
-      setWalletName(detectWallet());
-    }
-  }, [isConnected]);
-
-  return (
-    <>
-      {isConnected && walletName === 'rabby' && !dismissed && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-            background: 'linear-gradient(135deg, #ff6b35 0%, #d63031 100%)',
-            padding: '10px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            fontSize: '13px',
-            color: 'white',
-            fontWeight: 500,
-          }}
-        >
-          <span>⚠️</span>
-          <span>
-            Rabby wallet has compatibility issues with Ritual Chain. Please use{' '}
-            <strong>OKX Wallet</strong> or <strong>MetaMask</strong> for transactions.
-          </span>
-          <button
-            onClick={() => setDismissed(true)}
-            style={{
-              background: 'rgba(255,255,255,0.2)',
-              border: 'none',
-              color: 'white',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '12px',
-              fontWeight: 600,
-            }}
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
