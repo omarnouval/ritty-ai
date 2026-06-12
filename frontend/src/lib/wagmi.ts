@@ -24,6 +24,6 @@ export const ritual = defineChain({
 
 export const config = getDefaultConfig({
   appName: 'Ritty.ai',
-  projectId: 'ritty-ai-demo', // WalletConnect project ID
+  projectId: '3d4e82389f1dbf057f8b96f6ca197d24', // WalletConnect project ID
   chains: [ritual],
 });
