@@ -38,6 +38,7 @@ export default function AgentRentPage() {
         <div className="flex items-center gap-3 md:gap-6">
           <Link href="/agent-rent" className="hidden md:block text-sm text-[#40FFAF] font-medium">{t('buttons.marketplace')}</Link>
           <Link href="/how-it-works" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('nav.howItWorks')}</Link>
+          <Link href="/feedback" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Feedback</Link>
           {isConnected && (
             <Link href="/dashboard" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('nav.dashboard')}</Link>
           )}

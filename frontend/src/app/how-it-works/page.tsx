@@ -21,6 +21,7 @@ export default function HowItWorksPage() {
         <div className="hidden md:flex items-center gap-10">
           <Link href="/agent-rent" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>{t('buttons.marketplace')}</Link>
           <Link href="/how-it-works" className="text-sm transition-colors hover:text-white" style={{ color: '#40FFAF' }}>{t('nav.howItWorks')}</Link>
+          <Link href="/feedback" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>Feedback</Link>
           {isConnected && (
             <Link href="/dashboard" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>{t('nav.dashboard')}</Link>
           )}
