@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
-import { parseEther, formatEther } from 'viem';
+import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
+import { formatEther } from 'viem';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
+import { UsernameModal } from '@/components/UsernameModal';
 
 export default function AgentDetailPage() {
   const params = useParams();
@@ -26,6 +28,7 @@ export default function AgentDetailPage() {
   const [selectedHours, setSelectedHours] = useState(1);
   const [customHours, setCustomHours] = useState('');
   const [useCustom, setUseCustom] = useState(false);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
 
   // Fetch agent data
   const { data: agent, isLoading } = useReadContract({
@@ -43,13 +46,22 @@ export default function AgentDetailPage() {
     args: [agentId, BigInt(useCustom ? (parseInt(customHours) || 1) : selectedHours)],
   });
 
+  // Check if user has profile on-chain
+  const { data: hasProfile } = useReadContract({
+    address: PROFILE_ADDRESS,
+    abi: PROFILE_ABI,
+    functionName: 'hasProfile',
+    args: address ? [address] : undefined,
+    query: { enabled: !!address },
+  });
+
   // Rent agent
   const { data: rentHash, writeContract: rentAgent, isPending: isRenting } = useWriteContract();
   const { isLoading: isRentConfirming, isSuccess: isRentSuccess } = useWaitForTransactionReceipt({
     hash: rentHash,
   });
 
-  const handleRent = () => {
+  const doRent = () => {
     const hours = useCustom ? parseInt(customHours) || 1 : selectedHours;
     if (!rentalCost) return;
     rentAgent({
@@ -59,9 +71,24 @@ export default function AgentDetailPage() {
       args: [agentId, BigInt(hours)],
       value: rentalCost,
       type: 'legacy' as const,
-      gasPrice: BigInt(1000000000), // 1 gwei - force legacy tx
+      gasPrice: BigInt(1000000000),
     });
   };
+
+  const handleRent = () => {
+    // Check if user has profile first
+    if (hasProfile === false) {
+      setShowUsernameModal(true);
+      return;
+    }
+    doRent();
+  };
+
+  // After username created, auto-rent
+  const handleUsernameComplete = useCallback((username: string) => {
+    setShowUsernameModal(false);
+    doRent();
+  }, [rentalCost, selectedHours, customHours, useCustom]);
 
   if (isLoading) {
     return (
@@ -97,6 +124,7 @@ export default function AgentDetailPage() {
 
   return (
     <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
+      {showUsernameModal && <UsernameModal onComplete={handleUsernameComplete} />}
       <Nav />
 
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 md:py-8">
