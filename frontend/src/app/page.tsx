@@ -124,14 +124,17 @@ export default function Home() {
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
-          <Link href="/agent-rent" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
+          <Link href="/agent-rent" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
             {nav.agentRent}
           </Link>
-          <Link href="/how-it-works" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
+          <Link href="/how-it-works" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
             {nav.howItWorks}
           </Link>
+          <Link href="/feedback" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
+            Feedback
+          </Link>
           {isConnected && (
-            <Link href="/dashboard" className="text-sm transition-colors hover:text-white" style={{ color: '#A1A1AA' }}>
+            <Link href="/dashboard" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
               {nav.dashboard}
             </Link>
           )}
