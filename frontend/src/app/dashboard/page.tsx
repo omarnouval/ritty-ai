@@ -19,6 +19,30 @@ interface ActiveRental {
   agentAddress: string;
 }
 
+function DashboardNav({ username }: { username?: string | null }) {
+  return (
+    <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b gap-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <Link href="/" className="flex items-center gap-2 shrink-0">
+        <Image src="/ritty-logo.png" alt="Ritty.ai" width={32} height={32} className="h-7 md:h-8 w-auto" />
+        <span className="text-base md:text-lg font-heavy text-white">Ritty.ai</span>
+      </Link>
+      <div className="flex items-center gap-2 md:gap-6 shrink-0">
+        <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
+        <Link href="/dashboard" className="hidden md:block text-sm text-[#40FFAF] font-medium">Dashboard</Link>
+        <div className="flex items-center gap-2">
+          {username && (
+            <span className="hidden md:inline text-sm text-gray-300 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(64,255,175,0.08)', border: '1px solid rgba(64,255,175,0.15)' }}>
+              @{username}
+            </span>
+          )}
+          <ConnectButton />
+          <LanguageSwitcher />
+        </div>
+      </div>
+    </nav>
+  );
+}
+
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -92,19 +116,9 @@ export default function DashboardPage() {
   if (!isConnected) {
     return (
       <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
-        <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-          <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/ritty-logo.png" alt="Ritty.ai" width={32} height={32} className="h-8 w-auto" />
-            <span className="text-lg font-heavy text-white">Ritty.ai</span>
-          </Link>
-          <div className="flex items-center gap-3 md:gap-6">
-            <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
-            <ConnectButton />
-            <LanguageSwitcher />
-          </div>
-        </nav>
-        <div className="flex flex-col items-center justify-center" style={{ minHeight: 'calc(100vh - 64px)' }}>
-          <p className="text-gray-400 mb-4">Connect your wallet to access the dashboard</p>
+        <DashboardNav />
+        <div className="flex flex-col items-center justify-center px-4" style={{ minHeight: 'calc(100vh - 64px)' }}>
+          <p className="text-gray-400 mb-4 text-center">Connect your wallet to access the dashboard</p>
           <ConnectButton />
         </div>
       </main>
@@ -113,28 +127,9 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
-      {/* Nav */}
-      <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/ritty-logo.png" alt="Ritty.ai" width={32} height={32} className="h-8 w-auto" />
-          <span className="text-lg font-heavy text-white">Ritty.ai</span>
-        </Link>
-        <div className="flex items-center gap-3 md:gap-6">
-          <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Agent Rent</Link>
-          <Link href="/dashboard" className="hidden md:block text-sm text-[#40FFAF] font-medium">Dashboard</Link>
-          <div className="flex items-center gap-2">
-            {username && (
-              <span className="text-sm text-gray-300 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(64,255,175,0.08)', border: '1px solid rgba(64,255,175,0.15)' }}>
-                @{username}
-              </span>
-            )}
-            <ConnectButton />
-            <LanguageSwitcher />
-          </div>
-        </div>
-      </nav>
+      <DashboardNav username={username} />
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-6 md:py-8">
         {/* Active Rentals */}
         {activeRentals.length > 0 && (
           <div className="mb-8">

@@ -97,18 +97,18 @@ export default function AgentDetailPage() {
     <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
       <Nav />
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 md:py-8">
         {/* Back link */}
         <Link href="/agent-rent" className="text-gray-500 text-sm hover:text-white transition mb-6 inline-block">
           {t('agent.backToRent')}
         </Link>
 
         {/* Agent Header */}
-        <div className="glass rounded-2xl p-8 mb-6">
-          <div className="flex items-start justify-between mb-6">
+        <div className="glass rounded-2xl p-4 md:p-8 mb-6">
+          <div className="flex flex-col md:flex-row items-start justify-between mb-6 gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-heavy text-white">{name}</h1>
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <h1 className="text-2xl md:text-3xl font-heavy text-white">{name}</h1>
                 <span className={`text-xs px-2 py-0.5 rounded-full ${isActive ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                   {isActive ? t('agent.active') : t('agent.inactive')}
                 </span>
@@ -128,7 +128,7 @@ export default function AgentDetailPage() {
           <p className="text-gray-300 leading-relaxed mb-6">{description}</p>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="text-gray-500 text-xs mb-1">{t('agent.totalRentals')}</div>
               <div className="text-white text-xl font-heavy">{Number(totalRentals)}</div>
@@ -145,7 +145,7 @@ export default function AgentDetailPage() {
         </div>
 
         {/* Rental Section */}
-        <div className="glass rounded-2xl p-8">
+        <div className="glass rounded-2xl p-4 md:p-8">
           <h2 className="text-xl font-heavy text-white mb-6">{t('agent.rentTitle')}</h2>
 
           {/* Duration Presets */}
@@ -262,13 +262,13 @@ export default function AgentDetailPage() {
 function Nav() {
   const { t } = useTranslations();
   return (
-    <nav className="flex justify-between items-center px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-      <Link href="/" className="flex items-center gap-2.5">
-        <img src="/ritty-logo.png" alt="Ritty.ai" className="h-8 w-auto" />
-        <span className="text-lg font-heavy text-white">Ritty.ai</span>
+    <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b gap-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <Link href="/" className="flex items-center gap-2 shrink-0">
+        <img src="/ritty-logo.png" alt="Ritty.ai" className="h-7 md:h-8 w-auto" />
+        <span className="text-base md:text-lg font-heavy text-white">Ritty.ai</span>
       </Link>
-      <div className="flex items-center gap-6">
-        <Link href="/agent-rent" className="text-sm text-gray-400 hover:text-white transition">{t('buttons.marketplace')}</Link>
+      <div className="flex items-center gap-2 md:gap-6 shrink-0">
+        <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('buttons.marketplace')}</Link>
         <ConnectButton />
         <LanguageSwitcher />
       </div>

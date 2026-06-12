@@ -117,10 +117,10 @@ export default function Home() {
       </div>
 
       {/* ─── Nav ─── */}
-      <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 lg:px-12 py-4" style={{ borderBottom: '1px solid #161616' }}>
-        <Link href="/" className="flex items-center gap-2 md:gap-3">
-          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-8 md:h-10 w-auto" />
-          <span className="text-lg md:text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
+      <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 lg:px-12 py-3 md:py-4 gap-2" style={{ borderBottom: '1px solid #161616' }}>
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-7 md:h-10 w-auto" />
+          <span className="text-base md:text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-10">
