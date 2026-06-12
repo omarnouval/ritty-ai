@@ -20,7 +20,6 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
 
-  // Check if user already has profile
   const { data: hasProfile, isLoading: isCheckingProfile } = useReadContract({
     address: PROFILE_ADDRESS,
     abi: PROFILE_ABI,
@@ -29,21 +28,12 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
     query: { enabled: !!address },
   });
 
-  // If already has profile, skip modal
   useEffect(() => {
     if (hasProfile === true) {
       onComplete('');
     }
   }, [hasProfile, onComplete]);
 
-  // Show modal after profile check completes
-  useEffect(() => {
-    if (!isCheckingProfile && hasProfile === false) {
-      // Profile doesn't exist, modal should be visible
-    }
-  }, [isCheckingProfile, hasProfile]);
-
-  // Check username availability with debounce
   useEffect(() => {
     if (username.length < 3) {
       setIsAvailable(null);
@@ -53,14 +43,13 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
     const check = async () => {
       setIsChecking(true);
       try {
-        // Simple client-side check
         const isValid = /^[a-zA-Z0-9_]{3,20}$/.test(username);
         if (!isValid) {
           setError('Only letters, numbers, underscore (3-20 chars)');
           setIsAvailable(false);
         } else {
           setError('');
-          setIsAvailable(true); // Optimistic — will verify on-chain
+          setIsAvailable(true);
         }
       } catch {
         setIsAvailable(false);
@@ -94,10 +83,8 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
     }
   };
 
-  // On success
   useEffect(() => {
     if (isSuccess) {
-      // Save to localStorage
       localStorage.setItem(`ritty_username_${address}`, username);
       onComplete(username);
     }

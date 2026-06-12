@@ -40,7 +40,6 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
   const [hours, setHours] = useState(1);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
 
-  // Check if user has profile on-chain
   const { data: hasProfile } = useReadContract({
     address: PROFILE_ADDRESS,
     abi: PROFILE_ABI,
@@ -48,13 +47,6 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
     args: address ? [address] : undefined,
     query: { enabled: !!address },
   });
-
-  // After username created, auto-rent
-  const handleUsernameComplete = useCallback((username: string) => {
-    setShowUsernameModal(false);
-    // Proceed with rent after profile created
-    doRent();
-  }, [agent.id, hours]);
 
   const doRent = async () => {
     try {
@@ -71,19 +63,20 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
     }
   };
 
+  const handleUsernameComplete = useCallback((username: string) => {
+    setShowUsernameModal(false);
+    doRent();
+  }, [agent.id, hours]);
+
   const handleRent = async () => {
     if (!isConnected) {
       openConnectModal?.();
       return;
     }
-
-    // Check if user has profile first
     if (hasProfile === false) {
       setShowUsernameModal(true);
       return;
     }
-
-    // Has profile, proceed with rent
     await doRent();
   };
 
@@ -155,13 +148,11 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
     );
   }
 
-  // Grid view (default)
   return (
     <>
       {showUsernameModal && <UsernameModal onComplete={handleUsernameComplete} />}
       <Link href={`/agent/${agent.id.toString()}`}>
         <div className="glass rounded-2xl p-5 hover:bg-white/[0.06] transition group cursor-pointer">
-        {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{ background: `rgba(${agent.agentType === 0 ? '59,130,246' : '168,85,247'},0.12)` }}>
@@ -174,17 +165,14 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           </div>
         </div>
 
-        {/* Description */}
         <p className="text-xs text-gray-400 leading-relaxed mb-4 line-clamp-2">{agent.description}</p>
 
-        {/* Capabilities */}
         <div className="flex flex-wrap gap-1.5 mb-4">
           {caps.map((cap) => (
             <span key={cap} className={`pill pill-${CAP_COLORS[cap] || 'orange'}`}>{cap}</span>
           ))}
         </div>
 
-        {/* Stats */}
         <div className="flex items-center gap-3 mb-4 text-xs text-gray-500">
           <span className="text-yellow-400">{'★'.repeat(Math.round(rating))}{'☆'.repeat(5 - Math.round(rating))}</span>
           <span>({agent.ratingCount.toString()})</span>
@@ -192,7 +180,6 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           <span>{agent.totalRentals.toString()} {t('agent.rentals')}</span>
         </div>
 
-        {/* Footer */}
         <div className="flex items-center justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex items-center gap-2">
             <select
