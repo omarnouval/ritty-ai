@@ -7,8 +7,22 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from '@/lib/wagmi';
 import { LanguageProvider } from '@/lib/i18n/LanguageContext';
 import { LegacyTxProvider } from '@/components/LegacyTxProvider';
+import { useRabbyDetect } from '@/lib/useRabbyDetect';
+import { RabbyWarning } from '@/components/RabbyWarning';
+import { useState } from 'react';
 
 const queryClient = new QueryClient();
+
+function RabbyGuard({ children }: { children: React.ReactNode }) {
+  const isRabby = useRabbyDetect();
+  const [dismissed, setDismissed] = useState(false);
+  return (
+    <>
+      {isRabby && !dismissed && <RabbyWarning onClose={() => setDismissed(true)} />}
+      {children}
+    </>
+  );
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -17,7 +31,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider theme={darkTheme({ accentColor: '#40FFAF' })}>
             <LegacyTxProvider>
-              {children}
+              <RabbyGuard>
+                {children}
+              </RabbyGuard>
             </LegacyTxProvider>
           </RainbowKitProvider>
         </QueryClientProvider>
