@@ -21,7 +21,6 @@ const AGENT_TYPES = [
 export default function RequestAgentModal({ isOpen, onClose }: Props) {
   const [agentType, setAgentType] = useState('');
   const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState('');
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,7 +42,7 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
           name,
           email: contact,
           category: 'request',
-          message: `🛠️ AGENT REQUEST\n\nType: ${agentType}\nDescription: ${description}\nBudget: ${budget || 'Not specified'}\nContact: ${contact || 'Not provided'}`,
+          message: `🛠️ AGENT REQUEST\n\nType: ${agentType}\nDescription: ${description}\nContact: ${contact || 'Not provided'}`,
         }),
       });
 
@@ -64,12 +63,17 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
   const resetAndClose = () => {
     setAgentType('');
     setDescription('');
-    setBudget('');
     setName('');
     setContact('');
     setSubmitted(false);
     setError('');
     onClose();
+  };
+
+  const selectStyle: React.CSSProperties = {
+    background: '#0A0A0A',
+    border: '1px solid rgba(255,255,255,0.08)',
+    color: '#fff',
   };
 
   return (
@@ -106,12 +110,12 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
                 value={agentType}
                 onChange={(e) => setAgentType(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none appearance-none cursor-pointer"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none appearance-none cursor-pointer"
+                style={selectStyle}
               >
-                <option value="">Select type...</option>
+                <option value="" style={{ background: '#0A0A0A', color: '#9ca3af' }}>Select type...</option>
                 {AGENT_TYPES.map((type) => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} value={type} style={{ background: '#0A0A0A', color: '#fff' }}>{type}</option>
                 ))}
               </select>
             </div>
@@ -126,19 +130,6 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
                 rows={4}
                 placeholder="Describe the agent's capabilities, tasks, and any specific requirements..."
                 className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 outline-none resize-none"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-              />
-            </div>
-
-            {/* Budget */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">Budget (optional)</label>
-              <input
-                type="text"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                placeholder="e.g. 0.5 ETH/hour, $50-100 range"
-                className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 outline-none"
                 style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
               />
             </div>
