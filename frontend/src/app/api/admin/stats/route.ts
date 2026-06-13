@@ -90,7 +90,7 @@ export async function GET() {
     const currentBlock = await client.getBlockNumber();
     const CHUNK = 99999n;
     const renterAddresses = new Set<string>();
-    const rentalEvents: any[] = [];
+    const profileAddresses = new Set<string>();
 
     // Scan last 5M blocks for events
     const scanFrom = currentBlock > 5000000n ? currentBlock - 5000000n : 0n;
@@ -98,6 +98,7 @@ export async function GET() {
     for (let from = scanFrom; from <= currentBlock; from += CHUNK) {
       const to = from + CHUNK > currentBlock ? currentBlock : from + CHUNK;
       try {
+        // Scan marketplace events
         const logs = await client.getLogs({
           address: MARKETPLACE_ADDRESS as `0x${string}`,
           fromBlock: from,
@@ -107,13 +108,11 @@ export async function GET() {
         for (const log of logs) {
           if (log.topics[0] && log.topics.length >= 2) {
             const addr = '0x' + (log.topics[1] || '').slice(26);
-            // Filter out zero addresses, invalid, and non-real addresses
             const isValidAddr = addr && addr.length === 42 && !addr.match(/^0x0{40}$/i) && !addr.match(/^0x0000000000000000000000000000000000000/i);
             if (isValidAddr) {
               renterAddresses.add(addr.toLowerCase());
               allAddresses.add(addr.toLowerCase());
             }
-            // Also check topics[2] for renter address in AgentRented events
             if (log.topics[2]) {
               const addr2 = '0x' + (log.topics[2] || '').slice(26);
               const isValidAddr2 = addr2 && addr2.length === 42 && !addr2.match(/^0x0{40}$/i) && !addr2.match(/^0x0000000000000000000000000000000000000/i);
@@ -123,6 +122,28 @@ export async function GET() {
               }
             }
           }
+        }
+
+        // Scan profile contract events (createProfile calls)
+        try {
+          const profileLogs = await client.getLogs({
+            address: PROFILE_ADDRESS as `0x${string}`,
+            fromBlock: from,
+            toBlock: to,
+          });
+
+          for (const log of profileLogs) {
+            if (log.topics.length >= 2) {
+              const addr = '0x' + (log.topics[1] || '').slice(26);
+              const isValidAddr = addr && addr.length === 42 && !addr.match(/^0x0{40}$/i) && !addr.match(/^0x0000000000000000000000000000000000000/i);
+              if (isValidAddr) {
+                profileAddresses.add(addr.toLowerCase());
+                allAddresses.add(addr.toLowerCase());
+              }
+            }
+          }
+        } catch {
+          // Profile contract might not exist at this block range
         }
       } catch {
         // Skip chunk errors
@@ -151,6 +172,7 @@ export async function GET() {
           hasProfile: !!username,
           isOwner: agents.some(a => a.owner.toLowerCase() === addr),
           isRenter: renterAddresses.has(addr),
+          isProfileUser: profileAddresses.has(addr),
         });
       } catch {
         users.push({
@@ -159,6 +181,7 @@ export async function GET() {
           hasProfile: false,
           isOwner: agents.some(a => a.owner.toLowerCase() === addr),
           isRenter: renterAddresses.has(addr),
+          isProfileUser: profileAddresses.has(addr),
         });
       }
     }
