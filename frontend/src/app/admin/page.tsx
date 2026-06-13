@@ -32,6 +32,9 @@ const AGENT_TYPE_LABELS: Record<number, string> = {
 };
 
 export default function AdminDashboard() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,10 +42,68 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'feedback'>('overview');
   const [feedbackList, setFeedbackList] = useState<any[]>([]);
 
+  // Check if already authenticated in this session
   useEffect(() => {
-    fetchOnChainData();
-    fetchFeedback();
+    if (sessionStorage.getItem('ritty_admin') === 'ok') {
+      setAuthenticated(true);
+    }
   }, []);
+
+  useEffect(() => {
+    if (authenticated) {
+      fetchOnChainData();
+      fetchFeedback();
+    }
+  }, [authenticated]);
+
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Password from env or default
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ritty2026';
+    if (password === adminPassword) {
+      sessionStorage.setItem('ritty_admin', 'ok');
+      setAuthenticated(true);
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  };
+
+  // Password gate
+  if (!authenticated) {
+    return (
+      <main className="min-h-screen flex items-center justify-center" style={{ background: '#050505' }}>
+        <div className="w-full max-w-sm rounded-2xl p-8" style={{ background: '#0A0A0A', border: '1px solid rgba(64,255,175,0.2)' }}>
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-3">🔒</div>
+            <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk' }}>Admin Access</h2>
+            <p className="text-xs text-gray-500 mt-1">Enter password to continue</p>
+          </div>
+          <form onSubmit={handlePasswordSubmit}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setPasswordError(false); }}
+              placeholder="Password"
+              autoFocus
+              className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 outline-none mb-3"
+              style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${passwordError ? 'rgba(239,68,68,0.5)' : 'rgba(255,255,255,0.08)'}` }}
+            />
+            {passwordError && (
+              <p className="text-xs text-red-400 mb-3">Wrong password</p>
+            )}
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl text-sm font-bold text-black transition hover:opacity-80"
+              style={{ background: '#40FFAF' }}
+            >
+              Enter
+            </button>
+          </form>
+        </div>
+      </main>
+    );
+  }
 
   const fetchOnChainData = async () => {
     try {
