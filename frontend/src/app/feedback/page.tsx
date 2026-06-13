@@ -1,17 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useSearchParams } from 'next/navigation';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 export default function FeedbackPage() {
   const { isConnected } = useAccount();
   const { t } = useTranslations();
-  const searchParams = useSearchParams();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('general');
@@ -19,14 +17,6 @@ export default function FeedbackPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-
-  // Auto-select category from URL query param
-  useEffect(() => {
-    const cat = searchParams.get('category');
-    if (cat && ['general', 'bug', 'feature', 'agent', 'request', 'ui', 'other'].includes(cat)) {
-      setCategory(cat);
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
