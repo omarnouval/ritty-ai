@@ -50,6 +50,7 @@ async function sendToTelegram(feedback: {
     bug: '🐛',
     feature: '💡',
     agent: '🤖',
+    request: '🛠️',
     ui: '🎨',
     other: '📝',
   };
