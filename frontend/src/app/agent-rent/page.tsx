@@ -56,6 +56,15 @@ export default function AgentRentPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Request Custom Agent */}
+            <Link
+              href="/feedback?category=request"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-black transition hover:opacity-80"
+              style={{ background: '#40FFAF' }}
+            >
+              🛠️ Request Agent
+            </Link>
+
             {/* Search */}
             <div className="relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
