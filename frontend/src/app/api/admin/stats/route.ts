@@ -106,11 +106,21 @@ export async function GET() {
 
         for (const log of logs) {
           if (log.topics[0] && log.topics.length >= 2) {
-            // Any event with indexed address in topics[1] is likely a user
             const addr = '0x' + (log.topics[1] || '').slice(26);
-            if (addr && addr !== '0x0000000000000000000000000000000000000000') {
+            // Filter out zero addresses, invalid, and non-real addresses
+            const isValidAddr = addr && addr.length === 42 && !addr.match(/^0x0{40}$/i) && !addr.match(/^0x0000000000000000000000000000000000000/i);
+            if (isValidAddr) {
               renterAddresses.add(addr.toLowerCase());
               allAddresses.add(addr.toLowerCase());
+            }
+            // Also check topics[2] for renter address in AgentRented events
+            if (log.topics[2]) {
+              const addr2 = '0x' + (log.topics[2] || '').slice(26);
+              const isValidAddr2 = addr2 && addr2.length === 42 && !addr2.match(/^0x0{40}$/i) && !addr2.match(/^0x0000000000000000000000000000000000000/i);
+              if (isValidAddr2) {
+                renterAddresses.add(addr2.toLowerCase());
+                allAddresses.add(addr2.toLowerCase());
+              }
             }
           }
         }
@@ -119,9 +129,10 @@ export async function GET() {
       }
     }
 
-    // Fetch usernames for ALL discovered addresses
+    // Fetch usernames for ALL discovered addresses (exclude zero address)
     const users = [];
     for (const addr of allAddresses) {
+      if (addr.match(/^0x0{40}$/i)) continue; // Skip zero address
       try {
         const username = await client.readContract({
           address: PROFILE_ADDRESS as `0x${string}`,
