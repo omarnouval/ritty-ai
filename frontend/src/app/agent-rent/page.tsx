@@ -9,6 +9,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
+import RequestAgentModal from '@/components/RequestAgentModal';
 
 const VIEW_MODES = ['grid', 'list', 'compact'] as const;
 
@@ -18,6 +19,7 @@ export default function AgentRentPage() {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'compact'>('grid');
+  const [showRequestModal, setShowRequestModal] = useState(false);
   const limit = 12;
 
   const { data: agentIds, isLoading } = useReadContract({
@@ -57,13 +59,13 @@ export default function AgentRentPage() {
 
           <div className="flex items-center gap-3">
             {/* Request Custom Agent */}
-            <Link
-              href="/feedback?category=request"
+            <button
+              onClick={() => setShowRequestModal(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-black transition hover:opacity-80"
               style={{ background: '#40FFAF' }}
             >
               🛠️ Request Agent
-            </Link>
+            </button>
 
             {/* Search */}
             <div className="relative">
@@ -145,6 +147,8 @@ export default function AgentRentPage() {
           </>
         )}
       </div>
+
+      <RequestAgentModal isOpen={showRequestModal} onClose={() => setShowRequestModal(false)} />
     </main>
   );
 }

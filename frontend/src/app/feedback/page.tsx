@@ -158,7 +158,6 @@ export default function FeedbackPage() {
                 <option value="bug">Bug Report</option>
                 <option value="feature">Feature Request</option>
                 <option value="agent">Agent Quality</option>
-                <option value="request">🛠️ Request Custom Agent</option>
                 <option value="ui">UI/UX</option>
                 <option value="other">Other</option>
               </select>
