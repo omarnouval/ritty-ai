@@ -18,7 +18,7 @@ const MIMO_MODEL = 'mimo-v2.5-pro';
 
 // Security constants
 const MAX_MESSAGE_LENGTH = 2000;
-const MAX_TOKENS = 250;
+const MAX_TOKENS = 400;
 const MAX_MESSAGES_PER_HOUR = 50;
 
 // Prompt injection patterns to block
@@ -82,6 +82,55 @@ function securityHeaders(response: NextResponse): NextResponse {
 function getApiKeys(): string[] {
   const keys = process.env.MIMO_API_KEYS || '';
   return keys.split(',').filter(k => k.trim().length > 0);
+}
+
+// Web scraping: fetch real-time crypto market data
+async function fetchMarketData(): Promise<string> {
+  try {
+    // CoinGecko free API - top 10 coins + global market data
+    const [coinsRes, globalRes] = await Promise.all([
+      fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false&price_change_percentage=1h,24h,7d', {
+        headers: { 'Accept': 'application/json' }
+      }),
+      fetch('https://api.coingecko.com/api/v3/global', {
+        headers: { 'Accept': 'application/json' }
+      })
+    ]);
+
+    if (!coinsRes.ok || !globalRes.ok) return '';
+
+    const coins = await coinsRes.json();
+    const global = await globalRes.json();
+
+    const globalData = global.data;
+    let data = `REAL-TIME MARKET DATA (CoinGecko, ${new Date().toISOString()}):\n`;
+    data += `Total Market Cap: $${(globalData.total_market_cap.usd / 1e12).toFixed(2)}T\n`;
+    data += `24h Volume: $${(globalData.total_volume.usd / 1e9).toFixed(1)}B\n`;
+    data += `BTC Dominance: ${globalData.market_cap_percentage.btc.toFixed(1)}%\n`;
+    data += `Market Cap Change 24h: ${globalData.market_cap_change_percentage_24h_usd.toFixed(2)}%\n\n`;
+    data += `Top 10 Coins:\n`;
+
+    for (const coin of coins) {
+      data += `- ${coin.symbol.toUpperCase()}: $${coin.current_price?.toLocaleString() ?? 'N/A'} | 24h: ${coin.price_change_percentage_24h?.toFixed(2) ?? 'N/A'}% | 7d: ${coin.price_change_percentage_7d_in_currency?.toFixed(2) ?? 'N/A'}% | Vol: $${(coin.total_volume / 1e9).toFixed(1)}B\n`;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Market data fetch failed:', error);
+    return '';
+  }
+}
+
+// Detect if user message needs real-time data
+function needsMarketData(message: string): boolean {
+  const keywords = [
+    /pasar|market|harga|price|tren|trend|analisa|analyze|analysis/i,
+    /bitcoin|btc|ethereum|eth|crypto|coin|token/i,
+    /minggu|week|hari|day|bulan|month|hari ini|today/i,
+    /naik|turun|bullish|bearish|pump|dump|moon/i,
+    /cap|volume|dominasi|dominance/i,
+  ];
+  return keywords.some(r => r.test(message));
 }
 
 // Round-robin key selector
@@ -266,8 +315,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 5. Call real LLM
-    const systemPrompt = SYSTEM_PROMPTS[agentCategory];
+    // 5. Fetch real-time data if needed
+    let systemPrompt = SYSTEM_PROMPTS[agentCategory];
+    if (needsMarketData(sanitized.clean)) {
+      const marketData = await fetchMarketData();
+      if (marketData) {
+        systemPrompt = `${systemPrompt}\n\n${marketData}`;
+      }
+    }
+
+    // 6. Call real LLM
     const response = await callMimo(systemPrompt, sanitized.clean);
 
     return securityHeaders(
