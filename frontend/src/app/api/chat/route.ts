@@ -85,7 +85,7 @@ function getApiKeys(): string[] {
 }
 
 // Scraping microservice config
-const SCRAPER_URL = 'https://scheduled-finder-order-night.trycloudflare.com';
+const SCRAPER_URL = 'https://variations-pixel-ebony-film.trycloudflare.com';
 
 // Web scraping: fetch real-time data via Scrapling service
 async function fetchMarketData(): Promise<string> {
@@ -135,6 +135,71 @@ async function searchWeb(query: string): Promise<string> {
     console.error('Web search failed:', error);
     return '';
   }
+}
+
+// Fetch skill content from scraper service
+async function fetchSkillContent(skillId: string): Promise<string> {
+  try {
+    const res = await fetch(`${SCRAPER_URL}/skills/get`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ skill_id: skillId }),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.content || '';
+  } catch (error) {
+    console.error('Skill fetch failed:', error);
+    return '';
+  }
+}
+
+// Map keywords to skills
+const SKILL_MAPPING: Record<string, string[]> = {
+  // Research skills
+  'riset|research|studi|study|analisa|analyze': ['deep-research', 'last30days'],
+  'paper|jurnal|journal|akademik|academic': ['academic-paper', 'academic-paper-reviewer'],
+  
+  // Trading skills
+  'trading|trade|jual|beli|buy|sell|strategi': ['ai4trade', 'market-intel'],
+  'prediksi|predict|polymarket|pasar|market': ['polymarket', 'market-intel'],
+  
+  // Marketing skills
+  'seo|search engine|ranking|google': ['ai-seo'],
+  'konten|content|blog|artikel': ['content-strategy', 'copywriting'],
+  'kompetitor|competitor|saingan': ['competitor-profiling'],
+  'email|cold email|outreach': ['cold-email'],
+  'iklan|ads|advertising|ad creative': ['ad-creative', 'ads'],
+  'komunitas|community|engagement': ['community-marketing'],
+  'copywriting|copy|sales copy': ['copywriting'],
+  'analytics|analitik|tracking': ['analytics'],
+  'konversi|conversion|cro': ['cro'],
+  'customer|pelanggan|riset pasar': ['customer-research'],
+  
+  // Coding skills
+  'code review|review code|code quality': ['code-review-and-quality'],
+  'debug|error|bug|fix': ['debugging-and-error-recovery'],
+  'test|testing|tdd|unit test': ['test-driven-development'],
+  'performance|optimasi|optimize|speed': ['performance-optimization'],
+  'security|secure|vulnerability|vulnerabilitas': ['security-and-hardening'],
+  'frontend|ui|ux|design': ['frontend-ui-engineering'],
+  'api|endpoint|interface': ['api-and-interface-design'],
+  'ci/cd|deploy|automation|pipeline': ['ci-cd-and-automation'],
+  'dokumentasi|documentation|docs': ['documentation-and-adrs'],
+  'ide|idea|brainstorm': ['idea-refine'],
+  'interview|wawancara|interview prep': ['interview-me'],
+};
+
+// Detect if user message needs skills
+function getRelevantSkills(message: string): string[] {
+  const skills: string[] = [];
+  for (const [keywords, skillIds] of Object.entries(SKILL_MAPPING)) {
+    const pattern = new RegExp(keywords, 'i');
+    if (pattern.test(message)) {
+      skills.push(...skillIds);
+    }
+  }
+  return [...new Set(skills)]; // Deduplicate
 }
 
 // Detect if user message needs real-time data
@@ -342,18 +407,37 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 5. Fetch real-time data if needed
+    // 5. Fetch real-time data and skills if needed
     let systemPrompt = SYSTEM_PROMPTS[agentCategory];
     let contextData = '';
     
+    // Get relevant skills
+    const relevantSkills = getRelevantSkills(sanitized.clean);
+    if (relevantSkills.length > 0) {
+      const skillContents = await Promise.all(
+        relevantSkills.slice(0, 2).map(skillId => fetchSkillContent(skillId))
+      );
+      const validSkills = skillContents.filter(s => s.length > 0);
+      if (validSkills.length > 0) {
+        contextData += `RELEVANT SKILLS:\n${validSkills.join('\n\n---\n\n')}\n\n`;
+      }
+    }
+    
+    // Get market data if needed
     if (needsMarketData(sanitized.clean)) {
-      contextData = await fetchMarketData();
+      const marketData = await fetchMarketData();
+      if (marketData) {
+        contextData += `REAL-TIME MARKET DATA:\n${marketData}\n\n`;
+      }
     } else if (needsWebSearch(sanitized.clean)) {
-      contextData = await searchWeb(sanitized.clean);
+      const searchData = await searchWeb(sanitized.clean);
+      if (searchData) {
+        contextData += `SEARCH RESULTS:\n${searchData}\n\n`;
+      }
     }
     
     if (contextData) {
-      systemPrompt = `${systemPrompt}\n\nREAL-TIME DATA:\n${contextData}`;
+      systemPrompt = `${systemPrompt}\n\n${contextData}`;
     }
 
     // 6. Call real LLM
