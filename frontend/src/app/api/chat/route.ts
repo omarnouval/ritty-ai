@@ -84,39 +84,55 @@ function getApiKeys(): string[] {
   return keys.split(',').filter(k => k.trim().length > 0);
 }
 
-// Web scraping: fetch real-time crypto market data
+// Scraping microservice config
+const SCRAPER_URL = 'https://scheduled-finder-order-night.trycloudflare.com';
+
+// Web scraping: fetch real-time data via Scrapling service
 async function fetchMarketData(): Promise<string> {
   try {
-    // CoinGecko free API - top 10 coins + global market data
-    const [coinsRes, globalRes] = await Promise.all([
-      fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false&price_change_percentage=1h,24h,7d', {
-        headers: { 'Accept': 'application/json' }
-      }),
-      fetch('https://api.coingecko.com/api/v3/global', {
-        headers: { 'Accept': 'application/json' }
-      })
-    ]);
-
-    if (!coinsRes.ok || !globalRes.ok) return '';
-
-    const coins = await coinsRes.json();
-    const global = await globalRes.json();
-
-    const globalData = global.data;
-    let data = `REAL-TIME MARKET DATA (CoinGecko, ${new Date().toISOString()}):\n`;
-    data += `Total Market Cap: $${(globalData.total_market_cap.usd / 1e12).toFixed(2)}T\n`;
-    data += `24h Volume: $${(globalData.total_volume.usd / 1e9).toFixed(1)}B\n`;
-    data += `BTC Dominance: ${globalData.market_cap_percentage.btc.toFixed(1)}%\n`;
-    data += `Market Cap Change 24h: ${globalData.market_cap_change_percentage_24h_usd.toFixed(2)}%\n\n`;
-    data += `Top 10 Coins:\n`;
-
-    for (const coin of coins) {
-      data += `- ${coin.symbol.toUpperCase()}: $${coin.current_price?.toLocaleString() ?? 'N/A'} | 24h: ${coin.price_change_percentage_24h?.toFixed(2) ?? 'N/A'}% | 7d: ${coin.price_change_percentage_7d_in_currency?.toFixed(2) ?? 'N/A'}% | Vol: $${(coin.total_volume / 1e9).toFixed(1)}B\n`;
-    }
-
-    return data;
+    const res = await fetch(`${SCRAPER_URL}/crypto-market`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.success ? data.content : '';
   } catch (error) {
     console.error('Market data fetch failed:', error);
+    return '';
+  }
+}
+
+// Scrape any URL via Scrapling service
+async function scrapeUrl(url: string): Promise<string> {
+  try {
+    const res = await fetch(`${SCRAPER_URL}/scrape`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, mode: 'stealthy-fetch', format: 'txt' }),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.success ? data.content : '';
+  } catch (error) {
+    console.error('URL scrape failed:', error);
+    return '';
+  }
+}
+
+// Search Google via Scrapling service
+async function searchWeb(query: string): Promise<string> {
+  try {
+    const res = await fetch(`${SCRAPER_URL}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, num_results: 5 }),
+    });
+    if (!res.ok) return '';
+    const data = await res.json();
+    return data.success ? data.content : '';
+  } catch (error) {
+    console.error('Web search failed:', error);
     return '';
   }
 }
@@ -129,6 +145,17 @@ function needsMarketData(message: string): boolean {
     /minggu|week|hari|day|bulan|month|hari ini|today/i,
     /naik|turun|bullish|bearish|pump|dump|moon/i,
     /cap|volume|dominasi|dominance/i,
+  ];
+  return keywords.some(r => r.test(message));
+}
+
+// Detect if user wants to search/scrape something
+function needsWebSearch(message: string): boolean {
+  const keywords = [
+    /cari|search|googling|cariin|tolong cari/i,
+    /berita|news|artikel|article/i,
+    /scrape|crawl|ambil data/i,
+    /siapa|who|apa itu|what is|kapan|when|dimana|where/i,
   ];
   return keywords.some(r => r.test(message));
 }
@@ -317,11 +344,16 @@ export async function POST(request: NextRequest) {
 
     // 5. Fetch real-time data if needed
     let systemPrompt = SYSTEM_PROMPTS[agentCategory];
+    let contextData = '';
+    
     if (needsMarketData(sanitized.clean)) {
-      const marketData = await fetchMarketData();
-      if (marketData) {
-        systemPrompt = `${systemPrompt}\n\n${marketData}`;
-      }
+      contextData = await fetchMarketData();
+    } else if (needsWebSearch(sanitized.clean)) {
+      contextData = await searchWeb(sanitized.clean);
+    }
+    
+    if (contextData) {
+      systemPrompt = `${systemPrompt}\n\nREAL-TIME DATA:\n${contextData}`;
     }
 
     // 6. Call real LLM
