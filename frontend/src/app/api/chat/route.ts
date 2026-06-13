@@ -13,7 +13,7 @@ const ritualChain = {
 };
 
 // Mimo LLM API config
-const MIMO_BASE_URL = 'https://api.xiaomimimo.com/v1';
+const MIMO_BASE_URL = 'https://token-plan-sgp.xiaomimimo.com/v1';
 const MIMO_MODEL = 'mimo-v2.5-pro';
 
 // Security constants
