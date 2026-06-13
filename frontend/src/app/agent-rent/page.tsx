@@ -9,6 +9,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
+import { RequestAgentModal } from '@/components/RequestAgentModal';
 
 const VIEW_MODES = ['grid', 'list', 'compact'] as const;
 
@@ -18,6 +19,7 @@ export default function AgentRentPage() {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'compact'>('grid');
+  const [showRequestModal, setShowRequestModal] = useState(false);
   const limit = 12;
 
   const { data: agentIds, isLoading } = useReadContract({
@@ -48,6 +50,9 @@ export default function AgentRentPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        {/* Request Agent Modal */}
+        {showRequestModal && <RequestAgentModal onClose={() => setShowRequestModal(false)} />}
+
         {/* Header + Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -56,6 +61,20 @@ export default function AgentRentPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Request Agent Button */}
+            <button
+              onClick={() => setShowRequestModal(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] cursor-pointer"
+              style={{
+                background: 'rgba(64,255,175,0.1)',
+                border: '1px solid rgba(64,255,175,0.3)',
+                color: '#40FFAF',
+              }}
+            >
+              <span>🛠️</span>
+              Request Agent
+            </button>
+
             {/* Search */}
             <div className="relative">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
