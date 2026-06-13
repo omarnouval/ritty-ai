@@ -4,26 +4,6 @@ const RPC_URL = 'https://rpc.ritualfoundation.org';
 const MARKETPLACE_ADDRESS = '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE';
 const PROFILE_ADDRESS = '0xA487bd6BEE21AaE0E1705FE5DDB256Ae6B384c03';
 
-const AGENT_ABI = {
-  name: 'agents',
-  type: 'function',
-  stateMutability: 'view',
-  inputs: [{ type: 'uint256' }],
-  outputs: [
-    { name: 'owner', type: 'address' },
-    { name: 'agentContract', type: 'address' },
-    { name: 'name', type: 'string' },
-    { name: 'description', type: 'string' },
-    { name: 'pricePerHour', type: 'uint256' },
-    { name: 'totalEarnings', type: 'uint256' },
-    { name: 'totalRentals', type: 'uint256' },
-    { name: 'rating', type: 'uint256' },
-    { name: 'ratingCount', type: 'uint256' },
-    { name: 'isActive', type: 'bool' },
-    { name: 'agentType', type: 'uint8' },
-  ],
-};
-
 const AGENT_TYPE_LABELS: Record<number, string> = {
   0: 'Research',
   1: 'Trading',
@@ -33,28 +13,14 @@ const AGENT_TYPE_LABELS: Record<number, string> = {
   5: 'Other',
 };
 
-async function rpcCall(method: string, params: any[]) {
-  const res = await fetch(RPC_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 }),
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(data.error.message);
-  return data.result;
-}
-
-// Encode function call
-function encodeFunction(fn: typeof AGENT_ABI, args: any[]): string {
-  // Use ethers.js or manual encoding — for now use a simple approach
-  // We'll use the client-side viem for complex encoding
-  return '0x';
-}
+// AgentRented event signature
+const AGENT_RENTED_TOPIC = '0x' + Buffer.from(
+  require('crypto').createHash('sha256').update('AgentRented(uint256,address,uint256,uint256)').digest('hex')
+).toString('hex').slice(0, 64);
 
 export async function GET() {
   try {
-    // Import viem server-side
-    const { createPublicClient, http, parseAbi } = await import('viem');
+    const { createPublicClient, http } = await import('viem');
 
     const client = createPublicClient({
       chain: { id: 1979, name: 'Ritual', rpcUrls: { default: { http: [RPC_URL] } } },
@@ -70,13 +36,29 @@ export async function GET() {
 
     // Fetch all agents
     const agents = [];
-    const ownerAddresses = new Set<string>();
+    const allAddresses = new Set<string>();
 
     for (let i = 0; i < Number(agentCount); i++) {
       try {
         const data = await client.readContract({
           address: MARKETPLACE_ADDRESS as `0x${string}`,
-          abi: [AGENT_ABI] as any,
+          abi: [{
+            name: 'agents', type: 'function', stateMutability: 'view',
+            inputs: [{ type: 'uint256' }],
+            outputs: [
+              { name: 'owner', type: 'address' },
+              { name: 'agentContract', type: 'address' },
+              { name: 'name', type: 'string' },
+              { name: 'description', type: 'string' },
+              { name: 'pricePerHour', type: 'uint256' },
+              { name: 'totalEarnings', type: 'uint256' },
+              { name: 'totalRentals', type: 'uint256' },
+              { name: 'rating', type: 'uint256' },
+              { name: 'ratingCount', type: 'uint256' },
+              { name: 'isActive', type: 'bool' },
+              { name: 'agentType', type: 'uint8' },
+            ],
+          }],
           functionName: 'agents',
           args: [BigInt(i)],
         });
@@ -98,22 +80,53 @@ export async function GET() {
           agentType: AGENT_TYPE_LABELS[Number(agentType)] || 'Unknown',
         });
 
-        ownerAddresses.add(owner.toLowerCase());
-      } catch (e) {
+        allAddresses.add(owner.toLowerCase());
+      } catch {
         // Skip
       }
     }
 
-    // Fetch usernames
+    // Fetch rental events to find all unique renters
+    const currentBlock = await client.getBlockNumber();
+    const CHUNK = 99999n;
+    const renterAddresses = new Set<string>();
+    const rentalEvents: any[] = [];
+
+    // Scan last 5M blocks for events
+    const scanFrom = currentBlock > 5000000n ? currentBlock - 5000000n : 0n;
+
+    for (let from = scanFrom; from <= currentBlock; from += CHUNK) {
+      const to = from + CHUNK > currentBlock ? currentBlock : from + CHUNK;
+      try {
+        const logs = await client.getLogs({
+          address: MARKETPLACE_ADDRESS as `0x${string}`,
+          fromBlock: from,
+          toBlock: to,
+        });
+
+        for (const log of logs) {
+          if (log.topics[0] && log.topics.length >= 2) {
+            // Any event with indexed address in topics[1] is likely a user
+            const addr = '0x' + (log.topics[1] || '').slice(26);
+            if (addr && addr !== '0x0000000000000000000000000000000000000000') {
+              renterAddresses.add(addr.toLowerCase());
+              allAddresses.add(addr.toLowerCase());
+            }
+          }
+        }
+      } catch {
+        // Skip chunk errors
+      }
+    }
+
+    // Fetch usernames for ALL discovered addresses
     const users = [];
-    for (const addr of ownerAddresses) {
+    for (const addr of allAddresses) {
       try {
         const username = await client.readContract({
           address: PROFILE_ADDRESS as `0x${string}`,
           abi: [{
-            name: 'getUsername',
-            type: 'function',
-            stateMutability: 'view',
+            name: 'getUsername', type: 'function', stateMutability: 'view',
             inputs: [{ type: 'address' }],
             outputs: [{ type: 'string' }],
           }],
@@ -121,15 +134,32 @@ export async function GET() {
           args: [addr as `0x${string}`],
         });
 
-        if (username) {
-          users.push({ address: addr, username });
-        }
+        users.push({
+          address: addr,
+          username: username || null,
+          hasProfile: !!username,
+          isOwner: agents.some(a => a.owner.toLowerCase() === addr),
+          isRenter: renterAddresses.has(addr),
+        });
       } catch {
-        // No profile
+        users.push({
+          address: addr,
+          username: null,
+          hasProfile: false,
+          isOwner: agents.some(a => a.owner.toLowerCase() === addr),
+          isRenter: renterAddresses.has(addr),
+        });
       }
     }
 
-    return NextResponse.json({ agents, users, totalAgents: Number(agentCount) });
+    return NextResponse.json({
+      agents,
+      users,
+      totalAgents: Number(agentCount),
+      totalUsers: users.length,
+      usersWithProfile: users.filter(u => u.hasProfile).length,
+      uniqueRenters: renterAddresses.size,
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

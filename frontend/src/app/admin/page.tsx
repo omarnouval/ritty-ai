@@ -19,7 +19,10 @@ interface Agent {
 
 interface UserProfile {
   address: string;
-  username: string;
+  username: string | null;
+  hasProfile: boolean;
+  isOwner: boolean;
+  isRenter: boolean;
 }
 
 const AGENT_TYPE_LABELS: Record<number, string> = {
@@ -59,7 +62,7 @@ export default function AdminDashboard() {
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Password from env or default
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ritty2026';
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bosowa2000';
     if (password === adminPassword) {
       sessionStorage.setItem('ritty_admin', 'ok');
       setAuthenticated(true);
@@ -442,12 +445,17 @@ export default function AdminDashboard() {
                         <div key={user.address} className="flex items-center justify-between py-3 px-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
                           <div className="flex items-center gap-3">
                             <span className="text-sm text-gray-600 font-mono w-8">{i + 1}.</span>
-                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'rgba(64,255,175,0.15)', color: '#40FFAF' }}>
-                              {user.username.charAt(0).toUpperCase()}
+                            <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: user.hasProfile ? 'rgba(64,255,175,0.15)' : 'rgba(255,255,255,0.05)', color: user.hasProfile ? '#40FFAF' : '#6b7280' }}>
+                              {user.username ? user.username.charAt(0).toUpperCase() : '?'}
                             </div>
                             <div>
-                              <div className="text-sm font-medium text-white">{user.username}</div>
+                              <div className="text-sm font-medium text-white">{user.username || 'No Profile'}</div>
                               <div className="text-xs text-gray-600 font-mono">{user.address}</div>
+                              <div className="flex gap-2 mt-1">
+                                {user.isOwner && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa' }}>Owner</span>}
+                                {user.isRenter && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>Renter</span>}
+                                {!user.hasProfile && <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>No Profile</span>}
+                              </div>
                             </div>
                           </div>
                           <a
@@ -456,7 +464,7 @@ export default function AdminDashboard() {
                             rel="noopener noreferrer"
                             className="text-xs text-gray-500 hover:text-[#40FFAF] transition"
                           >
-                            View on Explorer →
+                            Explorer →
                           </a>
                         </div>
                       ))}
