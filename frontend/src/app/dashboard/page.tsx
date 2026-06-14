@@ -1,24 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount } from 'wagmi';
+import { useAccount, useReadContract } from 'wagmi';
 import Link from 'next/link';
 import Image from 'next/image';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { ChatBox } from '@/components/ChatBox';
 import { UsernameModal } from '@/components/UsernameModal';
 import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
+import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import ReviewModal from '@/components/ReviewModal';
 
 interface ActiveRental {
   id: string;
+  agentId: number;
   agentName: string;
   category: string;
   icon: string;
   endTime: number; // unix timestamp
   agentAddress: string;
 }
+
+// Agent ID to category mapping
+const AGENT_CATEGORY_MAP: Record<number, { category: string; icon: string }> = {
+  0: { category: 'content', icon: '✍️' },
+  1: { category: 'research', icon: '🔬' },
+  2: { category: 'trading', icon: '📈' },
+  3: { category: 'marketing', icon: '📣' },
+  4: { category: 'coding', icon: '🧑‍💻' },
+  5: { category: 'other', icon: '🤖' },
+  12: { category: 'healthcare', icon: '🏥' },
+};
 
 function DashboardNav({ username }: { username?: string | null }) {
   return (
@@ -46,26 +59,8 @@ function DashboardNav({ username }: { username?: string | null }) {
 
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [activeRentals, setActiveRentals] = useState<ActiveRental[]>([
-    // Demo data — replace with on-chain data later
-    {
-      id: '1',
-      agentName: 'Content Pro',
-      category: 'content',
-      icon: '✍️',
-      endTime: Math.floor(Date.now() / 1000) + 7200, // 2 hours from now
-      agentAddress: '0x0000000000000000000000000000000000000001',
-    },
-    {
-      id: '2',
-      agentName: 'Research Alpha',
-      category: 'research',
-      icon: '🔬',
-      endTime: Math.floor(Date.now() / 1000) + 86400, // 24 hours from now
-      agentAddress: '0x0000000000000000000000000000000000000002',
-    },
-  ]);
+  const [activeRentals, setActiveRentals] = useState<ActiveRental[]>([]);
+  const [loadingRentals, setLoadingRentals] = useState(false);
   const [chatRental, setChatRental] = useState<ActiveRental | null>(null);
   const [counters, setCounters] = useState<Record<string, number>>({});
   const [username, setUsername] = useState<string | null>(null);
@@ -73,6 +68,59 @@ export default function DashboardPage() {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewRental, setReviewRental] = useState<ActiveRental | null>(null);
   const [reviewedRentals, setReviewedRentals] = useState<Set<string>>(new Set());
+
+  // Fetch agent count to know how many agents exist
+  const { data: agentCount } = useReadContract({
+    address: MARKETPLACE_ADDRESS,
+    abi: MARKETPLACE_ABI,
+    functionName: 'agentCount',
+  });
+
+  // Fetch real active rentals from contract
+  const fetchActiveRentals = useCallback(async () => {
+    if (!address || !agentCount) return;
+    setLoadingRentals(true);
+    const count = Number(agentCount);
+    const rentals: ActiveRental[] = [];
+
+    // Check each agent for active rental
+    const checks = [];
+    for (let i = 0; i < count; i++) {
+      checks.push(
+        fetch(`/api/rental-check?address=${address}&agentId=${i}`)
+          .then(r => r.json())
+          .then(data => {
+            if (data.active) {
+              const meta = AGENT_CATEGORY_MAP[i] || { category: 'other', icon: '🤖' };
+              rentals.push({
+                id: `${i}-${data.rentalId}`,
+                agentId: i,
+                agentName: data.name || `Agent #${i}`,
+                category: meta.category,
+                icon: meta.icon,
+                endTime: Number(data.endTime),
+                agentAddress: MARKETPLACE_ADDRESS,
+              });
+            }
+          })
+          .catch(() => {/* skip */})
+      );
+    }
+
+    await Promise.all(checks);
+    setActiveRentals(rentals);
+    if (rentals.length > 0 && !chatRental) {
+      setChatRental(rentals[0]);
+    }
+    setLoadingRentals(false);
+  }, [address, agentCount]);
+
+  // Fetch rentals on connect
+  useEffect(() => {
+    if (isConnected && address) {
+      fetchActiveRentals();
+    }
+  }, [isConnected, address, fetchActiveRentals]);
 
   // Countdown timer + detect expiry for review
   useEffect(() => {
@@ -106,24 +154,6 @@ export default function DashboardPage() {
     }
   }, [isConnected, address]);
 
-  const handleRentCategory = (cat: AgentCategory) => {
-    if (cat.id === 'custom') {
-      // TODO: open custom request modal
-      return;
-    }
-    // TODO: trigger smart contract rental
-    const newRental: ActiveRental = {
-      id: Date.now().toString(),
-      agentName: cat.name + ' Agent',
-      category: cat.id,
-      icon: cat.icon,
-      endTime: Math.floor(Date.now() / 1000) + 3600, // 1 hour
-      agentAddress: '0x' + Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-    };
-    setActiveRentals((prev) => [...prev, newRental]);
-    setChatRental(newRental);
-  };
-
   if (!isConnected) {
     return (
       <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
@@ -142,7 +172,12 @@ export default function DashboardPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-8">
         {/* Active Rentals */}
-        {activeRentals.length > 0 && (
+        {loadingRentals ? (
+          <div className="text-center py-12">
+            <div className="animate-spin w-8 h-8 border-2 border-[#40FFAF] border-t-transparent rounded-full mx-auto" />
+            <p className="text-gray-500 mt-4 text-sm">Loading your rentals...</p>
+          </div>
+        ) : activeRentals.length > 0 ? (
           <div className="mb-8">
             <h2 className="text-xl font-heavy text-white mb-4">Active Rentals</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -169,7 +204,7 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-mono text-gray-500">{rental.agentAddress.slice(0, 6)}...{rental.agentAddress.slice(-4)}</span>
+                      <span className="text-xs font-mono text-gray-500">#{rental.agentId}</span>
                       <span className={`text-xs font-medium ${remaining > 3600 ? 'text-[#40FFAF]' : remaining > 600 ? 'text-orange-400' : 'text-red-400'}`}>
                         {remaining > 3600 ? `${Math.floor(remaining / 3600)}h ${Math.floor((remaining % 3600) / 60)}m` : remaining > 600 ? `${Math.floor(remaining / 60)}m` : remaining > 0 ? `${remaining}s` : 'Expired'}
                       </span>
@@ -179,10 +214,19 @@ export default function DashboardPage() {
               })}
             </div>
           </div>
+        ) : (
+          <div className="text-center py-12 mb-8">
+            <div className="text-4xl mb-3">🤖</div>
+            <p className="text-gray-400 text-lg mb-2">No active rentals</p>
+            <p className="text-gray-500 text-sm mb-6">Rent an agent from the marketplace to start chatting</p>
+            <Link href="/agent-rent" className="text-sm px-6 py-2.5 rounded-xl text-black font-medium" style={{ background: '#40FFAF' }}>
+              Browse Agents →
+            </Link>
+          </div>
         )}
 
         {/* Chat Area */}
-        {chatRental ? (
+        {chatRental && (
           <div className="mb-8" style={{ height: '500px' }}>
             <ChatBox
               key={chatRental.id}
@@ -194,50 +238,15 @@ export default function DashboardPage() {
               onSwitch={() => setChatRental(null)}
             />
           </div>
-        ) : (
-          /* Category Picker */
-          <div>
-            <h2 className="text-xl font-heavy text-white mb-2">Rent an Agent</h2>
-            <p className="text-sm text-gray-400 mb-6">Pick a category to start chatting instantly</p>
-            <div className="flex flex-wrap gap-3">
-              {AGENT_CATEGORIES.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => handleRentCategory(cat)}
-                  className="flex items-center gap-2.5 px-5 py-3 rounded-xl transition-all hover:scale-[1.02]"
-                  style={{
-                    background: 'rgba(17,17,17,0.8)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = cat.id === 'custom' ? 'rgba(255,255,255,0.2)' : 'rgba(64,255,175,0.3)';
-                    e.currentTarget.style.background = cat.id === 'custom' ? 'rgba(255,255,255,0.05)' : 'rgba(64,255,175,0.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                    e.currentTarget.style.background = 'rgba(17,17,17,0.8)';
-                  }}
-                >
-                  <span className="text-lg">{cat.icon}</span>
-                  <span className="text-sm text-gray-300 font-medium">{cat.name}</span>
-                  {cat.id === 'custom' && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full ml-1" style={{ background: 'rgba(255,255,255,0.08)', color: '#A1A1AA' }}>
-                      Request
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
         )}
 
         {/* Stats */}
         <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: 'Active Rentals', value: activeRentals.length.toString() },
-            { label: 'Total Spent', value: '0 RITUAL' },
+            { label: 'Total Spent', value: '—' },
             { label: 'Agents Used', value: new Set(activeRentals.map(r => r.category)).size.toString() },
-            { label: 'Member Since', value: 'Today' },
+            { label: 'Status', value: activeRentals.length > 0 ? 'Active' : 'Idle' },
           ].map((stat) => (
             <div key={stat.label} className="p-4 rounded-xl" style={{ background: 'rgba(17,17,17,0.6)', border: '1px solid rgba(255,255,255,0.04)' }}>
               <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
@@ -261,7 +270,7 @@ export default function DashboardPage() {
       {showReviewModal && reviewRental && (
         <ReviewModal
           isOpen={showReviewModal}
-          agentId={reviewRental.id}
+          agentId={reviewRental.agentId.toString()}
           agentName={reviewRental.agentName}
           onClose={() => {
             setReviewedRentals(prev => new Set([...prev, reviewRental.id]));

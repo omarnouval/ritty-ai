@@ -68,6 +68,21 @@ export const MARKETPLACE_ABI = [
   },
   {
     type: 'function',
+    name: 'getActiveRental',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'user', type: 'address' },
+      { name: 'agentId', type: 'uint256' },
+    ],
+    outputs: [
+      { name: 'rentalId', type: 'uint256' },
+      { name: 'startTime', type: 'uint256' },
+      { name: 'endTime', type: 'uint256' },
+      { name: 'active', type: 'bool' },
+    ],
+  },
+  {
+    type: 'function',
     name: 'calculateRentalCost',
     stateMutability: 'view',
     inputs: [
