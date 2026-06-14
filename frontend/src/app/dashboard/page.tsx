@@ -9,6 +9,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { ChatBox } from '@/components/ChatBox';
 import { UsernameModal } from '@/components/UsernameModal';
 import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
+import ReviewModal from '@/components/ReviewModal';
 
 interface ActiveRental {
   id: string;
@@ -69,19 +70,29 @@ export default function DashboardPage() {
   const [counters, setCounters] = useState<Record<string, number>>({});
   const [username, setUsername] = useState<string | null>(null);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewRental, setReviewRental] = useState<ActiveRental | null>(null);
+  const [reviewedRentals, setReviewedRentals] = useState<Set<string>>(new Set());
 
-  // Countdown timer
+  // Countdown timer + detect expiry for review
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Math.floor(Date.now() / 1000);
       const newCounters: Record<string, number> = {};
       activeRentals.forEach((r) => {
-        newCounters[r.id] = Math.max(0, r.endTime - now);
+        const remaining = Math.max(0, r.endTime - now);
+        newCounters[r.id] = remaining;
+        
+        // If just expired and not yet reviewed, show review modal
+        if (remaining === 0 && !reviewedRentals.has(r.id) && !showReviewModal) {
+          setReviewRental(r);
+          setShowReviewModal(true);
+        }
       });
       setCounters(newCounters);
     }, 1000);
     return () => clearInterval(interval);
-  }, [activeRentals]);
+  }, [activeRentals, reviewedRentals, showReviewModal]);
 
   // Check username on connect
   useEffect(() => {
@@ -242,6 +253,20 @@ export default function DashboardPage() {
           onComplete={(name) => {
             setUsername(name);
             setShowUsernameModal(false);
+          }}
+        />
+      )}
+
+      {/* Review Modal - shows when rental expires */}
+      {showReviewModal && reviewRental && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          agentId={reviewRental.id}
+          agentName={reviewRental.agentName}
+          onClose={() => {
+            setReviewedRentals(prev => new Set([...prev, reviewRental.id]));
+            setShowReviewModal(false);
+            setReviewRental(null);
           }}
         />
       )}
