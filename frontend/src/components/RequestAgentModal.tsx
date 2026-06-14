@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
 
 interface Props {
   isOpen: boolean;
@@ -19,36 +20,45 @@ const AGENT_TYPES = [
 ];
 
 export default function RequestAgentModal({ isOpen, onClose }: Props) {
+  const { address } = useAccount();
   const [agentType, setAgentType] = useState('');
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [ticketId, setTicketId] = useState<number | null>(null);
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!address) {
+      setError('Please connect your wallet first');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
 
     try {
-      const response = await fetch('/api/feedback', {
+      const response = await fetch('/api/tickets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name,
-          email: contact,
-          category: 'request',
-          message: `🛠️ AGENT REQUEST\n\nType: ${agentType}\nDescription: ${description}\nContact: ${contact || 'Not provided'}`,
+          userAddress: address,
+          agentType,
+          description,
+          contactName: name || 'Anonymous',
+          contactInfo: contact,
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
+        setTicketId(data.ticket.id);
         setSubmitted(true);
       } else {
         setError(data.error || 'Failed to submit request');
@@ -66,6 +76,7 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
     setName('');
     setContact('');
     setSubmitted(false);
+    setTicketId(null);
     setError('');
     onClose();
   };
@@ -90,9 +101,13 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
 
         {submitted ? (
           <div className="p-8 text-center">
-            <div className="text-5xl mb-4">✅</div>
-            <h3 className="text-xl font-bold text-white mb-2">Request Submitted!</h3>
-            <p className="text-sm text-gray-400 mb-6">We&apos;ll review your request and get back to you.</p>
+            <div className="text-5xl mb-4">🎫</div>
+            <h3 className="text-xl font-bold text-white mb-2">Ticket Created!</h3>
+            <div className="inline-block px-4 py-2 rounded-xl mb-4" style={{ background: 'rgba(64,255,175,0.1)', border: '1px solid rgba(64,255,175,0.2)' }}>
+              <span className="text-2xl font-bold" style={{ color: '#40FFAF', fontFamily: 'Space Grotesk' }}>#{ticketId}</span>
+            </div>
+            <p className="text-sm text-gray-400 mb-2">Your request has been submitted.</p>
+            <p className="text-xs text-gray-500 mb-6">Track status in your Dashboard. We&apos;ll notify you when the agent is ready.</p>
             <button
               onClick={resetAndClose}
               className="px-6 py-2.5 rounded-xl text-sm font-bold text-black transition hover:opacity-80"

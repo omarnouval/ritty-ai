@@ -42,8 +42,9 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'feedback'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'agents' | 'users' | 'feedback' | 'tickets'>('overview');
   const [feedbackList, setFeedbackList] = useState<any[]>([]);
+  const [ticketsList, setTicketsList] = useState<any[]>([]);
 
   // Check if already authenticated in this session
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function AdminDashboard() {
     if (authenticated) {
       fetchOnChainData();
       fetchFeedback();
+      fetchTickets();
     }
   }, [authenticated]);
 
@@ -247,6 +249,34 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchTickets = async () => {
+    try {
+      const res = await fetch('/api/tickets?all=true');
+      if (res.ok) {
+        const data = await res.json();
+        setTicketsList(data.tickets || []);
+      }
+    } catch {
+      // Tickets not available
+    }
+  };
+
+  const updateTicketStatus = async (ticketId: number, status: string) => {
+    try {
+      const res = await fetch('/api/tickets', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticketId, status }),
+      });
+      if (res.ok) {
+        // Refresh tickets
+        fetchTickets();
+      }
+    } catch {
+      // skip
+    }
+  };
+
   const totalRentals = agents.reduce((sum, a) => sum + a.totalRentals, 0);
   const totalEarnings = agents.reduce((sum, a) => sum + parseFloat(a.totalEarnings), 0);
   const activeAgents = agents.filter(a => a.isActive).length;
@@ -257,6 +287,7 @@ export default function AdminDashboard() {
     { id: 'agents' as const, label: '🤖 Agents', icon: '🤖' },
     { id: 'users' as const, label: '👥 Users', icon: '👥' },
     { id: 'feedback' as const, label: '💬 Feedback', icon: '💬' },
+    { id: 'tickets' as const, label: '🎫 Tickets', icon: '🎫' },
   ];
 
   return (
@@ -502,6 +533,81 @@ export default function AdminDashboard() {
                           <span className="text-xs text-gray-600">{fb.name || 'Anonymous'}</span>
                         </div>
                         <p className="text-sm text-gray-300">{fb.message}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Tickets Tab */}
+            {activeTab === 'tickets' && (
+              <div className="rounded-2xl p-6" style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-white">🎫 Agent Requests</h3>
+                  <span className="text-sm text-gray-500">{ticketsList.length} total</span>
+                </div>
+                {ticketsList.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-4xl mb-3">🎫</div>
+                    <p className="text-gray-500">No tickets yet</p>
+                    <p className="text-xs text-gray-600 mt-1">Agent requests will appear here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {ticketsList.map((ticket: any) => (
+                      <div key={ticket.id} className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg font-bold" style={{ color: '#40FFAF', fontFamily: 'Space Grotesk' }}>#{ticket.id}</span>
+                            <div>
+                              <div className="text-sm font-medium text-white">{ticket.agentType}</div>
+                              <div className="text-xs text-gray-500 mt-0.5">{ticket.contactName} · {ticket.userAddress.slice(0, 6)}...{ticket.userAddress.slice(-4)}</div>
+                            </div>
+                          </div>
+                          <span
+                            className="text-xs px-3 py-1 rounded-full font-medium"
+                            style={{
+                              background: ticket.status === 'completed' ? 'rgba(64,255,175,0.15)' : ticket.status === 'in_progress' ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)',
+                              color: ticket.status === 'completed' ? '#40FFAF' : ticket.status === 'in_progress' ? '#60a5fa' : '#fbbf24',
+                            }}
+                          >
+                            {ticket.status === 'completed' ? '✅ Done' : ticket.status === 'in_progress' ? '🔨 Building' : '⏳ Waiting'}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-3">{ticket.description}</p>
+                        {ticket.contactInfo && (
+                          <p className="text-xs text-gray-600 mb-3">📧 {ticket.contactInfo}</p>
+                        )}
+                        <div className="flex gap-2">
+                          {ticket.status === 'waiting' && (
+                            <button
+                              onClick={() => updateTicketStatus(ticket.id, 'in_progress')}
+                              className="text-xs px-3 py-1.5 rounded-lg text-white font-medium transition hover:opacity-80"
+                              style={{ background: 'rgba(59,130,246,0.2)', border: '1px solid rgba(59,130,246,0.3)' }}
+                            >
+                              🔨 Start Building
+                            </button>
+                          )}
+                          {ticket.status === 'in_progress' && (
+                            <button
+                              onClick={() => updateTicketStatus(ticket.id, 'completed')}
+                              className="text-xs px-3 py-1.5 rounded-lg text-black font-medium transition hover:opacity-80"
+                              style={{ background: '#40FFAF' }}
+                            >
+                              ✅ Mark Complete
+                            </button>
+                          )}
+                          {ticket.status !== 'completed' && (
+                            <button
+                              onClick={() => updateTicketStatus(ticket.id, 'cancelled')}
+                              className="text-xs px-3 py-1.5 rounded-lg text-gray-400 font-medium transition hover:text-white"
+                              style={{ background: 'rgba(255,255,255,0.05)' }}
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>

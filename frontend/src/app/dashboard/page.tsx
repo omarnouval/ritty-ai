@@ -68,6 +68,8 @@ export default function DashboardPage() {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewRental, setReviewRental] = useState<ActiveRental | null>(null);
   const [reviewedRentals, setReviewedRentals] = useState<Set<string>>(new Set());
+  const [tickets, setTickets] = useState<any[]>([]);
+  const [loadingTickets, setLoadingTickets] = useState(false);
 
   // Fetch agent count to know how many agents exist
   const { data: agentCount } = useReadContract({
@@ -119,6 +121,13 @@ export default function DashboardPage() {
   useEffect(() => {
     if (isConnected && address) {
       fetchActiveRentals();
+      // Fetch tickets
+      setLoadingTickets(true);
+      fetch(`/api/tickets?address=${address}`)
+        .then(r => r.json())
+        .then(data => setTickets(data.tickets || []))
+        .catch(() => {})
+        .finally(() => setLoadingTickets(false));
     }
   }, [isConnected, address, fetchActiveRentals]);
 
@@ -237,6 +246,45 @@ export default function DashboardPage() {
               onExtend={() => {/* TODO: extend rental */}}
               onSwitch={() => setChatRental(null)}
             />
+          </div>
+        )}
+
+        {/* Agent Tickets */}
+        {tickets.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-heavy text-white mb-4">🎫 Agent Requests</h2>
+            <div className="space-y-3">
+              {tickets.map((ticket: any) => (
+                <div
+                  key={ticket.id}
+                  className="flex items-center justify-between p-4 rounded-xl"
+                  style={{ background: 'rgba(17,17,17,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold" style={{ color: '#40FFAF', fontFamily: 'Space Grotesk' }}>#{ticket.id}</span>
+                    <div>
+                      <div className="text-sm font-medium text-white">{ticket.agentType}</div>
+                      <div className="text-xs text-gray-500 truncate max-w-xs">{ticket.description}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="text-xs px-3 py-1 rounded-full font-medium"
+                      style={{
+                        background: ticket.status === 'completed' ? 'rgba(64,255,175,0.15)' : ticket.status === 'in_progress' ? 'rgba(59,130,246,0.15)' : 'rgba(245,158,11,0.15)',
+                        color: ticket.status === 'completed' ? '#40FFAF' : ticket.status === 'in_progress' ? '#60a5fa' : '#fbbf24',
+                        border: `1px solid ${ticket.status === 'completed' ? 'rgba(64,255,175,0.3)' : ticket.status === 'in_progress' ? 'rgba(59,130,246,0.3)' : 'rgba(245,158,11,0.3)'}`,
+                      }}
+                    >
+                      {ticket.status === 'completed' ? '✅ Ready' : ticket.status === 'in_progress' ? '🔨 Building' : '⏳ Waiting'}
+                    </span>
+                    <span className="text-xs text-gray-600">
+                      {new Date(ticket.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
