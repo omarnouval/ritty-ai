@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
@@ -11,12 +11,14 @@ import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
 import { formatEther } from 'viem';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 import { UsernameModal } from '@/components/UsernameModal';
+import { useNotifications } from '@/components/NotificationProvider';
 
 export default function AgentDetailPage() {
   const params = useParams();
   const agentId = params?.id ? BigInt(params.id as string) : BigInt(0);
   const { address, isConnected } = useAccount();
   const { t } = useTranslations();
+  const { addNotification } = useNotifications();
 
   const DURATIONS = [
     { label: t('agent.duration1h'), hours: 1 },
@@ -270,6 +272,7 @@ export default function AgentDetailPage() {
             <div className="text-center">
               <div className="text-green-400 text-lg font-heavy mb-2">✅ {t('agent.rentalSuccess')}</div>
               <p className="text-gray-500 text-sm">{t('agent.rentalSuccessDesc')}</p>
+              <RentalSuccessNotification addNotification={addNotification} agentName={name} />
               <Link href="/dashboard" className="text-orange-400 text-sm mt-2 inline-block hover:underline">
                 {t('agent.goToDashboard')}
               </Link>
@@ -296,6 +299,22 @@ export default function AgentDetailPage() {
       `}</style>
     </main>
   );
+}
+
+function RentalSuccessNotification({ addNotification, agentName }: { addNotification: any; agentName: string }) {
+  // Trigger notification once when component mounts
+  const triggered = useRef(false);
+  useEffect(() => {
+    if (!triggered.current) {
+      triggered.current = true;
+      addNotification({
+        type: 'rental_success',
+        title: 'Rental Successful!',
+        message: `${agentName} is now active. Start chatting in your dashboard!`,
+      });
+    }
+  }, []);
+  return null;
 }
 
 function Nav() {

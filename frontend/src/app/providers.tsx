@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from '@/lib/wagmi';
 import { LanguageProvider } from '@/lib/i18n/LanguageContext';
 import { LegacyTxProvider } from '@/components/LegacyTxProvider';
+import { NotificationProvider } from '@/components/NotificationProvider';
 import { useRabbyDetect } from '@/lib/useRabbyDetect';
 import { RabbyWarning } from '@/components/RabbyWarning';
 import { useState } from 'react';
@@ -31,9 +32,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider theme={darkTheme({ accentColor: '#40FFAF' })}>
             <LegacyTxProvider>
-              <RabbyGuard>
-                {children}
-              </RabbyGuard>
+              <NotificationProvider>
+                <RabbyGuard>
+                  {children}
+                </RabbyGuard>
+              </NotificationProvider>
             </LegacyTxProvider>
           </RainbowKitProvider>
         </QueryClientProvider>

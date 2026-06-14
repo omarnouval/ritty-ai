@@ -6,10 +6,12 @@ import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
+import { useNotifications } from '@/components/NotificationProvider';
 
 export default function FeedbackPage() {
   const { isConnected } = useAccount();
   const { t } = useTranslations();
+  const { addNotification } = useNotifications();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [category, setCategory] = useState('general');
@@ -38,6 +40,11 @@ export default function FeedbackPage() {
         setEmail('');
         setCategory('general');
         setMessage('');
+        addNotification({
+          type: 'feedback_sent',
+          title: 'Feedback Sent!',
+          message: 'Thank you for your feedback! We read every submission 🙏',
+        });
       } else {
         setError(data.error || 'Failed to submit feedback');
       }
@@ -85,7 +92,7 @@ export default function FeedbackPage() {
         {submitted ? (
           /* Success State */
           <div className="text-center rounded-2xl p-12" style={{ background: '#0A0A0A', border: '1px solid #161616' }}>
-            <div className="text-5xl mb-4">✅</div>
+            <div className="text-5xl mb-4">🙏</div>
             <h2 className="text-xl font-bold mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
               Thank you!
             </h2>
@@ -142,7 +149,7 @@ export default function FeedbackPage() {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none appearance-none cursor-pointer"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+                style={{ background: '#0A0A0A', border: '1px solid rgba(255,255,255,0.08)' }}
               >
                 <option value="general">General Feedback</option>
                 <option value="bug">Bug Report</option>

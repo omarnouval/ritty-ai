@@ -11,7 +11,7 @@ import { UsernameModal } from '@/components/UsernameModal';
 import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import ReviewModal from '@/components/ReviewModal';
-import { NotificationBanner } from '@/components/NotificationBanner';
+import { useNotifications } from '@/components/NotificationProvider';
 
 interface ActiveRental {
   id: string;
@@ -60,6 +60,7 @@ function DashboardNav({ username }: { username?: string | null }) {
 
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
+  const { addNotification } = useNotifications();
   const [activeRentals, setActiveRentals] = useState<ActiveRental[]>([]);
   const [loadingRentals, setLoadingRentals] = useState(false);
   const [chatRental, setChatRental] = useState<ActiveRental | null>(null);
@@ -141,10 +142,15 @@ export default function DashboardPage() {
         const remaining = Math.max(0, r.endTime - now);
         newCounters[r.id] = remaining;
         
-        // If just expired and not yet reviewed, show review modal
+        // If just expired and not yet reviewed, show review modal + notification
         if (remaining === 0 && !reviewedRentals.has(r.id) && !showReviewModal) {
           setReviewRental(r);
           setShowReviewModal(true);
+          addNotification({
+            type: 'rental_expired',
+            title: 'Rental Expired',
+            message: `Your ${r.agentName} rental has expired. Thank you for using Ritty.ai! 🙏`,
+          });
         }
       });
       setCounters(newCounters);
@@ -178,7 +184,6 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
-      <NotificationBanner address={address} />
       <DashboardNav username={username} />
 
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-8">

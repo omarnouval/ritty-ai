@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
+import { useNotifications } from '@/components/NotificationProvider';
 
 interface Props {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const AGENT_TYPES = [
 
 export default function RequestAgentModal({ isOpen, onClose }: Props) {
   const { address } = useAccount();
+  const { addNotification } = useNotifications();
   const [agentType, setAgentType] = useState('');
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
@@ -60,8 +62,11 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
       if (data.success) {
         setTicketId(data.ticket.id);
         setSubmitted(true);
-        // Trigger notification event for dashboard
-        window.dispatchEvent(new CustomEvent('ticket-update', { detail: { ticketId: data.ticket.id, status: 'waiting' } }));
+        addNotification({
+          type: 'ticket_sent',
+          title: `Ticket #${data.ticket.id} Sent`,
+          message: 'Your agent request has been sent to the dev team!',
+        });
       } else {
         setError(data.error || 'Failed to submit request');
       }
