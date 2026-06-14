@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { keccak256, toBytes } from 'viem';
 
 const RPC_URL = 'https://rpc.ritualfoundation.org';
 const MARKETPLACE_ADDRESS = '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE';
@@ -13,17 +14,15 @@ const AGENT_TYPE_LABELS: Record<number, string> = {
   5: 'Other',
 };
 
-// AgentRented event signature
-const AGENT_RENTED_TOPIC = '0x' + Buffer.from(
-  require('crypto').createHash('sha256').update('AgentRented(uint256,address,uint256,uint256)').digest('hex')
-).toString('hex').slice(0, 64);
+// AgentRented event signature — keccak256, not SHA-256
+const AGENT_RENTED_TOPIC = keccak256(toBytes('AgentRented(uint256,address,uint256,uint256)'));
 
 export async function GET() {
   try {
     const { createPublicClient, http } = await import('viem');
 
     const client = createPublicClient({
-      chain: { id: 1979, name: 'Ritual', rpcUrls: { default: { http: [RPC_URL] } } },
+      chain: { id: 1979, name: 'Ritual', nativeCurrency: { name: 'RITUAL', symbol: 'RITUAL', decimals: 18 }, rpcUrls: { default: { http: [RPC_URL] } } },
       transport: http(RPC_URL),
     });
 
@@ -88,12 +87,12 @@ export async function GET() {
 
     // Fetch rental events to find all unique renters
     const currentBlock = await client.getBlockNumber();
-    const CHUNK = 99999n;
+    const CHUNK = BigInt(99999);
     const renterAddresses = new Set<string>();
     const profileAddresses = new Set<string>();
 
     // Scan last 5M blocks for events
-    const scanFrom = currentBlock > 5000000n ? currentBlock - 5000000n : 0n;
+    const scanFrom = currentBlock > BigInt(5000000) ? currentBlock - BigInt(5000000) : BigInt(0);
 
     for (let from = scanFrom; from <= currentBlock; from += CHUNK) {
       const to = from + CHUNK > currentBlock ? currentBlock : from + CHUNK;
@@ -195,6 +194,7 @@ export async function GET() {
       uniqueRenters: renterAddresses.size,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Admin stats error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

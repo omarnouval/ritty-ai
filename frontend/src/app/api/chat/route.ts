@@ -85,7 +85,7 @@ function getApiKeys(): string[] {
 }
 
 // Scraping microservice config
-const SCRAPER_URL = 'https://variations-pixel-ebony-film.trycloudflare.com';
+const SCRAPER_URL = process.env.SCRAPER_URL || 'https://variations-pixel-ebony-film.trycloudflare.com';
 
 // Web scraping: fetch real-time data via Scrapling service
 async function fetchMarketData(): Promise<string> {
@@ -318,8 +318,8 @@ async function verifyRental(userAddress: string, agentCategory: string): Promise
     return active;
   } catch (error) {
     console.error('Rental verification failed:', error);
-    // For MVP: allow if verification fails (testnet)
-    return true;
+    // Fail-closed: deny access if verification fails
+    return false;
   }
 }
 
@@ -400,27 +400,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 4. Rental verification (if user connected)
-    if (userAddress) {
-      // Validate address format
-      if (!/^0x[a-fA-F0-9]{40}$/.test(userAddress)) {
-        return securityHeaders(
-          NextResponse.json(
-            { success: false, error: 'Invalid wallet address format' },
-            { status: 400 }
-          )
-        );
-      }
+    // 4. Rental verification (mandatory — no free chat)
+    if (!userAddress || userAddress === '0x0000000000000000000000000000000000000000') {
+      return securityHeaders(
+        NextResponse.json(
+          { success: false, error: 'Wallet address required. Please connect and rent this agent.' },
+          { status: 401 }
+        )
+      );
+    }
 
-      const hasRental = await verifyRental(userAddress, agentCategory);
-      if (!hasRental) {
-        return securityHeaders(
-          NextResponse.json(
-            { success: false, error: 'No active rental. Please rent this agent first.' },
-            { status: 403 }
-          )
-        );
-      }
+    // Validate address format
+    if (!/^0x[a-fA-F0-9]{40}$/.test(userAddress)) {
+      return securityHeaders(
+        NextResponse.json(
+          { success: false, error: 'Invalid wallet address format' },
+          { status: 400 }
+        )
+      );
+    }
+
+    const hasRental = await verifyRental(userAddress, agentCategory);
+    if (!hasRental) {
+      return securityHeaders(
+        NextResponse.json(
+          { success: false, error: 'No active rental. Please rent this agent first.' },
+          { status: 403 }
+        )
+      );
     }
 
     // 5. Fetch real-time data and skills if needed

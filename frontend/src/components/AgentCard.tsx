@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi';
+import { useAccount, useReadContract } from 'wagmi';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { MARKETPLACE_ABI, MARKETPLACE_ADDRESS } from '@/lib/contracts';
 import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
@@ -35,9 +35,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
   const { address, isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { t } = useTranslations();
-  const { writeContractAsync, isPending } = useWriteContract();
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash: txHash });
   const [hours, setHours] = useState(1);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
   const [isRenting, setIsRenting] = useState(false);
@@ -107,7 +105,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           <div className="flex items-center gap-4 shrink-0 ml-4">
             <span className="text-xs text-gray-400">{'★'.repeat(Math.round(rating))} ({agent.ratingCount.toString()})</span>
             <span className="text-xs font-mono text-green-400">{formatEther(agent.pricePerHour)}/hr</span>
-            <button onClick={handleRent} disabled={isPending} className="text-xs text-[#40FFAF] hover:text-[#2EF19C] font-medium cursor-pointer">
+            <button onClick={handleRent} disabled={isRenting} className="text-xs text-[#40FFAF] hover:text-[#2EF19C] font-medium cursor-pointer">
               {isConnected ? t('agent.rent') : t('agent.connectToRent')}
             </button>
           </div>
@@ -142,11 +140,11 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
           </div>
           <button
             onClick={handleRent}
-            disabled={isPending || isConfirming}
+            disabled={isRenting}
             className="shrink-0 text-sm font-medium text-black px-5 py-2 rounded-full transition-all cursor-pointer"
             style={{ background: '#40FFAF' }}
           >
-            {isPending ? '…' : isConnected ? t('agent.rent') : t('agent.connect')}
+            {isRenting ? '…' : isConnected ? t('agent.rent') : t('agent.connect')}
           </button>
         </div>
       </>
@@ -206,11 +204,11 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
               e.preventDefault();
               handleRent();
             }}
-            disabled={isPending || isConfirming}
+            disabled={isRenting}
             className="text-xs font-medium text-black px-4 py-2 rounded-full transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
             style={{ background: '#40FFAF' }}
           >
-            {isPending ? t('agent.confirming') : isConfirming ? t('agent.processing') : isConnected ? t('agent.rent') : t('agent.connect')}
+            {isRenting ? t('agent.processing') : isConnected ? t('agent.rent') : t('agent.connect')}
           </button>
         </div>
 

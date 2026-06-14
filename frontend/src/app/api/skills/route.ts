@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const SCRAPER_URL = 'https://variations-pixel-ebony-film.trycloudflare.com';
+const SCRAPER_URL = process.env.SCRAPER_URL || 'https://variations-pixel-ebony-film.trycloudflare.com';
 
 export async function GET() {
   try {

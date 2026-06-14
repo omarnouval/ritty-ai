@@ -125,10 +125,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const VALID_CATEGORIES = ['general', 'bug', 'feature', 'agent', 'ui', 'other'];
     const sanitized = {
       name: (name || '').toString().slice(0, 100).trim() || 'Anonymous',
       email: (email || '').toString().slice(0, 200).trim(),
-      category: (category || 'general').toString().slice(0, 50).trim(),
+      category: VALID_CATEGORIES.includes((category || 'general').toString().trim()) ? category.trim() : 'general',
       message: message.toString().slice(0, 5000).trim(),
     };
 
@@ -137,6 +138,12 @@ export async function POST(request: NextRequest) {
 
     if (!sent) {
       console.error('Failed to send feedback to Telegram');
+      return securityHeaders(
+        NextResponse.json(
+          { success: false, error: 'Failed to deliver feedback. Please try again.' },
+          { status: 502 }
+        )
+      );
     }
 
     return securityHeaders(

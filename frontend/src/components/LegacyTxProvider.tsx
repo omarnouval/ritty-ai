@@ -1,8 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useAccount } from 'wagmi';
-
 /**
  * Minimal provider — no monkey-patching.
  * Let the wallet handle transaction types natively.

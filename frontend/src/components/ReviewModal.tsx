@@ -2,12 +2,7 @@
 
 import { useState } from 'react';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseAbi } from 'viem';
-
-const MARKETPLACE_ADDRESS = '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE';
-const MARKETPLACE_ABI = parseAbi([
-  'function rateAgent(uint256 _agentId, uint8 _rating) external',
-]);
+import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 
 interface Props {
   isOpen: boolean;
@@ -18,6 +13,20 @@ interface Props {
 
 const RATING_LABELS = ['', 'Terrible', 'Bad', 'Okay', 'Good', 'Excellent'];
 const RATING_EMOJIS = ['', '😤', '😕', '😐', '😊', '🤩'];
+
+// rateAgent ABI
+const RATE_ABI = [
+  {
+    name: 'rateAgent',
+    type: 'function',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: '_agentId', type: 'uint256' },
+      { name: '_rating', type: 'uint8' },
+    ],
+    outputs: [],
+  },
+] as const;
 
 export default function ReviewModal({ isOpen, agentId, agentName, onClose }: Props) {
   const [rating, setRating] = useState(0);
@@ -35,7 +44,7 @@ export default function ReviewModal({ isOpen, agentId, agentName, onClose }: Pro
     try {
       writeContract({
         address: MARKETPLACE_ADDRESS,
-        abi: MARKETPLACE_ABI,
+        abi: RATE_ABI,
         functionName: 'rateAgent',
         args: [BigInt(agentId), rating],
       });

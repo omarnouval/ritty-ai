@@ -59,15 +59,22 @@ export default function AdminDashboard() {
     }
   }, [authenticated]);
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Password from env or default
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'bosowa2000';
-    if (password === adminPassword) {
-      sessionStorage.setItem('ritty_admin', 'ok');
-      setAuthenticated(true);
-      setPasswordError(false);
-    } else {
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        sessionStorage.setItem('ritty_admin', 'ok');
+        setAuthenticated(true);
+        setPasswordError(false);
+      } else {
+        setPasswordError(true);
+      }
+    } catch {
       setPasswordError(true);
     }
   };
@@ -136,7 +143,7 @@ export default function AdminDashboard() {
       const { createPublicClient, http } = await import('viem');
       
       const client = createPublicClient({
-        chain: { id: 1979, name: 'Ritual', rpcUrls: { default: { http: ['https://rpc.ritualfoundation.org'] } } },
+        chain: { id: 1979, name: 'Ritual', nativeCurrency: { name: 'RITUAL', symbol: 'RITUAL', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.ritualfoundation.org'] } } },
         transport: http('https://rpc.ritualfoundation.org'),
       });
 
@@ -214,7 +221,7 @@ export default function AdminDashboard() {
           });
           
           if (username) {
-            userList.push({ address: addr, username });
+            userList.push({ address: addr, username, hasProfile: true, isOwner: false, isRenter: false });
           }
         } catch (e) {
           // No profile
@@ -362,7 +369,7 @@ export default function AdminDashboard() {
                       {users.map((user) => (
                         <div key={user.address} className="flex items-center gap-2 py-2 px-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.02)' }}>
                           <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(64,255,175,0.15)', color: '#40FFAF' }}>
-                            {user.username.charAt(0).toUpperCase()}
+                            {user.username ? user.username.charAt(0).toUpperCase() : '?'}
                           </div>
                           <div>
                             <div className="text-sm font-medium text-white">{user.username}</div>

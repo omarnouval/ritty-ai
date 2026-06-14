@@ -18,7 +18,9 @@ interface ChatBoxProps {
 }
 
 export function ChatBox({ agentName, agentCategory, agentIcon, remainingTime, onExtend, onSwitch }: ChatBoxProps) {
-  const storageKey = `ritty_chat_${agentCategory}`;
+  const storageKey = typeof window !== 'undefined'
+    ? `ritty_chat_${(window as any).__ritty_user_address || 'anon'}_${agentCategory}`
+    : `ritty_chat_anon_${agentCategory}`;
   
   // Load messages from localStorage
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -26,9 +28,15 @@ export function ChatBox({ agentName, agentCategory, agentIcon, remainingTime, on
     try {
       const saved = localStorage.getItem(storageKey);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        // Restore Date objects
-        return parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) }));
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            return parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) }));
+          }
+        } catch {
+          // Corrupted data — clear it
+          localStorage.removeItem(storageKey);
+        }
       }
     } catch {}
     return [];

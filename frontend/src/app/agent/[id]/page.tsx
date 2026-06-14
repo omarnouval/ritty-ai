@@ -70,7 +70,6 @@ export default function AgentDetailPage() {
       functionName: 'rentAgent',
       args: [agentId, BigInt(hours)],
       value: rentalCost,
-      type: 'legacy' as const,
     });
   };
 
@@ -86,8 +85,19 @@ export default function AgentDetailPage() {
   // After username created, auto-rent
   const handleUsernameComplete = useCallback((username: string) => {
     setShowUsernameModal(false);
-    doRent();
-  }, [rentalCost, selectedHours, customHours, useCustom]);
+    // Trigger rent after a tick to ensure state is updated
+    setTimeout(() => {
+      const hours = useCustom ? parseInt(customHours) || 1 : selectedHours;
+      if (!rentalCost || !rentAgent) return;
+      rentAgent({
+        address: MARKETPLACE_ADDRESS,
+        abi: MARKETPLACE_ABI,
+        functionName: 'rentAgent',
+        args: [agentId, BigInt(hours)],
+        value: rentalCost,
+      });
+    }, 100);
+  }, [rentalCost, selectedHours, customHours, useCustom, rentAgent, agentId]);
 
   if (isLoading) {
     return (
@@ -118,7 +128,7 @@ export default function AgentDetailPage() {
   const [owner, agentContract, name, description, pricePerHour, totalEarnings, totalRentals, rating, ratingCount, isActive, agentType] = agent;
   const pricePerHourEth = formatEther(pricePerHour);
   const costEth = rentalCost ? formatEther(rentalCost) : '0';
-  const avgRating = ratingCount > 0 ? Number(rating) / Number(ratingCount) : 0;
+  const avgRating = ratingCount > 0 ? Number(rating) / 100 : 0;
   const agentTypes = ['Persistent', 'Sovereign'];
 
   return (

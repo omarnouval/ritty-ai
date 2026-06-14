@@ -118,7 +118,7 @@ export default function DashboardPage() {
       category: cat.id,
       icon: cat.icon,
       endTime: Math.floor(Date.now() / 1000) + 3600, // 1 hour
-      agentAddress: '0x' + Math.random().toString(16).slice(2, 42),
+      agentAddress: '0x' + Array.from({ length: 40 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
     };
     setActiveRentals((prev) => [...prev, newRental]);
     setChatRental(newRental);
