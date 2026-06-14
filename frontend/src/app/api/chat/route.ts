@@ -190,13 +190,14 @@ const SKILL_MAPPING: Record<string, string[]> = {
   'interview|wawancara|interview prep': ['interview-me'],
 
   // Healthcare skills
-  'kesehatan|health|penyakit|disease|symptom|gejala': ['deep-research'],
-  'obat|medication|medicine|drug|farmasi': ['deep-research'],
-  'lab|laboratory|blood test|darah|kolesterol|cholesterol': ['deep-research'],
-  'bmi|blood pressure|tekanan darah|gula darah|diabetes': ['deep-research'],
-  'diet|nutrition|nutrisi|makanan|food': ['deep-research'],
+  'kesehatan|health|penyakit|disease|symptom|gejala': ['deep-research', 'academic-paper'],
+  'obat|medication|medicine|drug|farmasi': ['deep-research', 'academic-paper'],
+  'lab|laboratory|blood test|darah|kolesterol|cholesterol': ['deep-research', 'academic-paper'],
+  'bmi|blood pressure|tekanan darah|gula darah|diabetes': ['deep-research', 'academic-paper'],
+  'diet|nutrition|nutrisi|makanan|food': ['deep-research', 'academic-paper'],
   'exercise|olahraga|fitness|workout': ['deep-research'],
-  'mental health|stress|anxiety|depresi|kesehatan mental': ['deep-research'],
+  'mental health|stress|anxiety|depresi|kesehatan mental': ['deep-research', 'academic-paper'],
+  'jurnal|journal|paper|riset|research|studi|study': ['academic-paper', 'academic-paper-reviewer'],
 };
 
 // Detect if user message needs skills
