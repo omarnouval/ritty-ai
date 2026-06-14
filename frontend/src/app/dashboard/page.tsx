@@ -11,6 +11,7 @@ import { UsernameModal } from '@/components/UsernameModal';
 import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import ReviewModal from '@/components/ReviewModal';
+import { NotificationBanner } from '@/components/NotificationBanner';
 
 interface ActiveRental {
   id: string;
@@ -177,6 +178,7 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
+      <NotificationBanner address={address} />
       <DashboardNav username={username} />
 
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-8">

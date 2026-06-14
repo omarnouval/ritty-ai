@@ -60,6 +60,8 @@ export default function RequestAgentModal({ isOpen, onClose }: Props) {
       if (data.success) {
         setTicketId(data.ticket.id);
         setSubmitted(true);
+        // Trigger notification event for dashboard
+        window.dispatchEvent(new CustomEvent('ticket-update', { detail: { ticketId: data.ticket.id, status: 'waiting' } }));
       } else {
         setError(data.error || 'Failed to submit request');
       }
