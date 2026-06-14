@@ -39,10 +39,18 @@ export function ChatBox({ agentName, agentCategory, agentIcon, remainingTime, on
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length > 0 && remainingTime > 0) {
       localStorage.setItem(storageKey, JSON.stringify(messages));
     }
-  }, [messages, storageKey]);
+  }, [messages, storageKey, remainingTime]);
+
+  // Clear chat history when rental expires
+  useEffect(() => {
+    if (remainingTime <= 0 && messages.length > 0) {
+      localStorage.removeItem(storageKey);
+      setMessages([]);
+    }
+  }, [remainingTime, storageKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Add welcome message for new chats
   useEffect(() => {
