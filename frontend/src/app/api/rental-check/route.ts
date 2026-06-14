@@ -62,15 +62,7 @@ export async function GET(request: NextRequest) {
       transport: http(),
     });
 
-    // Get rental info
-    const [rentalId, startTime, endTime, active] = await client.readContract({
-      address: MARKETPLACE_ADDRESS,
-      abi: RENTAL_ABI,
-      functionName: 'getActiveRental',
-      args: [address as `0x${string}`, BigInt(agentId)],
-    });
-
-    // Get agent name
+    // Get agent name first
     let name = `Agent #${agentId}`;
     try {
       const agentData = await client.readContract({
@@ -79,18 +71,31 @@ export async function GET(request: NextRequest) {
         functionName: 'agents',
         args: [BigInt(agentId)],
       });
-      name = agentData[2]; // name is 3rd output
+      if (agentData[2]) name = agentData[2];
     } catch {
       // skip
     }
 
-    return NextResponse.json({
-      active,
-      rentalId: rentalId.toString(),
-      startTime: startTime.toString(),
-      endTime: endTime.toString(),
-      name,
-    });
+    // Get rental info — contract reverts if no rental exists
+    try {
+      const [rentalId, startTime, endTime, active] = await client.readContract({
+        address: MARKETPLACE_ADDRESS,
+        abi: RENTAL_ABI,
+        functionName: 'getActiveRental',
+        args: [address as `0x${string}`, BigInt(agentId)],
+      });
+
+      return NextResponse.json({
+        active,
+        rentalId: rentalId.toString(),
+        startTime: startTime.toString(),
+        endTime: endTime.toString(),
+        name,
+      });
+    } catch {
+      // Contract reverts when no rental exists — that's expected
+      return NextResponse.json({ active: false, rentalId: '0', startTime: '0', endTime: '0', name });
+    }
   } catch (error: any) {
     console.error('Rental check error:', error);
     return NextResponse.json({ active: false, error: 'Internal server error' }, { status: 500 });
