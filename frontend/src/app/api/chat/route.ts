@@ -283,7 +283,7 @@ const AGENT_IDS: Record<string, bigint> = {
   'trading': BigInt(2),
   'marketing': BigInt(3),
   'coding': BigInt(4),
-  'healthcare': BigInt(5),
+  'healthcare': BigInt(12),
 };
 
 // System prompts per category (with anti-injection suffix)
