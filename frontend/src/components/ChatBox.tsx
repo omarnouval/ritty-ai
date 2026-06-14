@@ -18,16 +18,42 @@ interface ChatBoxProps {
 }
 
 export function ChatBox({ agentName, agentCategory, agentIcon, remainingTime, onExtend, onSwitch }: ChatBoxProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'agent',
-      content: `Hi! I'm your ${agentCategory} agent. How can I help you today?`,
-      timestamp: new Date(),
-    },
-  ]);
+  const storageKey = `ritty_chat_${agentCategory}`;
+  
+  // Load messages from localStorage
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Restore Date objects
+        return parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) }));
+      }
+    } catch {}
+    return [];
+  });
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem(storageKey, JSON.stringify(messages));
+    }
+  }, [messages, storageKey]);
+
+  // Add welcome message for new chats
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{
+        role: 'agent',
+        content: `Hi! I'm your ${agentCategory} agent. How can I help you today?`,
+        timestamp: new Date(),
+      }]);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
