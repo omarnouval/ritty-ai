@@ -499,7 +499,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Add language enforcement at the end (after context data) for strong recency bias
-    systemPrompt += `\n\nCRITICAL LANGUAGE RULE: Detect the language of the user's message and respond ONLY in that same language. If the user writes in Indonesian, respond in Indonesian. If in Korean, respond in Korean. If in English, respond in English. NEVER switch languages unless the user does first.`;
+    systemPrompt += `\n\nLANGUAGE RULE (HIGHEST PRIORITY): You MUST respond in the EXACT same language as the user's last message. Indonesian → reply in Indonesian. English → reply in English. Korean → reply in Korean. This is NON-NEGOTIABLE. If user writes "halo" you reply in Indonesian. If user writes "hello" you reply in English. NEVER break this rule.`;
 
     // 6. Call real LLM
     const response = await callMimo(systemPrompt, sanitized.clean);
