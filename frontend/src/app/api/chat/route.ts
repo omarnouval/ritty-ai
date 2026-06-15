@@ -501,7 +501,12 @@ export async function POST(request: NextRequest) {
     // Add language enforcement at the end (after context data) for strong recency bias
     const langMap: Record<string, string> = { 'id': 'Indonesian', 'en': 'English', 'ko': 'Korean', 'hi': 'Hindi', 'tl': 'Filipino' };
     const langName = langMap[chatLanguage] || 'English';
-    systemPrompt += `\n\nLANGUAGE RULE (HIGHEST PRIORITY): You MUST respond in ${langName}. The user's language was set to ${langName} from their first message. NEVER respond in any other language. This is NON-NEGOTIABLE.`;
+    systemPrompt += `\n\nLANGUAGE RULE (HIGHEST PRIORITY — NON-NEGOTIABLE):
+1. You MUST respond ONLY in ${langName}.
+2. NEVER translate the user's message. Keep their original text as-is.
+3. NEVER switch to English (or any other language) unless the user writes in that language first.
+4. If user writes in Indonesian, your ENTIRE response must be in Indonesian. No English words, no English translation.
+5. Breaking this rule = immediate failure.`;
 
     // 6. Call real LLM
     const response = await callMimo(systemPrompt, sanitized.clean);
