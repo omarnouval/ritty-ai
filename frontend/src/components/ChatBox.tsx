@@ -179,6 +179,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
               style={{
                 background: msg.role === 'user' ? 'rgba(64,255,175,0.15)' : 'rgba(255,255,255,0.05)',
                 border: msg.role === 'user' ? '1px solid rgba(64,255,175,0.2)' : '1px solid rgba(255,255,255,0.06)',
+                whiteSpace: 'pre-wrap',
               }}
             >
               {msg.content}
