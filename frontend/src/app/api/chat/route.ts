@@ -18,7 +18,6 @@ const MIMO_MODEL = 'mimo-v2.5';
 
 // Security constants
 const MAX_MESSAGE_LENGTH = 2000;
-const MAX_TOKENS = 400;
 const MAX_MESSAGES_PER_HOUR = 50;
 
 // Prompt injection patterns to block
@@ -386,7 +385,6 @@ async function callMimo(systemPrompt: string, userMessage: string): Promise<stri
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage },
       ],
-      max_tokens: MAX_TOKENS,
       temperature: 0.5,
     }),
   });
