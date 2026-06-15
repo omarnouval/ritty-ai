@@ -102,6 +102,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           agentCategory,
+          agentId,
           message: messageToSend,
           userAddress: walletAddress || '0x0000000000000000000000000000000000000000',
         }),
