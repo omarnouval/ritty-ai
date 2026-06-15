@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -16,6 +16,7 @@ import { useNotifications } from '@/components/NotificationProvider';
 
 export default function AgentDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const agentId = params?.id ? BigInt(params.id as string) : BigInt(0);
   const { address, isConnected } = useAccount();
   const { t } = useTranslations();
@@ -63,6 +64,16 @@ export default function AgentDetailPage() {
   const { isLoading: isRentConfirming, isSuccess: isRentSuccess } = useWaitForTransactionReceipt({
     hash: rentHash,
   });
+
+  // Auto-redirect to dashboard after successful rental
+  useEffect(() => {
+    if (isRentSuccess) {
+      const timer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 2000); // 2 second delay to show success message
+      return () => clearTimeout(timer);
+    }
+  }, [isRentSuccess, router]);
 
   const doRent = () => {
     const hours = useCustom ? parseInt(customHours) || 1 : selectedHours;
