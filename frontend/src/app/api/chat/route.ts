@@ -308,7 +308,7 @@ async function verifyRentalById(userAddress: string, agentId: bigint): Promise<b
     // Use AgentRented events instead of getActiveRental
     // Reduced range to 5000 blocks for faster queries (~2-3 hours of blocks)
     const latest = await client.getBlockNumber();
-    const fromBlock = latest - BigInt(5000);
+    const fromBlock = latest - BigInt(50000);
     
     const RENTAL_EVENT = {
       type: 'event' as const,
