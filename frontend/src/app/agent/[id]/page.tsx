@@ -69,11 +69,11 @@ export default function AgentDetailPage() {
   useEffect(() => {
     if (isRentSuccess) {
       const timer = setTimeout(() => {
-        router.push('/dashboard');
+        window.location.href = '/dashboard'; // Hard redirect for mobile reliability
       }, 2000); // 2 second delay to show success message
       return () => clearTimeout(timer);
     }
-  }, [isRentSuccess, router]);
+  }, [isRentSuccess]);
 
   const doRent = async () => {
     const hours = useCustom ? parseInt(customHours) || 1 : selectedHours;
@@ -83,13 +83,40 @@ export default function AgentDetailPage() {
     setRentError('');
     
     try {
-      await sendDirectTx({
+      const hash = await sendDirectTx({
         to: MARKETPLACE_ADDRESS,
         abi: MARKETPLACE_ABI as any,
         functionName: 'rentAgent',
         args: [agentId, BigInt(hours)],
         value: rentalCost,
       });
+      
+      // Wait for receipt to confirm TX actually succeeded
+      const provider = (window as any).ethereum;
+      let receipt = null;
+      let attempts = 0;
+      while (!receipt && attempts < 30) {
+        await new Promise(r => setTimeout(r, 1000));
+        try {
+          receipt = await provider.request({
+            method: 'eth_getTransactionReceipt',
+            params: [hash],
+          });
+        } catch {
+          // retry
+        }
+        attempts++;
+      }
+      
+      if (!receipt) {
+        throw new Error('Transaction timeout - please check your wallet');
+      }
+      
+      if (receipt.status === '0x0' || receipt.status === '0') {
+        throw new Error('Transaction failed on-chain. Please try again.');
+      }
+      
+      // TX confirmed successful
       setIsRentSuccess(true);
     } catch (err: any) {
       setRentError(err.message || 'Transaction failed');

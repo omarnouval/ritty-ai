@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAccount, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useReadContract } from 'wagmi';
 import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
 import { sendDirectTx } from '@/lib/directTx';
 
@@ -17,9 +17,8 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   const [isPending, setIsPending] = useState(false);
-
-  const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash: txHash });
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const { data: hasProfile, isLoading: isCheckingProfile } = useReadContract({
     address: PROFILE_ADDRESS,
@@ -59,12 +58,44 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
         functionName: 'createProfile',
         args: [username, bio || 'Ritty.ai user'],
       });
-      setTxHash(hash);
+      
+      setIsPending(false);
+      setIsConfirming(true);
+      
+      // Wait for receipt to confirm TX actually succeeded
+      const provider = (window as any).ethereum;
+      let receipt = null;
+      let attempts = 0;
+      while (!receipt && attempts < 30) {
+        await new Promise(r => setTimeout(r, 1000));
+        try {
+          receipt = await provider.request({
+            method: 'eth_getTransactionReceipt',
+            params: [hash],
+          });
+        } catch {
+          // retry
+        }
+        attempts++;
+      }
+      
+      setIsConfirming(false);
+      
+      if (!receipt) {
+        throw new Error('Transaction timeout - please check your wallet');
+      }
+      
+      if (receipt.status === '0x0' || receipt.status === '0') {
+        throw new Error('Transaction failed on-chain. Please try again.');
+      }
+      
+      // TX confirmed successful
+      setIsSuccess(true);
     } catch (err: any) {
       if (err.message?.includes('Username taken')) setError('Username already taken');
       else setError(err.message || 'Transaction failed');
-    } finally {
       setIsPending(false);
+      setIsConfirming(false);
     }
   };
 
@@ -106,7 +137,6 @@ export function UsernameModal({ onComplete }: UsernameModalProps) {
         <button onClick={handleCreate} disabled={!username || !isAvailable || isPending || isConfirming} className="w-full mt-6 py-3 rounded-xl text-sm font-medium text-black disabled:opacity-40 transition-all" style={{ background: '#40FFAF' }}>
           {isPending ? 'Confirm in wallet...' : isConfirming ? 'Creating profile...' : 'Create Profile'}
         </button>
-        {txHash && <p className="text-xs text-center text-gray-500 mt-3">TX: {txHash.slice(0, 10)}...{txHash.slice(-8)}</p>}
         <p className="text-xs text-center text-gray-600 mt-4">Stored on-chain on Ritual Testnet</p>
       </div>
     </div>
