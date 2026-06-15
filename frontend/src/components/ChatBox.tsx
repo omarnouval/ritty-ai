@@ -14,13 +14,14 @@ interface ChatBoxProps {
   agentCategory: string;
   agentIcon: string;
   remainingTime: number; // seconds
+  walletAddress?: string;
   onExtend?: () => void;
   onSwitch?: () => void;
 }
 
-export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainingTime, onExtend, onSwitch }: ChatBoxProps) {
+export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainingTime, walletAddress, onExtend, onSwitch }: ChatBoxProps) {
   const storageKey = typeof window !== 'undefined'
-    ? `ritty_chat_${(window as any).__ritty_user_address || 'anon'}_agent${agentId}`
+    ? `ritty_chat_${walletAddress || (window as any).__ritty_user_address || 'anon'}_agent${agentId}`
     : `ritty_chat_anon_agent${agentId}`;
   
   // Load messages from localStorage
@@ -102,7 +103,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
         body: JSON.stringify({
           agentCategory,
           message: messageToSend,
-          userAddress: '0x0000000000000000000000000000000000000000',
+          userAddress: walletAddress || '0x0000000000000000000000000000000000000000',
         }),
       });
 

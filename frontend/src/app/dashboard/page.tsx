@@ -292,6 +292,7 @@ export default function DashboardPage() {
               agentCategory={chatRental.category}
               agentIcon={chatRental.icon}
               remainingTime={counters[chatRental.id] || 0}
+              walletAddress={address}
               onExtend={() => {/* TODO: extend rental */}}
               onSwitch={() => setChatRental(null)}
             />
