@@ -466,7 +466,22 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Fetch real-time data and skills if needed
-    let systemPrompt = SYSTEM_PROMPTS[agentCategory];
+    const langMap: Record<string, string> = { 'id': 'Indonesian', 'en': 'English', 'ko': 'Korean', 'hi': 'Hindi', 'tl': 'Filipino' };
+    const langName = langMap[chatLanguage] || 'English';
+    
+    // Language instruction at BEGINNING (mimo follows first instruction best)
+    let langPrefix = '';
+    if (chatLanguage === 'id') {
+      langPrefix = `PENTING: Semua respons HARUS dalam bahasa Indonesia. Jangan terjemahkan pesan pengguna. Jangan gunakan bahasa Inggris sama sekali. Balas dalam bahasa Indonesia.\n\n`;
+    } else if (chatLanguage === 'ko') {
+      langPrefix = `중요: 모든 응답은 한국어로만 작성하세요. 사용자의 메시지를 번역하지 마세요. 영어를 사용하지 마세요.\n\n`;
+    } else if (chatLanguage === 'hi') {
+      langPrefix = `महत्वपूर्ण: सभी उत्तर केवल हिंदी में होने चाहिए। उपयोगकर्ता के संदेश का अनुवाद न करें। अंग्रेज़ी का उपयोग न करें।\n\n`;
+    } else if (chatLanguage === 'tl') {
+      langPrefix = `MAHALAGA: Lahat ng sagot ay dapat sa Tagalog. Huwag isalin ang mensahe ng user. Huwag gumamit ng English.\n\n`;
+    }
+    
+    let systemPrompt = langPrefix + SYSTEM_PROMPTS[agentCategory];
     let contextData = '';
     
     // Get relevant skills
@@ -498,15 +513,8 @@ export async function POST(request: NextRequest) {
       systemPrompt = `${systemPrompt}\n\n${contextData}`;
     }
 
-    // Add language enforcement at the end (after context data) for strong recency bias
-    const langMap: Record<string, string> = { 'id': 'Indonesian', 'en': 'English', 'ko': 'Korean', 'hi': 'Hindi', 'tl': 'Filipino' };
-    const langName = langMap[chatLanguage] || 'English';
-    systemPrompt += `\n\nLANGUAGE RULE (HIGHEST PRIORITY — NON-NEGOTIABLE):
-1. You MUST respond ONLY in ${langName}.
-2. NEVER translate the user's message. Keep their original text as-is.
-3. NEVER switch to English (or any other language) unless the user writes in that language first.
-4. If user writes in Indonesian, your ENTIRE response must be in Indonesian. No English words, no English translation.
-5. Breaking this rule = immediate failure.`;
+    // Reinforce language at end too
+    systemPrompt += `\n\nREMEMBER: Respond in ${langName} only. No translation. No English.`;
 
     // 6. Call real LLM
     const response = await callMimo(systemPrompt, sanitized.clean);
