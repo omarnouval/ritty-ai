@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import MobileMenu from '@/components/MobileMenu';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
 import { formatEther } from 'viem';
@@ -329,6 +330,7 @@ function Nav() {
         <Link href="/agent-rent" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('buttons.marketplace')}</Link>
         <ConnectButton />
         <LanguageSwitcher />
+        <MobileMenu />
       </div>
     </nav>
   );

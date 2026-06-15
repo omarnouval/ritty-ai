@@ -6,6 +6,7 @@ import { useAccount, useReadContract } from 'wagmi';
 import Link from 'next/link';
 import Image from 'next/image';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import MobileMenu from '@/components/MobileMenu';
 import { ChatBox } from '@/components/ChatBox';
 import { UsernameModal } from '@/components/UsernameModal';
 import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
@@ -52,9 +53,10 @@ function DashboardNav({ username }: { username?: string | null }) {
           )}
           <ConnectButton />
           <LanguageSwitcher />
+          <MobileMenu />
         </div>
       </div>
-    </nav>
+      </nav>
   );
 }
 

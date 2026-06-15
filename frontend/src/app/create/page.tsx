@@ -4,6 +4,7 @@ import { CreateAgentForm } from '@/components/CreateAgentForm';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import MobileMenu from '@/components/MobileMenu';
 
 export default function CreatePage() {
   return (
@@ -16,6 +17,7 @@ export default function CreatePage() {
         <div className="flex items-center gap-2 md:gap-6 shrink-0">
           <ConnectButton />
           <LanguageSwitcher />
+          <MobileMenu />
         </div>
       </nav>
       <div className="px-4 py-8">

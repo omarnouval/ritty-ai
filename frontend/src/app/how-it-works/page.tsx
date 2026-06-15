@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 export default function HowItWorksPage() {
@@ -29,6 +30,7 @@ export default function HowItWorksPage() {
         <div className="flex items-center gap-2 md:gap-3">
           <ConnectButton />
           <LanguageSwitcher />
+          <MobileMenu />
         </div>
       </nav>
 

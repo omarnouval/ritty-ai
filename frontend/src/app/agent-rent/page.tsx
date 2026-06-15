@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 import RequestAgentModal from '@/components/RequestAgentModal';
 
@@ -46,6 +47,7 @@ export default function AgentRentPage() {
           )}
           <ConnectButton />
           <LanguageSwitcher />
+          <MobileMenu />
         </div>
       </nav>
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAccount, useConnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 import dynamic from 'next/dynamic';
 const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false });
@@ -141,6 +142,7 @@ export default function Home() {
 
         <div className="flex items-center gap-2 md:gap-3">
           <LanguageSwitcher />
+          <MobileMenu />
         </div>
       </nav>
 
