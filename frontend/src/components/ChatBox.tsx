@@ -205,14 +205,19 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
             </button>
           </div>
         ) : (
-          <div className="flex gap-2">
-            <input
-              type="text"
+          <div className="flex gap-2 items-end">
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Type your message..."
-              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#40FFAF]/40 transition placeholder-gray-600"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              placeholder="Type your message... (Shift+Enter for new line)"
+              rows={1}
+              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#40FFAF]/40 transition placeholder-gray-600 resize-none max-h-32 overflow-y-auto"
             />
             <button
               onClick={handleSend}
