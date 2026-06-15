@@ -9,6 +9,7 @@ interface Message {
 }
 
 interface ChatBoxProps {
+  agentId: number;
   agentName: string;
   agentCategory: string;
   agentIcon: string;
@@ -17,10 +18,10 @@ interface ChatBoxProps {
   onSwitch?: () => void;
 }
 
-export function ChatBox({ agentName, agentCategory, agentIcon, remainingTime, onExtend, onSwitch }: ChatBoxProps) {
+export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainingTime, onExtend, onSwitch }: ChatBoxProps) {
   const storageKey = typeof window !== 'undefined'
-    ? `ritty_chat_${(window as any).__ritty_user_address || 'anon'}_${agentCategory}`
-    : `ritty_chat_anon_${agentCategory}`;
+    ? `ritty_chat_${(window as any).__ritty_user_address || 'anon'}_agent${agentId}`
+    : `ritty_chat_anon_agent${agentId}`;
   
   // Load messages from localStorage
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -65,7 +66,7 @@ export function ChatBox({ agentName, agentCategory, agentIcon, remainingTime, on
     if (messages.length === 0) {
       setMessages([{
         role: 'agent',
-        content: `Hi! I'm your ${agentCategory} agent. How can I help you today?`,
+        content: `Hi! I'm your ${agentName} agent. How can I help you today?`,
         timestamp: new Date(),
       }]);
     }

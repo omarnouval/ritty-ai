@@ -287,6 +287,7 @@ export default function DashboardPage() {
           <div className="mb-8" style={{ height: '500px' }}>
             <ChatBox
               key={chatRental.id}
+              agentId={chatRental.agentId}
               agentName={chatRental.agentName}
               agentCategory={chatRental.category}
               agentIcon={chatRental.icon}
