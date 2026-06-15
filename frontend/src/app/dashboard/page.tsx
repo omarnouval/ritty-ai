@@ -179,6 +179,17 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [activeRentals, reviewedRentals, showReviewModal]);
 
+  // Refresh rental data when tab becomes visible (fixes browser throttle causing expired display)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && isConnected && address) {
+        fetchActiveRentals();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [isConnected, address, fetchActiveRentals]);
+
   // Check username on connect
   useEffect(() => {
     if (isConnected && address) {
