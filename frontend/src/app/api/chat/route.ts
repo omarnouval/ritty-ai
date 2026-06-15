@@ -309,8 +309,9 @@ async function verifyRental(userAddress: string, agentCategory: string): Promise
     });
 
     // Use AgentRented events instead of getActiveRental
+    // Reduced range to 5000 blocks for faster queries (~2-3 hours of blocks)
     const latest = await client.getBlockNumber();
-    const fromBlock = latest - BigInt(100000);
+    const fromBlock = latest - BigInt(5000);
     
     const RENTAL_EVENT = {
       type: 'event' as const,
@@ -323,7 +324,12 @@ async function verifyRental(userAddress: string, agentCategory: string): Promise
       ],
     };
 
-    const logs = await client.getLogs({
+    // Add timeout to prevent Vercel function timeout
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Rental check timeout')), 8000)
+    );
+    
+    const checkPromise = client.getLogs({
       address: MARKETPLACE_ADDRESS as `0x${string}`,
       event: RENTAL_EVENT,
       args: {
@@ -334,7 +340,9 @@ async function verifyRental(userAddress: string, agentCategory: string): Promise
       toBlock: latest,
     });
 
-    if (logs.length === 0) return false;
+    const logs = await Promise.race([checkPromise, timeoutPromise]) as any[];
+
+    if (!logs || logs.length === 0) return false;
 
     // Check if the most recent rental is still active
     const lastLog = logs[logs.length - 1];
