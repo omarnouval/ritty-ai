@@ -135,6 +135,17 @@ export default function DashboardPage() {
     }
   }, [isConnected, address, fetchActiveRentals]);
 
+  // Auto-refresh when page becomes visible (user navigates back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && isConnected && address) {
+        fetchActiveRentals();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isConnected, address, fetchActiveRentals]);
+
   // Countdown timer + detect expiry for review
   useEffect(() => {
     const interval = setInterval(() => {
@@ -197,7 +208,18 @@ export default function DashboardPage() {
           </div>
         ) : activeRentals.length > 0 ? (
           <div className="mb-8">
-            <h2 className="text-xl font-heavy text-white mb-4">Active Rentals</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-heavy text-white">Active Rentals</h2>
+              <button
+                onClick={fetchActiveRentals}
+                className="text-sm text-gray-400 hover:text-white transition flex items-center gap-1"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </button>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {activeRentals.map((rental) => {
                 const remaining = counters[rental.id] || 0;
@@ -237,9 +259,18 @@ export default function DashboardPage() {
             <div className="text-4xl mb-3">🤖</div>
             <p className="text-gray-400 text-lg mb-2">No active rentals</p>
             <p className="text-gray-500 text-sm mb-6">Rent an agent from the marketplace to start chatting</p>
-            <Link href="/agent-rent" className="text-sm px-6 py-2.5 rounded-xl text-black font-medium" style={{ background: '#40FFAF' }}>
-              Browse Agents →
-            </Link>
+            <div className="flex items-center justify-center gap-3">
+              <Link href="/agent-rent" className="text-sm px-6 py-2.5 rounded-xl text-black font-medium" style={{ background: '#40FFAF' }}>
+                Browse Agents →
+              </Link>
+              <button
+                onClick={fetchActiveRentals}
+                className="text-sm px-6 py-2.5 rounded-xl text-gray-400 hover:text-white transition border"
+                style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+              >
+                Refresh
+              </button>
+            </div>
           </div>
         )}
 
