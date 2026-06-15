@@ -392,7 +392,7 @@ async function callMimo(systemPrompt: string, userMessage: string): Promise<stri
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { agentCategory, message, userAddress, agentId: agentIdParam } = body;
+    const { agentCategory, message, userAddress, agentId: agentIdParam, chatLanguage } = body;
 
     // 1. Validation
     if (!agentCategory || !message) {
@@ -499,7 +499,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Add language enforcement at the end (after context data) for strong recency bias
-    systemPrompt += `\n\nLANGUAGE RULE (HIGHEST PRIORITY): You MUST respond in the EXACT same language as the user's last message. Indonesian → reply in Indonesian. English → reply in English. Korean → reply in Korean. This is NON-NEGOTIABLE. If user writes "halo" you reply in Indonesian. If user writes "hello" you reply in English. NEVER break this rule.`;
+    const langMap: Record<string, string> = { 'id': 'Indonesian', 'en': 'English', 'ko': 'Korean', 'hi': 'Hindi', 'tl': 'Filipino' };
+    const langName = langMap[chatLanguage] || 'English';
+    systemPrompt += `\n\nLANGUAGE RULE (HIGHEST PRIORITY): You MUST respond in ${langName}. The user's language was set to ${langName} from their first message. NEVER respond in any other language. This is NON-NEGOTIABLE.`;
 
     // 6. Call real LLM
     const response = await callMimo(systemPrompt, sanitized.clean);

@@ -45,6 +45,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
   });
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [chatLanguage, setChatLanguage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Save messages to localStorage whenever they change
@@ -90,7 +91,16 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
   const handleSend = async () => {
     if (!input.trim() || remainingTime <= 0) return;
 
-    const userMsg: Message = { role: 'user', content: input.trim(), timestamp: new Date() };
+    // Detect language from first message
+    const userMessage = input.trim();
+    if (!chatLanguage) {
+      // Simple detection: if contains Indonesian keywords → id, else → en
+      const indoWords = /\b(gua|gue|gw|lo|lu|yang|ini|itu|ada|gak|nggak|bisa|mau|apa|kenapa|gimana|kapan|dimana|siapa|halo|hai|bang|bro|sis|kak|cok|anjg|anjing|wkwk|oke|ok|gas|jos|mantap|keren|bagus|jelek|sulit|mudah|susah|gampang)\b/i;
+      const lang = indoWords.test(userMessage) ? 'id' : 'en';
+      setChatLanguage(lang);
+    }
+
+    const userMsg: Message = { role: 'user', content: userMessage, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
     const messageToSend = input.trim();
     setInput('');
@@ -105,6 +115,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
           agentId,
           message: messageToSend,
           userAddress: walletAddress || '0x0000000000000000000000000000000000000000',
+          chatLanguage: chatLanguage || 'en',
         }),
       });
 
