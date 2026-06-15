@@ -39,6 +39,7 @@ export async function sendDirectTx({
     from: accounts[0],
     to,
     data,
+    gas: '0x493E0', // 300,000 gas limit - enough for profile creation
   };
 
   if (value && value > BigInt(0)) {
