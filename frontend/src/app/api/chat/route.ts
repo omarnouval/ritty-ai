@@ -479,19 +479,13 @@ export async function POST(request: NextRequest) {
     const langMap: Record<string, string> = { 'id': 'Indonesian', 'en': 'English', 'ko': 'Korean', 'hi': 'Hindi', 'tl': 'Filipino' };
     const langName = langMap[chatLanguage] || 'English';
     
-    // Language instruction at BEGINNING (mimo follows first instruction best)
-    let langPrefix = '';
-    if (chatLanguage === 'id') {
-      langPrefix = `PENTING: Semua respons HARUS dalam bahasa Indonesia. Jangan terjemahkan pesan pengguna. Jangan gunakan bahasa Inggris sama sekali. Balas dalam bahasa Indonesia.\n\n`;
-    } else if (chatLanguage === 'ko') {
-      langPrefix = `중요: 모든 응답은 한국어로만 작성하세요. 사용자의 메시지를 번역하지 마세요. 영어를 사용하지 마세요.\n\n`;
-    } else if (chatLanguage === 'hi') {
-      langPrefix = `महत्वपूर्ण: सभी उत्तर केवल हिंदी में होने चाहिए। उपयोगकर्ता के संदेश का अनुवाद न करें। अंग्रेज़ी का उपयोग न करें।\n\n`;
-    } else if (chatLanguage === 'tl') {
-      langPrefix = `MAHALAGA: Lahat ng sagot ay dapat sa Tagalog. Huwag isalin ang mensahe ng user. Huwag gumamit ng English.\n\n`;
-    }
+    // Build system prompt — match user's language naturally (no aggressive commands)
+    let systemPrompt = chatLanguage === 'id' && SYSTEM_PROMPTS_ID[agentCategory] ? SYSTEM_PROMPTS_ID[agentCategory] : SYSTEM_PROMPTS[agentCategory];
     
-    let systemPrompt = langPrefix + (chatLanguage === 'id' && SYSTEM_PROMPTS_ID[agentCategory] ? SYSTEM_PROMPTS_ID[agentCategory] : SYSTEM_PROMPTS[agentCategory]);
+    // Add user language preference naturally (like a profile, not a command)
+    if (chatLanguage && chatLanguage !== 'en') {
+      systemPrompt += `\n\nUser profile:\n- Language preference: ${langName}`;
+    }
     let contextData = '';
     
     // Get relevant skills
@@ -523,16 +517,8 @@ export async function POST(request: NextRequest) {
       systemPrompt = `${systemPrompt}\n\n${contextData}`;
     }
 
-    // Reinforce language at end too
-    systemPrompt += `\n\nREMEMBER: Respond in ${langName} only. No translation. No English.`;
-
     // 6. Call real LLM
-    // Wrap user message with language context for stubborn models
-    let finalUserMessage = sanitized.clean;
-    if (chatLanguage === 'id') {
-      finalUserMessage = `[Pengguna menulis dalam Bahasa Indonesia. Balas dalam Bahasa Indonesia.] ${sanitized.clean}`;
-    }
-    const response = await callMimo(systemPrompt, finalUserMessage);
+    const response = await callMimo(systemPrompt, sanitized.clean);
 
     return securityHeaders(
       NextResponse.json({
