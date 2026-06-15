@@ -65,13 +65,10 @@ export default function AgentDetailPage() {
   const [isRentSuccess, setIsRentSuccess] = useState(false);
   const [rentError, setRentError] = useState('');
 
-  // Auto-redirect to dashboard after successful rental
+  // Show message after successful rental (no auto-redirect)
   useEffect(() => {
     if (isRentSuccess) {
-      const timer = setTimeout(() => {
-        window.location.href = '/dashboard'; // Hard redirect for mobile reliability
-      }, 2000); // 2 second delay to show success message
-      return () => clearTimeout(timer);
+      // Just show the success message, user will navigate manually
     }
   }, [isRentSuccess]);
 
