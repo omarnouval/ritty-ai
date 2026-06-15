@@ -11,12 +11,13 @@ export default function MobileMenu() {
       {/* Hamburger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex flex-col gap-1.5 p-2 md:hidden"
+        className="flex flex-col justify-center items-center w-10 h-10 md:hidden"
         aria-label="Menu"
+        style={{ minWidth: '40px', minHeight: '40px' }}
       >
-        <span className={`block w-5 h-0.5 bg-white transition-transform ${isOpen ? 'rotate-45 translate-y-2' : ''}`} />
-        <span className={`block w-5 h-0.5 bg-white transition-opacity ${isOpen ? 'opacity-0' : ''}`} />
-        <span className={`block w-5 h-0.5 bg-white transition-transform ${isOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+        <span className={`block w-6 h-0.5 bg-white mb-1.5 transition-transform ${isOpen ? 'rotate-45 translate-y-2' : ''}`} />
+        <span className={`block w-6 h-0.5 bg-white mb-1.5 transition-opacity ${isOpen ? 'opacity-0' : ''}`} />
+        <span className={`block w-6 h-0.5 bg-white transition-transform ${isOpen ? '-rotate-45 -translate-y-2' : ''}`} />
       </button>
 
       {/* Mobile Menu Overlay */}
