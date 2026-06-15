@@ -517,7 +517,12 @@ export async function POST(request: NextRequest) {
     systemPrompt += `\n\nREMEMBER: Respond in ${langName} only. No translation. No English.`;
 
     // 6. Call real LLM
-    const response = await callMimo(systemPrompt, sanitized.clean);
+    // Wrap user message with language context for stubborn models
+    let finalUserMessage = sanitized.clean;
+    if (chatLanguage === 'id') {
+      finalUserMessage = `[Pengguna menulis dalam Bahasa Indonesia. Balas dalam Bahasa Indonesia.] ${sanitized.clean}`;
+    }
+    const response = await callMimo(systemPrompt, finalUserMessage);
 
     return securityHeaders(
       NextResponse.json({
