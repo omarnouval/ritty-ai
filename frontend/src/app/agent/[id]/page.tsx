@@ -3,12 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useReadContract } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import { PROFILE_ADDRESS, PROFILE_ABI } from '@/lib/profile';
+import { sendDirectTx } from '@/lib/directTx';
 import { formatEther } from 'viem';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 import { UsernameModal } from '@/components/UsernameModal';
@@ -59,11 +60,10 @@ export default function AgentDetailPage() {
     query: { enabled: !!address },
   });
 
-  // Rent agent
-  const { data: rentHash, writeContract: rentAgent, isPending: isRenting } = useWriteContract();
-  const { isLoading: isRentConfirming, isSuccess: isRentSuccess } = useWaitForTransactionReceipt({
-    hash: rentHash,
-  });
+  // Rent agent - using sendDirectTx for mobile compatibility
+  const [isRenting, setIsRenting] = useState(false);
+  const [isRentSuccess, setIsRentSuccess] = useState(false);
+  const [rentError, setRentError] = useState('');
 
   // Auto-redirect to dashboard after successful rental
   useEffect(() => {
@@ -75,16 +75,27 @@ export default function AgentDetailPage() {
     }
   }, [isRentSuccess, router]);
 
-  const doRent = () => {
+  const doRent = async () => {
     const hours = useCustom ? parseInt(customHours) || 1 : selectedHours;
     if (!rentalCost) return;
-    rentAgent({
-      address: MARKETPLACE_ADDRESS,
-      abi: MARKETPLACE_ABI,
-      functionName: 'rentAgent',
-      args: [agentId, BigInt(hours)],
-      value: rentalCost,
-    });
+    
+    setIsRenting(true);
+    setRentError('');
+    
+    try {
+      await sendDirectTx({
+        to: MARKETPLACE_ADDRESS,
+        abi: MARKETPLACE_ABI as any,
+        functionName: 'rentAgent',
+        args: [agentId, BigInt(hours)],
+        value: rentalCost,
+      });
+      setIsRentSuccess(true);
+    } catch (err: any) {
+      setRentError(err.message || 'Transaction failed');
+    } finally {
+      setIsRenting(false);
+    }
   };
 
   const handleRent = () => {
@@ -101,17 +112,9 @@ export default function AgentDetailPage() {
     setShowUsernameModal(false);
     // Trigger rent after a tick to ensure state is updated
     setTimeout(() => {
-      const hours = useCustom ? parseInt(customHours) || 1 : selectedHours;
-      if (!rentalCost || !rentAgent) return;
-      rentAgent({
-        address: MARKETPLACE_ADDRESS,
-        abi: MARKETPLACE_ABI,
-        functionName: 'rentAgent',
-        args: [agentId, BigInt(hours)],
-        value: rentalCost,
-      });
+      doRent();
     }, 100);
-  }, [rentalCost, selectedHours, customHours, useCustom, rentAgent, agentId]);
+  }, [doRent]);
 
   if (isLoading) {
     return (
@@ -290,14 +293,19 @@ export default function AgentDetailPage() {
               </Link>
             </div>
           ) : (
-            <button
-              onClick={handleRent}
-              disabled={isRenting || isRentConfirming || !isActive || (useCustom && (!customHours || parseInt(customHours) < 1))}
-              className="w-full py-3 rounded-xl text-sm font-heavy text-black transition disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: '#40FFAF' }}
-            >
-              {isRenting ? t('agent.confirmWallet') : isRentConfirming ? t('agent.processing') : `${t('agent.rentFor')} ${costEth} RITUAL`}
-            </button>
+            <>
+              <button
+                onClick={handleRent}
+                disabled={isRenting || !isActive || (useCustom && (!customHours || parseInt(customHours) < 1))}
+                className="w-full py-3 rounded-xl text-sm font-heavy text-black transition disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ background: '#40FFAF' }}
+              >
+                {isRenting ? t('agent.processing') : `${t('agent.rentFor')} ${costEth} RITUAL`}
+              </button>
+              {rentError && (
+                <p className="text-red-400 text-xs mt-2 text-center">{rentError}</p>
+              )}
+            </>
           )}
         </div>
       </div>

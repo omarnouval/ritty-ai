@@ -83,7 +83,7 @@ export default function DashboardPage() {
   });
 
   // Fetch real active rentals from contract
-  const fetchActiveRentals = useCallback(async () => {
+  const fetchActiveRentals = useCallback(async (retryCount = 0) => {
     if (!address || !agentCount) return;
     setLoadingRentals(true);
     const count = Number(agentCount);
@@ -119,6 +119,14 @@ export default function DashboardPage() {
       setChatRental(rentals[0]);
     }
     setLoadingRentals(false);
+    
+    // Retry if no rentals found and we haven't retried too many times
+    // This helps when redirecting from a fresh rental tx
+    if (rentals.length === 0 && retryCount < 3) {
+      setTimeout(() => {
+        fetchActiveRentals(retryCount + 1);
+      }, 2000 * (retryCount + 1)); // 2s, 4s, 6s delays
+    }
   }, [address, agentCount]);
 
   // Fetch rentals on connect
