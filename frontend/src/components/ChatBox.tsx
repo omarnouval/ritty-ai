@@ -55,13 +55,20 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
     }
   }, [messages, storageKey, remainingTime]);
 
-  // Clear chat history when rental expires
+  // Clear chat history when rental expires (with delay to avoid false clear on mount)
+  const [expireChecked, setExpireChecked] = useState(false);
   useEffect(() => {
-    if (remainingTime <= 0 && messages.length > 0) {
+    // Wait 2 seconds before checking expiry — timer needs time to populate
+    const timer = setTimeout(() => setExpireChecked(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  useEffect(() => {
+    if (expireChecked && remainingTime <= 0 && messages.length > 0) {
       localStorage.removeItem(storageKey);
       setMessages([]);
     }
-  }, [remainingTime, storageKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [expireChecked, remainingTime, storageKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Add welcome message for new chats
   useEffect(() => {

@@ -84,7 +84,7 @@ function getApiKeys(): string[] {
 }
 
 // Scraping microservice config
-const SCRAPER_URL = process.env.SCRAPER_URL || 'https://variations-pixel-ebony-film.trycloudflare.com';
+const SCRAPER_URL = process.env.SCRAPER_URL || 'http://84.252.123.150:8899';
 
 // Web scraping: fetch real-time data via Scrapling service
 async function fetchMarketData(): Promise<string> {
