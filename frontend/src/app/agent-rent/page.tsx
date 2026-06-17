@@ -36,7 +36,7 @@ export default function AgentRentPage() {
   return (
     <main className="min-h-screen relative" style={{ background: 'rgb(8, 9, 23)' }}>
       {/* ColorBends Background */}
-      <div className="absolute inset-0 z-0" style={{ opacity: 0.3 }}>
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.3 }}>
         <ColorBends
           colors={['#40FFAF', '#0D9373', '#0A7558']}
           speed={0.15}

@@ -103,7 +103,7 @@ export default function Home() {
   return (
     <main className="min-h-screen relative" style={{ background: '#050505' }}>
       {/* ─── ColorBends Background ─── */}
-      <div className="absolute inset-0 z-0" style={{ opacity: 0.4 }}>
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.4 }}>
         <ColorBends
           colors={['#40FFAF', '#0D9373', '#0A7558']}
           speed={0.15}
@@ -148,25 +148,25 @@ export default function Home() {
       </nav>
 
       {/* ─── Hero ─── */}
-      <div className="relative z-10 flex flex-col items-center justify-center px-4" style={{ minHeight: 'calc(100vh - 76px)' }}>
-        <div className="max-w-2xl w-full text-center">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 py-12 md:py-0" style={{ minHeight: 'min(calc(100vh - 76px), 100%)' }}>
+        <div className="max-w-2xl w-full text-center overflow-hidden">
           {/* Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-5 tracking-tight neon-text gradient-text" style={{ fontFamily: 'Orbitron, Space Grotesk, sans-serif' }}>
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-3 md:mb-5 tracking-tight neon-text gradient-text" style={{ fontFamily: 'Orbitron, Space Grotesk, sans-serif' }}>
             {hero.line1}<br />
             {hero.prefix && <>{hero.prefix} </>}<span style={{ color: '#40FFAF' }}>{hero.boldWord}</span><span style={{ color: '#40FFAF', fontSize: '0.5em', verticalAlign: 'super' }}>.</span>
           </h1>
 
-          <p className="text-base md:text-lg mb-3 font-light" style={{ color: '#FFFFFF', opacity: 0.7, fontFamily: 'DM Sans, sans-serif' }}>
+          <p className="text-sm sm:text-base md:text-lg mb-2 md:mb-3 font-light" style={{ color: '#FFFFFF', opacity: 0.7, fontFamily: 'DM Sans, sans-serif' }}>
             {HERO_SUB[l] || HERO_SUB.en}
           </p>
 
-          <p className="text-sm mb-14" style={{ color: '#FFFFFF', opacity: 0.4 }}>
+          <p className="text-xs sm:text-sm mb-8 md:mb-14" style={{ color: '#FFFFFF', opacity: 0.4 }}>
             {HERO_NOTE[l] || HERO_NOTE.en}
           </p>
 
           {/* ─── Chat Input ─── */}
           <div
-            className="rounded-2xl p-5 max-w-xl mx-auto transition-all duration-300"
+            className="rounded-2xl p-4 sm:p-5 max-w-xl mx-auto transition-all duration-300"
             style={{
               background: '#111',
               border: `1px solid ${isFocused ? 'rgba(64,255,175,0.25)' : '#222'}`,
@@ -207,12 +207,13 @@ export default function Home() {
             </div>
 
             {/* Type pills */}
-            <div className="flex flex-wrap gap-2 mt-4 pt-4" style={{ borderTop: '1px solid #1A1A1A' }}>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-3 sm:mt-4 pt-3 sm:pt-4" style={{ borderTop: '1px solid #1A1A1A' }}>
               {agentTypes.map((type) => (
                 <button
                   key={type.id}
+                  onPointerDown={(e) => e.preventDefault()}
                   onClick={() => setSelectedType(selectedType === type.id ? null : type.id)}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 cursor-pointer select-none"
                   style={{
                     background: selectedType === type.id ? 'rgba(64,255,175,0.1)' : '#161616',
                     color: selectedType === type.id ? '#40FFAF' : '#A1A1AA',
@@ -227,12 +228,12 @@ export default function Home() {
           </div>
 
           {/* Quick suggestions */}
-          <div className="flex flex-wrap justify-center gap-2.5 mt-10">
+          <div className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2 mt-6 sm:mt-10 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
             {suggestions.map((suggestion) => (
               <button
                 key={suggestion}
                 onClick={() => setPrompt(suggestion)}
-                className="text-xs px-4 py-2 rounded-lg transition-all duration-200 hover:border-[#333]"
+                className="text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all duration-200 hover:border-[#333] whitespace-nowrap shrink-0"
                 style={{ color: '#555', background: '#0A0A0A', border: '1px solid #1A1A1A', fontFamily: 'DM Sans, sans-serif' }}
               >
                 {suggestion}
@@ -241,7 +242,7 @@ export default function Home() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3 md:gap-6 mt-12 md:mt-20 max-w-lg mx-auto px-2">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-6 mt-8 sm:mt-12 md:mt-20 max-w-lg mx-auto px-2">
             {[
               { value: '1979', label: 'Ritual Chain', sub: 'testnet' },
               { value: '5+', label: 'AI Agents', sub: 'ready to rent' },
