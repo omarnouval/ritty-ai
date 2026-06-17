@@ -151,7 +151,7 @@ export default function Home() {
       <div className="relative z-10 flex flex-col items-center justify-center px-4" style={{ minHeight: 'calc(100vh - 76px)' }}>
         <div className="max-w-2xl w-full text-center">
           {/* Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-5 tracking-tight neon-text" style={{ fontFamily: 'Orbitron, Space Grotesk, sans-serif' }}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-5 tracking-tight neon-text gradient-text" style={{ fontFamily: 'Orbitron, Space Grotesk, sans-serif' }}>
             {hero.line1}<br />
             {hero.prefix && <>{hero.prefix} </>}<span style={{ color: '#40FFAF' }}>{hero.boldWord}</span><span style={{ color: '#40FFAF', fontSize: '0.5em', verticalAlign: 'super' }}>.</span>
           </h1>
