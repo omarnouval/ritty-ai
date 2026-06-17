@@ -37,7 +37,7 @@ export default function LanguageSwitcher() {
           color: '#A1A1AA',
           fontSize: 12,
           fontWeight: 500,
-          cursor: 'pointer',
+          cursor: 'none',
           outline: 'none',
           userSelect: 'none',
           WebkitTapHighlightColor: 'transparent',
