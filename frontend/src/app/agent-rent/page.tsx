@@ -12,6 +12,8 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 import RequestAgentModal from '@/components/RequestAgentModal';
+import dynamic from 'next/dynamic';
+const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false });
 
 const VIEW_MODES = ['grid', 'list', 'compact'] as const;
 
@@ -32,9 +34,23 @@ export default function AgentRentPage() {
   });
 
   return (
-    <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
+    <main className="min-h-screen relative" style={{ background: 'rgb(8, 9, 23)' }}>
+      {/* ColorBends Background */}
+      <div className="absolute inset-0 z-0" style={{ opacity: 0.3 }}>
+        <ColorBends
+          colors={['#40FFAF', '#0D9373', '#0A7558']}
+          speed={0.15}
+          frequency={0.8}
+          noise={0.1}
+          rotation={45}
+          transparent={true}
+          warpStrength={1}
+          mouseInfluence={1}
+          parallax={0.5}
+        />
+      </div>
       {/* Nav */}
-      <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
         <Link href="/" className="flex items-center gap-2">
           <img src="/ritty-logo.png" alt="Ritty.ai" className="h-7 md:h-8 w-auto" />
           <span className="text-base md:text-lg font-heavy text-white">Ritty.ai</span>
@@ -52,7 +68,7 @@ export default function AgentRentPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         {/* Header + Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>

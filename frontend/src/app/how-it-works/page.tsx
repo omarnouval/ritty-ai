@@ -7,15 +7,31 @@ import { Search, Link2, Rocket, Wallet, Fuel, Globe, Lightbulb } from 'lucide-re
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
+import dynamic from 'next/dynamic';
+const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false });
 
 export default function HowItWorksPage() {
   const { isConnected } = useAccount();
   const { t } = useTranslations();
 
   return (
-    <main className="min-h-screen" style={{ background: '#050505' }}>
+    <main className="min-h-screen relative" style={{ background: '#050505' }}>
+      {/* ColorBends Background */}
+      <div className="absolute inset-0 z-0" style={{ opacity: 0.3 }}>
+        <ColorBends
+          colors={['#40FFAF', '#0D9373', '#0A7558']}
+          speed={0.15}
+          frequency={0.8}
+          noise={0.1}
+          rotation={45}
+          transparent={true}
+          warpStrength={1}
+          mouseInfluence={1}
+          parallax={0.5}
+        />
+      </div>
       {/* Nav */}
-      <nav className="flex justify-between items-center px-4 md:px-6 lg:px-12 py-4" style={{ borderBottom: '1px solid #161616' }}>
+      <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 lg:px-12 py-4" style={{ borderBottom: '1px solid #161616' }}>
         <Link href="/" className="flex items-center gap-2 md:gap-3">
           <img src="/ritty-logo.png" alt="Ritty.ai" className="h-8 md:h-10 w-auto" />
           <span className="text-lg md:text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
@@ -36,7 +52,7 @@ export default function HowItWorksPage() {
       </nav>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-24">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-24">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight neon-text" style={{ fontFamily: 'Orbitron, sans-serif', color: '#fff' }}>

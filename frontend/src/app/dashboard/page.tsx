@@ -14,6 +14,8 @@ import { AGENT_CATEGORIES, type AgentCategory } from '@/lib/agents';
 import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import ReviewModal from '@/components/ReviewModal';
 import { useNotifications } from '@/components/NotificationProvider';
+import dynamic from 'next/dynamic';
+const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false });
 
 interface ActiveRental {
   id: string;
@@ -38,7 +40,7 @@ const AGENT_CATEGORY_MAP: Record<number, { category: string; Icon: any }> = {
 
 function DashboardNav({ username }: { username?: string | null }) {
   return (
-    <nav className="flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b gap-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+    <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b gap-2" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
       <Link href="/" className="flex items-center gap-2 shrink-0">
         <Image src="/ritty-logo.png" alt="Ritty.ai" width={32} height={32} className="h-7 md:h-8 w-auto" />
         <span className="text-base md:text-lg font-heavy text-white">Ritty.ai</span>
@@ -98,13 +100,13 @@ export default function DashboardPage() {
           .then(r => r.json())
           .then(data => {
             if (data.active) {
-              const meta = AGENT_CATEGORY_MAP[i] || { category: 'other', icon: '🤖' };
+              const meta = AGENT_CATEGORY_MAP[i] || { category: 'other', Icon: Bot };
               rentals.push({
                 id: `${i}-${data.rentalId}`,
                 agentId: i,
                 agentName: data.name || `Agent #${i}`,
                 category: meta.category,
-                icon: meta.icon,
+                icon: meta.Icon,
                 endTime: Number(data.endTime),
                 agentAddress: MARKETPLACE_ADDRESS,
               });
@@ -216,7 +218,21 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen" style={{ background: 'rgb(8, 9, 23)' }}>
+    <main className="min-h-screen relative" style={{ background: 'rgb(8, 9, 23)' }}>
+      {/* ColorBends Background */}
+      <div className="absolute inset-0 z-0" style={{ opacity: 0.3 }}>
+        <ColorBends
+          colors={['#40FFAF', '#0D9373', '#0A7558']}
+          speed={0.15}
+          frequency={0.8}
+          noise={0.1}
+          rotation={45}
+          transparent={true}
+          warpStrength={1}
+          mouseInfluence={1}
+          parallax={0.5}
+        />
+      </div>
       <DashboardNav username={username} />
 
       <div className="max-w-6xl mx-auto px-4 py-6 md:py-8">
@@ -256,7 +272,7 @@ export default function DashboardPage() {
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-lg">{rental.icon}</span>
+                        {rental.icon && <rental.icon size={18} style={{ color: '#40FFAF' }} />}
                         <span className="text-sm font-medium text-white">{rental.agentName}</span>
                       </div>
                       <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(64,255,175,0.1)', color: '#40FFAF' }}>

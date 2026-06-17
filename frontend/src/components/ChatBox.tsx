@@ -12,7 +12,7 @@ interface ChatBoxProps {
   agentId: number;
   agentName: string;
   agentCategory: string;
-  agentIcon: string;
+  agentIcon: string | React.ReactNode;
   remainingTime: number; // seconds
   walletAddress?: string;
   onExtend?: () => void;
@@ -151,7 +151,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center gap-3">
-          <span className="text-xl">{agentIcon}</span>
+          <span className="text-xl">{typeof agentIcon === 'string' ? agentIcon : agentIcon}</span>
           <div>
             <p className="text-white text-sm font-medium">{agentName}</p>
             <p className="text-xs" style={{ color: remainingTime > 3600 ? '#40FFAF' : remainingTime > 600 ? '#FFA500' : '#FF4444' }}>
