@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAccount, useConnect } from 'wagmi';
 import { useState, useEffect } from 'react';
+import { Search, FlaskConical, TrendingUp, Radio, Code, PenTool, MessageSquare } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
@@ -82,12 +83,12 @@ export default function Home() {
 
   const agentLabels = AGENT_LABELS[l] || AGENT_LABELS.en;
   const agentTypes = [
-    { id: 'research', label: agentLabels.research, icon: '🔬' },
-    { id: 'trading', label: agentLabels.trading, icon: '📈' },
-    { id: 'monitoring', label: agentLabels.monitor, icon: '📡' },
-    { id: 'code-review', label: agentLabels.codeReview, icon: '🧑‍💻' },
-    { id: 'content', label: agentLabels.content, icon: '✍️' },
-    { id: 'chatbot', label: agentLabels.chatbot, icon: '💬' },
+    { id: 'research', label: agentLabels.research, Icon: FlaskConical },
+    { id: 'trading', label: agentLabels.trading, Icon: TrendingUp },
+    { id: 'monitoring', label: agentLabels.monitor, Icon: Radio },
+    { id: 'code-review', label: agentLabels.codeReview, Icon: Code },
+    { id: 'content', label: agentLabels.content, Icon: PenTool },
+    { id: 'chatbot', label: agentLabels.chatbot, Icon: MessageSquare },
   ];
 
   const handleSearch = () => {
@@ -150,7 +151,7 @@ export default function Home() {
       <div className="relative z-10 flex flex-col items-center justify-center px-4" style={{ minHeight: 'calc(100vh - 76px)' }}>
         <div className="max-w-2xl w-full text-center">
           {/* Heading */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-5 tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-5 tracking-tight neon-text" style={{ fontFamily: 'Orbitron, Space Grotesk, sans-serif' }}>
             {hero.line1}<br />
             {hero.prefix && <>{hero.prefix} </>}<span style={{ color: '#40FFAF' }}>{hero.boldWord}</span><span style={{ color: '#40FFAF', fontSize: '0.5em', verticalAlign: 'super' }}>.</span>
           </h1>
@@ -218,7 +219,7 @@ export default function Home() {
                     border: `1px solid ${selectedType === type.id ? 'rgba(64,255,175,0.2)' : '#222'}`,
                   }}
                 >
-                  <span>{type.icon}</span>
+                  <type.Icon size={14} strokeWidth={2} />
                   {type.label}
                 </button>
               ))}

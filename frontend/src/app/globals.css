@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -54,6 +54,34 @@ h1, h2, h3, h4, h5, h6 {
 /* Glow effect */
 .glow-primary {
   box-shadow: 0 0 20px rgba(64, 255, 175, 0.1), 0 0 60px rgba(64, 255, 175, 0.05);
+}
+
+/* Neon glow text */
+.neon-text {
+  text-shadow: 0 0 10px rgba(64, 255, 175, 0.5), 0 0 30px rgba(64, 255, 175, 0.3), 0 0 60px rgba(64, 255, 175, 0.1);
+}
+
+/* Heading font - Orbitron for crypto feel */
+h1, h2, h3 {
+  font-family: 'Orbitron', 'Space Grotesk', system-ui, sans-serif;
+}
+
+/* Body font - Exo 2 for clean readability */
+p, span, a, button {
+  font-family: 'Exo 2', 'DM Sans', system-ui, sans-serif;
+}
+
+/* Skeleton loading animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #161616 25%, #222 50%, #161616 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
 }
 
 /* Ambient blob animation */
