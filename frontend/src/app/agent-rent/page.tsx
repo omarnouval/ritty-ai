@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+import { Search, Wrench, LayoutGrid, List, AlignLeft, PackageOpen } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
@@ -55,7 +56,7 @@ export default function AgentRentPage() {
         {/* Header + Search */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-heavy text-white">{t('agentRent.title')}</h1>
+            <h1 className="text-3xl font-heavy text-white" style={{ fontFamily: 'Orbitron, sans-serif' }}>{t('agentRent.title')}</h1>
             <p className="text-sm text-gray-500 mt-1">{t('agentRent.subtitle')}</p>
           </div>
 
@@ -65,8 +66,8 @@ export default function AgentRentPage() {
               onClick={() => setShowRequestModal(true)}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-black transition hover:opacity-80"
               style={{ background: '#40FFAF' }}
-            >
-              🛠️ Request Agent
+            > 
+              <Wrench size={16} className="inline" /> Request Agent
             </button>
 
             {/* Search */}
@@ -92,7 +93,7 @@ export default function AgentRentPage() {
                   onClick={() => setViewMode(mode)}
                   className={`px-3 py-2 text-xs transition ${viewMode === mode ? 'bg-white/10 text-white' : 'text-gray-500 hover:text-gray-300'}`}
                 >
-                  {mode === 'grid' ? '▦' : mode === 'list' ? '☰' : '≡'}
+                  {mode === 'grid' ? <LayoutGrid size={14} /> : mode === 'list' ? <List size={14} /> : <AlignLeft size={14} />}
                 </button>
               ))}
             </div>
@@ -107,7 +108,7 @@ export default function AgentRentPage() {
           </div>
         ) : !agentIds || agentIds.length === 0 ? (
           <div className="text-center py-24 glass rounded-2xl">
-            <div className="text-5xl mb-4">🏜️</div>
+            <PackageOpen size={48} className="mx-auto mb-4" style={{ color: '#40FFAF' }} />
             <p className="text-gray-400 text-lg font-heavy mb-2">{t('agentRent.empty')}</p>
             <p className="text-gray-500 text-sm mb-6">{t('agentRent.emptyDesc')}</p>
             <Link href="/create" className="inline-flex items-center gap-2 text-sm font-medium text-black px-6 py-2.5 rounded-full" style={{ background: '#40FFAF' }}>

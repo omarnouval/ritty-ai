@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Search, Link2, Rocket, Wallet, Fuel, Globe, Lightbulb } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
@@ -38,7 +39,7 @@ export default function HowItWorksPage() {
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-16 md:py-24">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight neon-text" style={{ fontFamily: 'Orbitron, sans-serif', color: '#fff' }}>
             {t('howItWorks.title')}
           </h1>
           <p className="text-sm md:text-base" style={{ color: '#fff', opacity: 0.7 }}>
@@ -51,21 +52,21 @@ export default function HowItWorksPage() {
           {[
             {
               step: '01',
-              icon: '🔍',
+              Icon: Search,
               title: t('howItWorks.step1Title'),
               desc: t('howItWorks.step1Desc'),
               detail: t('howItWorks.step1Detail'),
             },
             {
               step: '02',
-              icon: '🔗',
+              Icon: Link2,
               title: t('howItWorks.step2Title'),
               desc: t('howItWorks.step2Desc'),
               detail: t('howItWorks.step2Detail'),
             },
             {
               step: '03',
-              icon: '🚀',
+              Icon: Rocket,
               title: t('howItWorks.step3Title'),
               desc: t('howItWorks.step3Desc'),
               detail: t('howItWorks.step3Detail'),
@@ -82,7 +83,7 @@ export default function HowItWorksPage() {
               <div className="text-xs font-mono font-bold mb-4 tracking-widest" style={{ color: '#40FFAF' }}>
                 STEP {item.step}
               </div>
-              <div className="text-4xl mb-5">{item.icon}</div>
+              <item.Icon size={40} className="mb-5" style={{ color: '#40FFAF' }} strokeWidth={1.5} />
               <h3 className="text-lg font-bold mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
                 {item.title}
               </h3>
@@ -98,28 +99,28 @@ export default function HowItWorksPage() {
 
         {/* Requirements */}
         <div className="mb-20">
-          <h2 className="text-xl md:text-2xl font-bold mb-8 text-center" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
+          <h2 className="text-xl md:text-2xl font-bold mb-8 text-center" style={{ fontFamily: 'Orbitron, sans-serif', color: '#fff' }}>
             {t('howItWorks.needTitle')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               {
-                icon: '🦊',
+                Icon: Wallet,
                 title: t('howItWorks.needEvmTitle'),
                 desc: t('howItWorks.needEvmDesc'),
               },
               {
-                icon: '⛽',
+                Icon: Fuel,
                 title: t('howItWorks.needTokensTitle'),
                 desc: t('howItWorks.needTokensDesc'),
               },
               {
-                icon: '🌐',
+                Icon: Globe,
                 title: t('howItWorks.needNetworkTitle'),
                 desc: t('howItWorks.needNetworkDesc'),
               },
               {
-                icon: '💡',
+                Icon: Lightbulb,
                 title: t('howItWorks.needIdeaTitle'),
                 desc: t('howItWorks.needIdeaDesc'),
               },
@@ -129,7 +130,7 @@ export default function HowItWorksPage() {
                 className="flex items-start gap-4 rounded-xl px-5 py-5"
                 style={{ background: '#0A0A0A', border: '1px solid #161616' }}
               >
-                <span className="text-2xl shrink-0">{item.icon}</span>
+                <item.Icon size={24} className="shrink-0" style={{ color: '#40FFAF' }} />
                 <div>
                   <p className="text-sm font-bold mb-1" style={{ color: '#fff', fontFamily: 'Space Grotesk, sans-serif' }}>
                     {item.title}

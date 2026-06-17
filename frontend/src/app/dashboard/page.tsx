@@ -5,6 +5,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useReadContract } from 'wagmi';
 import Link from 'next/link';
 import Image from 'next/image';
+import { PenTool, FlaskConical, TrendingUp, Megaphone, Code, Bot, Stethoscope } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { ChatBox } from '@/components/ChatBox';
@@ -25,14 +26,14 @@ interface ActiveRental {
 }
 
 // Agent ID to category mapping
-const AGENT_CATEGORY_MAP: Record<number, { category: string; icon: string }> = {
-  0: { category: 'content', icon: '✍️' },
-  1: { category: 'research', icon: '🔬' },
-  2: { category: 'trading', icon: '📈' },
-  3: { category: 'marketing', icon: '📣' },
-  4: { category: 'coding', icon: '🧑‍💻' },
-  5: { category: 'other', icon: '🤖' },
-  12: { category: 'healthcare', icon: '🏥' },
+const AGENT_CATEGORY_MAP: Record<number, { category: string; Icon: any }> = {
+  0: { category: 'content', Icon: PenTool },
+  1: { category: 'research', Icon: FlaskConical },
+  2: { category: 'trading', Icon: TrendingUp },
+  3: { category: 'marketing', Icon: Megaphone },
+  4: { category: 'coding', Icon: Code },
+  5: { category: 'other', Icon: Bot },
+  12: { category: 'healthcare', Icon: Stethoscope },
 };
 
 function DashboardNav({ username }: { username?: string | null }) {
@@ -230,7 +231,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-heavy text-white">Active Rentals</h2>
               <button
-                onClick={fetchActiveRentals}
+                onClick={() => fetchActiveRentals()}
                 className="text-sm text-gray-400 hover:text-white transition flex items-center gap-1"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -283,7 +284,7 @@ export default function DashboardPage() {
                 Browse Agents →
               </Link>
               <button
-                onClick={fetchActiveRentals}
+                onClick={() => fetchActiveRentals()}
                 className="text-sm px-6 py-2.5 rounded-xl text-gray-400 hover:text-white transition border"
                 style={{ borderColor: 'rgba(255,255,255,0.1)' }}
               >

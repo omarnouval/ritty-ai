@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { Heart } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
@@ -83,7 +84,7 @@ export default function FeedbackPage() {
       <div className="max-w-2xl mx-auto px-4 md:px-6 py-16 md:py-24">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight neon-text" style={{ fontFamily: 'Orbitron, sans-serif', color: '#fff' }}>
             Feedback
           </h1>
           <p className="text-sm md:text-base" style={{ color: '#fff', opacity: 0.7 }}>
@@ -94,7 +95,7 @@ export default function FeedbackPage() {
         {submitted ? (
           /* Success State */
           <div className="text-center rounded-2xl p-12" style={{ background: '#0A0A0A', border: '1px solid #161616' }}>
-            <div className="text-5xl mb-4">🙏</div>
+            <Heart size={48} className="mx-auto mb-4" style={{ color: '#40FFAF' }} fill="currentColor" />
             <h2 className="text-xl font-bold mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif', color: '#fff' }}>
               Thank you!
             </h2>
