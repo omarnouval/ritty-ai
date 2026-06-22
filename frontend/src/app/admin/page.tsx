@@ -151,7 +151,7 @@ export default function AdminDashboard() {
 
       // Get agent count
       const agentCount = await client.readContract({
-        address: '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE',
+        address: '0x896277Ca55946c3602Bb6f5668d2eDdAb645A76c',
         abi: [{ name: 'agentCount', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] }],
         functionName: 'agentCount',
       });
@@ -160,16 +160,15 @@ export default function AdminDashboard() {
       const agentList: Agent[] = [];
       const ownerAddresses = new Set<string>();
 
-      for (let i = 0; i < Number(agentCount); i++) {
+      for (let i = 1; i <= Number(agentCount); i++) {
         try {
           const data = await client.readContract({
-            address: '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE',
+            address: '0x896277Ca55946c3602Bb6f5668d2eDdAb645A76c',
             abi: [{
               name: 'agents', type: 'function', stateMutability: 'view',
               inputs: [{ type: 'uint256' }],
               outputs: [
                 { name: 'owner', type: 'address' },
-                { name: 'agentContract', type: 'address' },
                 { name: 'name', type: 'string' },
                 { name: 'description', type: 'string' },
                 { name: 'pricePerHour', type: 'uint256' },
@@ -178,14 +177,13 @@ export default function AdminDashboard() {
                 { name: 'rating', type: 'uint256' },
                 { name: 'ratingCount', type: 'uint256' },
                 { name: 'isActive', type: 'bool' },
-                { name: 'agentType', type: 'uint8' },
               ],
             }],
             functionName: 'agents',
             args: [BigInt(i)],
           });
 
-          const [owner, , name, description, pricePerHour, totalEarnings, totalRentals, rating, ratingCount, isActive, agentType] = data;
+          const [owner, name, description, pricePerHour, totalEarnings, totalRentals, rating, ratingCount, isActive] = data;
           
           agentList.push({
             id: i,
@@ -198,7 +196,7 @@ export default function AdminDashboard() {
             rating: Number(rating),
             ratingCount: Number(ratingCount),
             isActive,
-            agentType: AGENT_TYPE_LABELS[Number(agentType)] || 'Unknown',
+            agentType: 'AI Agent',
           });
 
           ownerAddresses.add(owner.toLowerCase());

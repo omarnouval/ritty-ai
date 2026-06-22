@@ -33,6 +33,26 @@ declare module "hardhat/types/runtime" {
       name: "RittyProfile",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.RittyProfile__factory>;
+    getContractFactory(
+      name: "IStakingPool",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IStakingPool__factory>;
+    getContractFactory(
+      name: "RittyRental",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RittyRental__factory>;
+    getContractFactory(
+      name: "IMarketplace",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IMarketplace__factory>;
+    getContractFactory(
+      name: "IRental",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRental__factory>;
+    getContractFactory(
+      name: "RittyStakingPool",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RittyStakingPool__factory>;
 
     getContractAt(
       name: "AgentMarketplace",
@@ -59,6 +79,31 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.RittyProfile>;
+    getContractAt(
+      name: "IStakingPool",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IStakingPool>;
+    getContractAt(
+      name: "RittyRental",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RittyRental>;
+    getContractAt(
+      name: "IMarketplace",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IMarketplace>;
+    getContractAt(
+      name: "IRental",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IRental>;
+    getContractAt(
+      name: "RittyStakingPool",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RittyStakingPool>;
 
     deployContract(
       name: "AgentMarketplace",
@@ -80,6 +125,26 @@ declare module "hardhat/types/runtime" {
       name: "RittyProfile",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.RittyProfile>;
+    deployContract(
+      name: "IStakingPool",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IStakingPool>;
+    deployContract(
+      name: "RittyRental",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyRental>;
+    deployContract(
+      name: "IMarketplace",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IMarketplace>;
+    deployContract(
+      name: "IRental",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRental>;
+    deployContract(
+      name: "RittyStakingPool",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyStakingPool>;
 
     deployContract(
       name: "AgentMarketplace",
@@ -106,6 +171,31 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.RittyProfile>;
+    deployContract(
+      name: "IStakingPool",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IStakingPool>;
+    deployContract(
+      name: "RittyRental",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyRental>;
+    deployContract(
+      name: "IMarketplace",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IMarketplace>;
+    deployContract(
+      name: "IRental",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRental>;
+    deployContract(
+      name: "RittyStakingPool",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RittyStakingPool>;
 
     // default types
     getContractFactory(

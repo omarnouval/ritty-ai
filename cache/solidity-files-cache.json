@@ -1,8 +1,8 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/root/ritual-agent-marketplace/contracts/AgentMarketplace.sol": {
-      "lastModificationDate": 1780988155469,
+    "/home/ubuntu/root/ritty-ai/contracts/AgentMarketplace.sol": {
+      "lastModificationDate": 1781763656141,
       "contentHash": "1c0f58113e989103f8371e3d9697ad95",
       "sourceName": "contracts/AgentMarketplace.sol",
       "solcConfig": {
@@ -41,44 +41,8 @@
         "AgentMarketplace"
       ]
     },
-    "/root/ritual-agent-marketplace/contracts/interfaces/IPersistentAgent.sol": {
-      "lastModificationDate": 1780957273669,
-      "contentHash": "ce2b4ab1a4a2f19a60aabbe18fb62744",
-      "sourceName": "contracts/interfaces/IPersistentAgent.sol",
-      "solcConfig": {
-        "version": "0.8.20",
-        "settings": {
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "evmVersion": "paris",
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IPersistentAgent"
-      ]
-    },
-    "/root/ritual-agent-marketplace/contracts/interfaces/ISovereignAgent.sol": {
-      "lastModificationDate": 1780957273670,
+    "/home/ubuntu/root/ritty-ai/contracts/interfaces/ISovereignAgent.sol": {
+      "lastModificationDate": 1781763656141,
       "contentHash": "4c876ab2f15cc0cdc0b04a9cb128872d",
       "sourceName": "contracts/interfaces/ISovereignAgent.sol",
       "solcConfig": {
@@ -113,8 +77,44 @@
         "ISovereignAgent"
       ]
     },
-    "/root/ritual-agent-marketplace/contracts/libraries/AgentTypes.sol": {
-      "lastModificationDate": 1780957273671,
+    "/home/ubuntu/root/ritty-ai/contracts/interfaces/IPersistentAgent.sol": {
+      "lastModificationDate": 1781763656141,
+      "contentHash": "ce2b4ab1a4a2f19a60aabbe18fb62744",
+      "sourceName": "contracts/interfaces/IPersistentAgent.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IPersistentAgent"
+      ]
+    },
+    "/home/ubuntu/root/ritty-ai/contracts/libraries/AgentTypes.sol": {
+      "lastModificationDate": 1781763656141,
       "contentHash": "26b422ed42444cf05a7316a6b4d7f451",
       "sourceName": "contracts/libraries/AgentTypes.sol",
       "solcConfig": {
@@ -149,8 +149,8 @@
         "AgentTypes"
       ]
     },
-    "/root/ritual-agent-marketplace/contracts/RittyAgent.sol": {
-      "lastModificationDate": 1781105515870,
+    "/home/ubuntu/root/ritty-ai/contracts/RittyAgent.sol": {
+      "lastModificationDate": 1781763656141,
       "contentHash": "54dc53778927bddb68081971faf5f36a",
       "sourceName": "contracts/RittyAgent.sol",
       "solcConfig": {
@@ -185,8 +185,8 @@
         "RittyAgent"
       ]
     },
-    "/root/ritual-agent-marketplace/contracts/RittyProfile.sol": {
-      "lastModificationDate": 1781111178375,
+    "/home/ubuntu/root/ritty-ai/contracts/RittyProfile.sol": {
+      "lastModificationDate": 1781763656140,
       "contentHash": "30ece35654e851425e8411095c476c5a",
       "sourceName": "contracts/RittyProfile.sol",
       "solcConfig": {
@@ -219,6 +219,80 @@
       ],
       "artifacts": [
         "RittyProfile"
+      ]
+    },
+    "/home/ubuntu/root/ritty-ai/contracts/RittyStakingPool.sol": {
+      "lastModificationDate": 1782155413046,
+      "contentHash": "1d913f4f46dee6e11ef86f888e86c810",
+      "sourceName": "contracts/RittyStakingPool.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.19"
+      ],
+      "artifacts": [
+        "IRental",
+        "RittyStakingPool"
+      ]
+    },
+    "/home/ubuntu/root/ritty-ai/contracts/RittyRental.sol": {
+      "lastModificationDate": 1782155236804,
+      "contentHash": "7213055b2e8075820c89580715a1574c",
+      "sourceName": "contracts/RittyRental.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IStakingPool",
+        "RittyRental"
       ]
     }
   }

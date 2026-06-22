@@ -1,6 +1,10 @@
-export const MARKETPLACE_ADDRESS = (process.env.NEXT_PUBLIC_MARKETPLACE_ADDRESS || '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE') as `0x${string}`;
+export const RENTAL_ADDRESS = (process.env.NEXT_PUBLIC_RENTAL_ADDRESS || '0x896277Ca55946c3602Bb6f5668d2eDdAb645A76c') as `0x${string}`;
+export const STAKING_ADDRESS = (process.env.NEXT_PUBLIC_STAKING_ADDRESS || '0x2E3f82aE26a0EfE83B63bdabC905fFa3321223d0') as `0x${string}`;
 
-export const MARKETPLACE_ABI = [
+// Backward compat
+export const MARKETPLACE_ADDRESS = RENTAL_ADDRESS;
+
+export const RENTAL_ABI = [
   // Events
   {
     type: 'event',
@@ -9,7 +13,6 @@ export const MARKETPLACE_ABI = [
       { indexed: true, name: 'agentId', type: 'uint256' },
       { indexed: true, name: 'owner', type: 'address' },
       { name: 'name', type: 'string' },
-      { name: 'agentType', type: 'uint8' },
     ],
   },
   {
@@ -30,7 +33,6 @@ export const MARKETPLACE_ABI = [
     inputs: [{ name: '', type: 'uint256' }],
     outputs: [
       { name: 'owner', type: 'address' },
-      { name: 'agentContract', type: 'address' },
       { name: 'name', type: 'string' },
       { name: 'description', type: 'string' },
       { name: 'pricePerHour', type: 'uint256' },
@@ -39,7 +41,6 @@ export const MARKETPLACE_ABI = [
       { name: 'rating', type: 'uint256' },
       { name: 'ratingCount', type: 'uint256' },
       { name: 'isActive', type: 'bool' },
-      { name: 'agentType', type: 'uint8' },
     ],
   },
   {
@@ -68,21 +69,6 @@ export const MARKETPLACE_ABI = [
   },
   {
     type: 'function',
-    name: 'getActiveRental',
-    stateMutability: 'view',
-    inputs: [
-      { name: 'user', type: 'address' },
-      { name: 'agentId', type: 'uint256' },
-    ],
-    outputs: [
-      { name: 'rentalId', type: 'uint256' },
-      { name: 'startTime', type: 'uint256' },
-      { name: 'endTime', type: 'uint256' },
-      { name: 'active', type: 'bool' },
-    ],
-  },
-  {
-    type: 'function',
     name: 'calculateRentalCost',
     stateMutability: 'view',
     inputs: [
@@ -97,12 +83,10 @@ export const MARKETPLACE_ABI = [
     name: 'listAgent',
     stateMutability: 'nonpayable',
     inputs: [
-      { name: '_agentContract', type: 'address' },
       { name: '_name', type: 'string' },
       { name: '_description', type: 'string' },
       { name: '_capabilities', type: 'string[]' },
       { name: '_pricePerHour', type: 'uint256' },
-      { name: '_agentType', type: 'uint8' },
     ],
     outputs: [{ name: '', type: 'uint256' }],
   },
@@ -128,9 +112,12 @@ export const MARKETPLACE_ABI = [
   },
   {
     type: 'function',
-    name: 'withdrawEarnings',
+    name: 'updatePrice',
     stateMutability: 'nonpayable',
-    inputs: [],
+    inputs: [
+      { name: '_agentId', type: 'uint256' },
+      { name: '_newPrice', type: 'uint256' },
+    ],
     outputs: [],
   },
   {
@@ -140,32 +127,18 @@ export const MARKETPLACE_ABI = [
     inputs: [{ name: '_agentId', type: 'uint256' }],
     outputs: [],
   },
-  // Precompile integration
-  {
-    type: 'function',
-    name: 'executeTask',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: '_agentId', type: 'uint256' },
-      { name: '_task', type: 'bytes' },
-    ],
-    outputs: [{ name: '', type: 'bytes' }],
-  },
-  {
-    type: 'function',
-    name: 'createSovereignTask',
-    stateMutability: 'nonpayable',
-    inputs: [
-      { name: '_agentId', type: 'uint256' },
-      { name: '_input', type: 'bytes' },
-    ],
-    outputs: [{ name: '', type: 'bytes32' }],
-  },
-  {
-    type: 'function',
-    name: 'isPrecompileAgent',
-    stateMutability: 'view',
-    inputs: [{ name: '_agentId', type: 'uint256' }],
-    outputs: [{ name: '', type: 'bool' }],
-  },
 ] as const;
+
+export const STAKING_ABI = [
+  { type: 'function', name: 'stake', stateMutability: 'payable', inputs: [{ name: '_agentId', type: 'uint256' }], outputs: [] },
+  { type: 'function', name: 'unstake', stateMutability: 'nonpayable', inputs: [{ name: '_agentId', type: 'uint256' }, { name: '_amount', type: 'uint256' }], outputs: [] },
+  { type: 'function', name: 'claimReward', stateMutability: 'nonpayable', inputs: [{ name: '_agentId', type: 'uint256' }], outputs: [] },
+  { type: 'function', name: 'pendingReward', stateMutability: 'view', inputs: [{ name: '_agentId', type: 'uint256' }, { name: '_staker', type: 'address' }], outputs: [{ type: 'uint256' }] },
+  { type: 'function', name: 'getPoolInfo', stateMutability: 'view', inputs: [{ name: '_agentId', type: 'uint256' }], outputs: [{ type: 'uint256' }, { type: 'uint256' }, { type: 'uint256' }, { type: 'uint256' }] },
+  { type: 'function', name: 'stakers', stateMutability: 'view', inputs: [{ name: '', type: 'uint256' }, { name: '', type: 'address' }], outputs: [{ name: 'staked', type: 'uint256' }, { name: 'rewardPerTokenPaid', type: 'uint256' }, { name: 'rewards', type: 'uint256' }] },
+  { type: 'function', name: 'getAllPools', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256[]' }] },
+  { type: 'function', name: 'createPool', stateMutability: 'nonpayable', inputs: [{ name: '_agentId', type: 'uint256' }], outputs: [] },
+] as const;
+
+// Backward compat
+export const MARKETPLACE_ABI = RENTAL_ABI;

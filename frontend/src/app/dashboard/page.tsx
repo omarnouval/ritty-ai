@@ -6,6 +6,7 @@ import { useAccount, useReadContract } from 'wagmi';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PenTool, FlaskConical, TrendingUp, Megaphone, Code, Bot, Stethoscope } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import MobileMenu from '@/components/MobileMenu';
 import { ChatBox } from '@/components/ChatBox';
@@ -15,14 +16,15 @@ import { MARKETPLACE_ADDRESS, MARKETPLACE_ABI } from '@/lib/contracts';
 import ReviewModal from '@/components/ReviewModal';
 import { useNotifications } from '@/components/NotificationProvider';
 import dynamic from 'next/dynamic';
-const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false });
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false, loading: () => null });
 
 interface ActiveRental {
   id: string;
   agentId: number;
   agentName: string;
   category: string;
-  icon: string;
+  icon: string | React.ComponentType<any>;
   endTime: number; // unix timestamp
   agentAddress: string;
 }
@@ -92,11 +94,14 @@ export default function DashboardPage() {
     const count = Number(agentCount);
     const rentals: ActiveRental[] = [];
 
-    // Check each agent for active rental
+    // Check each agent for active rental — with timeout + error isolation
+    // +2 to catch agents beyond agentCount (e.g. HealthGuide at ID 12 when count=12)
     const checks = [];
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < count + 2; i++) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000); // 8s per request
       checks.push(
-        fetch(`/api/rental-check?address=${address}&agentId=${i}`)
+        fetch(`/api/rental-check?address=${address}&agentId=${i}`, { signal: controller.signal })
           .then(r => r.json())
           .then(data => {
             if (data.active) {
@@ -112,11 +117,12 @@ export default function DashboardPage() {
               });
             }
           })
-          .catch(() => {/* skip */})
+          .catch(() => {/* skip — don't let one failed request crash everything */})
+          .finally(() => clearTimeout(timeout))
       );
     }
 
-    await Promise.all(checks);
+    await Promise.allSettled(checks); // Use allSettled instead of all — don't fail on individual rejections
     setActiveRentals(rentals);
     if (rentals.length > 0 && !chatRental) {
       setChatRental(rentals[0]);
@@ -182,17 +188,6 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, [activeRentals, reviewedRentals, showReviewModal]);
 
-  // Refresh rental data when tab becomes visible (fixes browser throttle causing expired display)
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (document.visibilityState === 'visible' && isConnected && address) {
-        fetchActiveRentals();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, [isConnected, address, fetchActiveRentals]);
-
   // Check username on connect
   useEffect(() => {
     if (isConnected && address) {
@@ -221,6 +216,7 @@ export default function DashboardPage() {
     <main className="min-h-screen relative" style={{ background: 'rgb(8, 9, 23)' }}>
       {/* ColorBends Background */}
       <div className="absolute inset-0 z-0 pointer-events-none" style={{ opacity: 0.3 }}>
+      <ErrorBoundary>
         <ColorBends
           colors={['#40FFAF', '#0D9373', '#0A7558']}
           speed={0.15}
@@ -232,6 +228,7 @@ export default function DashboardPage() {
           mouseInfluence={1}
           parallax={0.5}
         />
+        </ErrorBoundary>
       </div>
       <DashboardNav username={username} />
 
@@ -313,17 +310,27 @@ export default function DashboardPage() {
         {/* Chat Area */}
         {chatRental && (
           <div className="mb-8" style={{ height: '500px' }}>
-            <ChatBox
-              key={chatRental.id}
-              agentId={chatRental.agentId}
-              agentName={chatRental.agentName}
-              agentCategory={chatRental.category}
-              agentIcon={chatRental.icon}
-              remainingTime={counters[chatRental.id] || 0}
-              walletAddress={address}
-              onExtend={() => {/* TODO: extend rental */}}
-              onSwitch={() => setChatRental(null)}
-            />
+            <ErrorBoundary fallback={
+              <div className="flex flex-col items-center justify-center h-full rounded-2xl text-center px-4" style={{ background: 'rgba(17,17,17,0.8)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="text-3xl mb-3">💬</div>
+                <p className="text-gray-300 text-sm mb-3">Chat failed to load for this agent.</p>
+                <button onClick={() => setChatRental(null)} className="text-sm px-5 py-2 rounded-xl text-black font-medium" style={{ background: '#40FFAF' }}>
+                  Back to rentals
+                </button>
+              </div>
+            }>
+              <ChatBox
+                key={chatRental.id}
+                agentId={chatRental.agentId}
+                agentName={chatRental.agentName}
+                agentCategory={chatRental.category}
+                agentIcon={chatRental.icon}
+                remainingTime={counters[chatRental.id] || 0}
+                walletAddress={address}
+                onExtend={() => {/* TODO: extend rental */}}
+                onSwitch={() => setChatRental(null)}
+              />
+            </ErrorBoundary>
           </div>
         )}
 

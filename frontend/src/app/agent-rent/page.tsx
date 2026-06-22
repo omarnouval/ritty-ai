@@ -8,8 +8,7 @@ import Link from 'next/link';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import { Search, Wrench, LayoutGrid, List, AlignLeft, PackageOpen } from 'lucide-react';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
-import MobileMenu from '@/components/MobileMenu';
+import Navbar from '@/components/Navbar';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 import RequestAgentModal from '@/components/RequestAgentModal';
 import dynamic from 'next/dynamic';
@@ -50,23 +49,7 @@ export default function AgentRentPage() {
         />
       </div>
       {/* Nav */}
-      <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 py-3 md:py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <Link href="/" className="flex items-center gap-2">
-          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-7 md:h-8 w-auto" />
-          <span className="text-base md:text-lg font-heavy text-white">Ritty.ai</span>
-        </Link>
-        <div className="flex items-center gap-3 md:gap-6">
-          <Link href="/agent-rent" className="hidden md:block text-sm text-[#40FFAF] font-medium">{t('buttons.marketplace')}</Link>
-          <Link href="/how-it-works" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('nav.howItWorks')}</Link>
-          <Link href="/feedback" className="hidden md:block text-sm text-gray-400 hover:text-white transition">Feedback</Link>
-          {isConnected && (
-            <Link href="/dashboard" className="hidden md:block text-sm text-gray-400 hover:text-white transition">{t('nav.dashboard')}</Link>
-          )}
-          <ConnectButton />
-          <LanguageSwitcher />
-          <MobileMenu />
-        </div>
-      </nav>
+      <Navbar activePage="agent-rent" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
         {/* Header + Search */}
@@ -182,14 +165,13 @@ function AgentRow({ agentId, viewMode }: { agentId: bigint; viewMode: 'grid' | '
 
   if (isLoading || !data) return null;
 
-  const [owner, agentContract, name, description, pricePerHour, totalEarnings, totalRentals, rating, ratingCount, isActive, agentType] = data;
+  const [owner, name, description, pricePerHour, totalEarnings, totalRentals, rating, ratingCount, isActive] = data;
 
   return (
     <AgentCard
       agent={{
         id: agentId,
         owner,
-        agentContract,
         name,
         description,
         pricePerHour,
@@ -197,7 +179,6 @@ function AgentRow({ agentId, viewMode }: { agentId: bigint; viewMode: 'grid' | '
         rating,
         ratingCount,
         isActive,
-        agentType,
       }}
       viewMode={viewMode}
     />

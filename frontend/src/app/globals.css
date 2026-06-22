@@ -166,6 +166,31 @@ p, span, a, button {
   * {
     cursor: none !important;
   }
+
+  /* Restore default cursor inside ANY dialog/modal/overlay (RainbowKit, etc) */
+  *:is(dialog, dialog *, [role="dialog"], [role="dialog"] *, [data-rk] *, .rk-overlay, .rk-overlay *) {
+    cursor: default !important;
+  }
+
+  *:is(dialog, dialog *, [role="dialog"], [role="dialog"] *) a,
+  *:is(dialog, dialog *, [role="dialog"], [role="dialog"] *) button,
+  *:is(dialog, dialog *, [role="dialog"], [role="dialog"] *) [role="button"],
+  *:is(dialog, dialog *, [role="dialog"], [role="dialog"] *) input {
+    cursor: pointer !important;
+  }
+
+  /* Fallback: when a dialog is open, restore cursor on everything */
+  html:has(dialog[open]) *,
+  html:has([role="dialog"]) * {
+    cursor: default !important;
+  }
+
+  html:has(dialog[open]) a,
+  html:has(dialog[open]) button,
+  html:has([role="dialog"]) a,
+  html:has([role="dialog"]) button {
+    cursor: pointer !important;
+  }
 }
 
 /* Ambient blob animation */

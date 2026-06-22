@@ -77,6 +77,13 @@ export default function MobileMenu() {
               Agent Rent
             </Link>
             <Link
+              href="/staking"
+              onClick={() => setIsOpen(false)}
+              className="text-2xl font-medium text-white hover:text-[#40FFAF] transition-colors"
+            >
+              Staking
+            </Link>
+            <Link
               href="/how-it-works"
               onClick={() => setIsOpen(false)}
               className="text-2xl font-medium text-white hover:text-[#40FFAF] transition-colors"
@@ -97,13 +104,7 @@ export default function MobileMenu() {
             >
               Dashboard
             </Link>
-            <Link
-              href="/marketplace"
-              onClick={() => setIsOpen(false)}
-              className="text-2xl font-medium text-white hover:text-[#40FFAF] transition-colors"
-            >
-              Marketplace
-            </Link>
+
           </div>
         </div>,
         document.body

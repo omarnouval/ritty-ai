@@ -8,7 +8,7 @@ const ritualChain = {
   rpcUrls: { default: { http: ['https://rpc.ritualfoundation.org'] } },
 };
 
-const MARKETPLACE_ADDRESS = '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE' as `0x${string}`;
+const MARKETPLACE_ADDRESS = '0x896277Ca55946c3602Bb6f5668d2eDdAb645A76c' as `0x${string}`;
 
 const RENTAL_ABI = [
   {
@@ -18,7 +18,6 @@ const RENTAL_ABI = [
     inputs: [{ name: '', type: 'uint256' }],
     outputs: [
       { name: 'owner', type: 'address' },
-      { name: 'agentContract', type: 'address' },
       { name: 'name', type: 'string' },
       { name: 'description', type: 'string' },
       { name: 'pricePerHour', type: 'uint256' },
@@ -27,7 +26,6 @@ const RENTAL_ABI = [
       { name: 'rating', type: 'uint256' },
       { name: 'ratingCount', type: 'uint256' },
       { name: 'isActive', type: 'bool' },
-      { name: 'agentType', type: 'uint8' },
     ],
   },
   {
@@ -66,7 +64,7 @@ export async function GET(request: NextRequest) {
         functionName: 'agents',
         args: [BigInt(agentId)],
       });
-      if (agentData[2]) name = agentData[2];
+      if (agentData[1]) name = agentData[1];
     } catch {
       // skip
     }

@@ -174,6 +174,14 @@ const SKILL_MAPPING: Record<string, string[]> = {
   'analytics|analitik|tracking': ['analytics'],
   'konversi|conversion|cro': ['cro'],
   'customer|pelanggan|riset pasar': ['customer-research'],
+  // Content Creator skills
+  'creator|kreator|influencer|personal brand': ['content-creator', 'content-strategy'],
+  'caption|thread|tweet|twitter|viral|hook': ['content-creator', 'copywriting', 'viral-content'],
+  'video|script|youtube|reels|tiktok|shorts': ['content-creator', 'video-script'],
+  'storytelling|narrative|cerita|story': ['content-creator', 'content-strategy'],
+  'newsletter|email content|edm': ['content-creator', 'cold-email'],
+  'podcast|episode|show notes': ['content-creator'],
+  'konten kreator|content creator|social media post': ['content-creator', 'social-media-content'],
   
   // Coding skills
   'code review|review code|code quality': ['code-review-and-quality'],
@@ -273,16 +281,16 @@ const MARKETPLACE_ABI = parseAbi([
   'function getActiveRental(address user, uint256 agentId) view returns (uint256 rentalId, uint256 startTime, uint256 endTime, bool active)',
 ]);
 
-const MARKETPLACE_ADDRESS = '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE';
+const MARKETPLACE_ADDRESS = '0x896277Ca55946c3602Bb6f5668d2eDdAb645A76c';
 
 // Agent contract addresses (for rental verification)
 const AGENT_IDS: Record<string, bigint> = {
-  'content': BigInt(0),
-  'research': BigInt(1),
-  'trading': BigInt(2),
-  'marketing': BigInt(3),
-  'coding': BigInt(4),
-  'healthcare': BigInt(12),
+  'content': BigInt(1),
+  'research': BigInt(2),
+  'coding': BigInt(3),
+  'marketing': BigInt(4),
+  'trading': BigInt(5),
+  'healthcare': BigInt(6),
 };
 
 // System prompts per category (with anti-injection suffix)

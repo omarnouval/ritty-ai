@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { keccak256, toBytes } from 'viem';
 
 const RPC_URL = 'https://rpc.ritualfoundation.org';
-const MARKETPLACE_ADDRESS = '0xAFDBA0921A3D108DF0282Eed99a44AFDbdBAF9cE';
+const MARKETPLACE_ADDRESS = '0x896277Ca55946c3602Bb6f5668d2eDdAb645A76c';
 const PROFILE_ADDRESS = '0xA487bd6BEE21AaE0E1705FE5DDB256Ae6B384c03';
 
 const AGENT_TYPE_LABELS: Record<number, string> = {

@@ -1,18 +1,20 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface Message {
   role: 'user' | 'agent';
   content: string;
   timestamp: Date;
+  txHash?: string;
+  explorer?: string;
 }
 
 interface ChatBoxProps {
   agentId: number;
   agentName: string;
   agentCategory: string;
-  agentIcon: string | React.ReactNode;
+  agentIcon: string | React.ReactNode | React.ComponentType<any>;
   remainingTime: number; // seconds
   walletAddress?: string;
   onExtend?: () => void;
@@ -46,6 +48,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [chatLanguage, setChatLanguage] = useState<string | null>(null);
+  const [onchainMode, setOnchainMode] = useState(false); // default: fast off-chain
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Save messages to localStorage whenever they change
@@ -113,25 +116,49 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
     setInput('');
     setIsTyping(true);
 
-    try {
-      const response = await fetch('/api/chat', {
+    const payload = {
+      agentCategory,
+      agentId,
+      message: messageToSend,
+      userAddress: walletAddress || '0x0000000000000000000000000000000000000000',
+      chatLanguage: chatLanguage || 'en',
+    };
+
+    const callApi = (endpoint: string) =>
+      fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          agentCategory,
-          agentId,
-          message: messageToSend,
-          userAddress: walletAddress || '0x0000000000000000000000000000000000000000',
-          chatLanguage: chatLanguage || 'en',
-        }),
-      });
+        body: JSON.stringify(payload),
+      }).then((r) => r.json());
 
-      const data = await response.json();
-      
+    try {
+      let data: any;
+      let usedOnchain = false;
+
+      if (onchainMode) {
+        // On-chain inference via 0x0802 (verifiable, slower)
+        try {
+          data = await callApi('/api/chat-onchain');
+          if (data?.success) {
+            usedOnchain = true;
+          } else {
+            // On-chain failed (model down / executor busy / settling) → fall back to fast off-chain
+            data = await callApi('/api/chat');
+          }
+        } catch {
+          data = await callApi('/api/chat');
+        }
+      } else {
+        // Fast off-chain (MIMO) — default
+        data = await callApi('/api/chat');
+      }
+
       const agentMsg: Message = {
         role: 'agent',
-        content: data.success ? data.data.response : 'Sorry, I encountered an error. Please try again.',
+        content: data?.success ? data.data.response : (data?.error || 'Sorry, I encountered an error. Please try again.'),
         timestamp: new Date(),
+        txHash: usedOnchain && data?.success ? data.data.txHash : undefined,
+        explorer: usedOnchain && data?.success ? data.data.explorer : undefined,
       };
       setMessages((prev) => [...prev, agentMsg]);
     } catch (error) {
@@ -151,7 +178,15 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex items-center gap-3">
-          <span className="text-xl">{typeof agentIcon === 'string' ? agentIcon : agentIcon}</span>
+          <span className="text-xl">
+            {typeof agentIcon === 'string'
+              ? agentIcon
+              : React.isValidElement(agentIcon)
+                ? agentIcon
+                : agentIcon
+                  ? React.createElement(agentIcon as React.ComponentType<any>, { size: 22, style: { color: '#40FFAF' } })
+                  : null}
+          </span>
           <div>
             <p className="text-white text-sm font-medium">{agentName}</p>
             <p className="text-xs" style={{ color: remainingTime > 3600 ? '#40FFAF' : remainingTime > 600 ? '#FFA500' : '#FF4444' }}>
@@ -176,7 +211,7 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4" style={{ maxHeight: '400px' }}>
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
             <div
               className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
                 msg.role === 'user'
@@ -191,12 +226,25 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
             >
               {msg.content}
             </div>
+            {msg.txHash && (
+              <a
+                href={msg.explorer || `https://explorer.ritualfoundation.org/tx/${msg.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 text-[10px] flex items-center gap-1 transition hover:opacity-80"
+                style={{ color: '#40FFAF' }}
+                title="This response was generated on-chain via Ritual precompile 0x0802"
+              >
+                <span style={{ fontSize: '8px' }}>●</span>
+                Verified on-chain · {msg.txHash.slice(0, 6)}…{msg.txHash.slice(-4)} ↗
+              </a>
+            )}
           </div>
         ))}
         {isTyping && (
           <div className="flex justify-start">
             <div className="px-4 py-2.5 rounded-2xl rounded-bl-md text-sm text-gray-400" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="animate-pulse">Typing...</span>
+              <span className="animate-pulse">{onchainMode ? 'Running inference on-chain… (~15s)' : 'Thinking…'}</span>
             </div>
           </div>
         )}
@@ -213,29 +261,52 @@ export function ChatBox({ agentId, agentName, agentCategory, agentIcon, remainin
             </button>
           </div>
         ) : (
-          <div className="flex gap-2 items-end">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Type your message... (Shift+Enter for new line)"
-              rows={1}
-              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#40FFAF]/40 transition placeholder-gray-600 resize-none max-h-32 overflow-y-auto"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim()}
-              className="px-5 py-2.5 rounded-xl text-sm font-medium text-black disabled:opacity-40 transition"
-              style={{ background: '#40FFAF' }}
-            >
-              Send
-            </button>
-          </div>
+          <>
+            {/* Mode toggle: Fast (off-chain) vs On-chain (verifiable) */}
+            <div className="flex items-center justify-between mb-2.5 px-1">
+              <span className="text-[10px] text-gray-500">
+                {onchainMode ? '🔗 Verifiable on Ritual · ~15s' : '⚡ Fast mode · ~2s'}
+              </span>
+              <button
+                onClick={() => setOnchainMode((v) => !v)}
+                className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-lg transition"
+                style={{
+                  background: onchainMode ? 'rgba(64,255,175,0.12)' : 'rgba(255,255,255,0.05)',
+                  border: onchainMode ? '1px solid rgba(64,255,175,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                  color: onchainMode ? '#40FFAF' : '#9ca3af',
+                }}
+                title={onchainMode
+                  ? 'On-chain: each response generated via Ritual precompile 0x0802, verifiable on explorer (slower)'
+                  : 'Fast: off-chain inference for instant replies'}
+              >
+                <span style={{ fontSize: '7px' }}>{onchainMode ? '●' : '○'}</span>
+                {onchainMode ? 'On-chain' : 'Fast'}
+              </button>
+            </div>
+            <div className="flex gap-2 items-end">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Type your message... (Shift+Enter for new line)"
+                rows={1}
+                className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-[#40FFAF]/40 transition placeholder-gray-600 resize-none max-h-32 overflow-y-auto"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim()}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium text-black disabled:opacity-40 transition"
+                style={{ background: '#40FFAF' }}
+              >
+                Send
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -6,13 +6,13 @@ import { useAccount, useConnect } from 'wagmi';
 import { useState, useEffect } from 'react';
 import { Search, FlaskConical, TrendingUp, Radio, Code, PenTool, MessageSquare } from 'lucide-react';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import MobileMenu from '@/components/MobileMenu';
+import Navbar from '@/components/Navbar';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 import dynamic from 'next/dynamic';
 const ColorBends = dynamic(() => import('@/components/reactbits/ColorBends'), { ssr: false });
 
 const HERO_LINES: Record<string, { line1: string; prefix: string; boldWord: string }> = {
-  en: { line1: "You Don't Need", prefix: 'to', boldWord: 'Code' },
+  en: { line1: 'Rent AI Agents', prefix: '', boldWord: 'Instantly' },
   id: { line1: 'Kamu Gak Perlu', prefix: '', boldWord: 'Coding' },
   fil: { line1: 'Hindi Mo Kailangan ng', prefix: 'mag', boldWord: 'Code' },
   ko: { line1: '코딩은 필요', prefix: '', boldWord: '없어요' },
@@ -20,7 +20,7 @@ const HERO_LINES: Record<string, { line1: string; prefix: string; boldWord: stri
 };
 
 const HERO_SUB: Record<string, string> = {
-  en: 'The future is agent-native. Build yours on Ritual Chain',
+  en: 'Rent AI agents on Ritual Chain. Chat on-chain, earn yield.',
   id: 'Masa depan itu agent-native. Bikin punyamu di Ritual Chain',
   fil: 'Ang future ay agent-native. Gawin mo sa Ritual Chain',
   ko: '미래는 에이전트 네이티브입니다. Ritual Chain에서 만드세요',
@@ -118,34 +118,7 @@ export default function Home() {
       </div>
 
       {/* ─── Nav ─── */}
-      <nav className="relative z-10 flex justify-between items-center px-4 md:px-6 lg:px-12 py-3 md:py-4 gap-2" style={{ borderBottom: '1px solid #161616' }}>
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <img src="/ritty-logo.png" alt="Ritty.ai" className="h-7 md:h-10 w-auto" />
-          <span className="text-base md:text-xl font-bold tracking-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ritty.ai</span>
-        </Link>
-
-        <div className="hidden md:flex items-center gap-10">
-          <Link href="/agent-rent" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
-            {nav.agentRent}
-          </Link>
-          <Link href="/how-it-works" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
-            {nav.howItWorks}
-          </Link>
-          <Link href="/feedback" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
-            Feedback
-          </Link>
-          {isConnected && (
-            <Link href="/dashboard" className="text-sm transition-colors hover:opacity-80" style={{ color: '#FFFFFF' }}>
-              {nav.dashboard}
-            </Link>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 md:gap-3">
-          <LanguageSwitcher />
-          <MobileMenu />
-        </div>
-      </nav>
+      <Navbar activePage="home" showConnect={false} />
 
       {/* ─── Hero ─── */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-12 md:py-0" style={{ minHeight: 'min(calc(100vh - 76px), 100%)' }}>
@@ -245,8 +218,8 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-6 mt-8 sm:mt-12 md:mt-20 max-w-lg mx-auto px-2">
             {[
               { value: '1979', label: 'Ritual Chain', sub: 'testnet' },
-              { value: '5+', label: 'AI Agents', sub: 'ready to rent' },
-              { value: '5%', label: 'Platform Fee', sub: 'per rental' },
+              { value: '12', label: 'AI Agents', sub: 'ready to rent' },
+              { value: '167+', label: 'Rentals', sub: 'completed' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-sm md:text-lg font-bold font-mono mb-1" style={{ color: '#40FFAF', fontFamily: 'Space Grotesk, monospace' }}>{stat.value}</div>

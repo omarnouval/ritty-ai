@@ -14,7 +14,6 @@ import { UsernameModal } from '@/components/UsernameModal';
 interface Agent {
   id: bigint;
   owner: `0x${string}`;
-  agentContract: `0x${string}`;
   name: string;
   description: string;
   pricePerHour: bigint;
@@ -22,7 +21,6 @@ interface Agent {
   rating: bigint;
   ratingCount: bigint;
   isActive: boolean;
-  agentType: number;
 }
 
 const CAP_COLORS: Record<string, string> = {
@@ -30,6 +28,21 @@ const CAP_COLORS: Record<string, string> = {
   'code-review': 'purple', 'content-generation': 'pink', chat: 'orange',
   analysis: 'cyan',
 };
+
+function getBadges(agent: Agent): { label: string; color: string }[] {
+  const badges: { label: string; color: string }[] = [];
+  const rentals = Number(agent.totalRentals);
+  const rating = agent.ratingCount > BigInt(0) ? Number(agent.rating) / 100 : 0;
+  
+  if (rentals >= 50) badges.push({ label: '🔥 Popular', color: 'rgba(251,191,36,0.15)' });
+  else if (rentals >= 20) badges.push({ label: '⭐ Trending', color: 'rgba(59,130,246,0.15)' });
+  
+  if (rating >= 4.5 && Number(agent.ratingCount) >= 3) badges.push({ label: '👑 Top Rated', color: 'rgba(168,85,247,0.15)' });
+  
+  if (rentals < 5) badges.push({ label: '🆕 New', color: 'rgba(64,255,175,0.15)' });
+  
+  return badges;
+}
 
 export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode?: 'grid' | 'list' | 'compact' }) {
   const { address, isConnected } = useAccount();
@@ -87,6 +100,7 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
   const typeLabel = t('agent.aiAgent');
   const typeColor = 'green';
   const caps = ['research', 'monitoring'];
+  const badges = getBadges(agent);
 
   if (viewMode === 'compact') {
     return (
@@ -126,6 +140,15 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-heavy text-white text-sm">{agent.name}</h3>
               <span className={`pill pill-${typeColor}`}>{typeLabel}</span>
+              {badges.slice(0, 1).map((badge) => (
+                <span
+                  key={badge.label}
+                  className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                  style={{ background: badge.color, color: '#fff' }}
+                >
+                  {badge.label}
+                </span>
+              ))}
             </div>
             <p className="text-xs text-gray-500 truncate">{agent.description}</p>
             <div className="flex gap-1.5 mt-2">
@@ -175,6 +198,20 @@ export function AgentCard({ agent, viewMode = 'grid' }: { agent: Agent; viewMode
             <span key={cap} className={`pill pill-${CAP_COLORS[cap] || 'orange'}`}>{cap}</span>
           ))}
         </div>
+
+        {badges.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {badges.map((badge) => (
+              <span
+                key={badge.label}
+                className="text-[10px] font-medium px-2 py-0.5 rounded-full"
+                style={{ background: badge.color, color: '#fff' }}
+              >
+                {badge.label}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center gap-3 mb-4 text-xs text-gray-500">
           <span className="text-yellow-400">{'★'.repeat(Math.round(rating))}{'☆'.repeat(5 - Math.round(rating))}</span>
