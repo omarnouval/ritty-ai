@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { CustomCursor } from "@/components/CustomCursor";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Ritty.ai — Rent AI Agents. Instantly.",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning className="noise-overlay">
         <CustomCursor />
         <Providers>{children}</Providers>
+        <Footer />
       </body>
     </html>
   );
