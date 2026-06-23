@@ -25,7 +25,7 @@ export default function Footer() {
             Twitter
           </a>
           <a
-            href="https://github.com/omarnouval/ritty-ai/blob/master/DOCS.md"
+            href="/docs"
             target="_blank"
             rel="noopener noreferrer"
             className="text-white/40 hover:text-[#40FFAF] transition-colors text-sm"
