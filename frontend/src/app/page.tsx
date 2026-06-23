@@ -207,7 +207,7 @@ export default function Home() {
                 key={suggestion}
                 onClick={() => setPrompt(suggestion)}
                 className="text-[11px] sm:text-xs px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-all duration-200 hover:border-[#333] whitespace-nowrap shrink-0"
-                style={{ color: '#555', background: '#0A0A0A', border: '1px solid #1A1A1A', fontFamily: 'DM Sans, sans-serif' }}
+                style={{ color: '#FFFFFF', background: '#0A0A0A', border: '1px solid #1A1A1A', fontFamily: 'DM Sans, sans-serif' }}
               >
                 {suggestion}
               </button>
