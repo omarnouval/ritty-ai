@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // MAINTENANCE MODE — set to true to redirect all pages to /maintenance
-const MAINTENANCE = true;
+const MAINTENANCE = false;
 
 export function middleware(request: NextRequest) {
   if (!MAINTENANCE) return NextResponse.next();
