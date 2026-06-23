@@ -8,7 +8,7 @@ import MobileMenu from '@/components/MobileMenu';
 import { useTranslations } from '@/lib/i18n/LanguageContext';
 
 interface NavbarProps {
-  activePage?: 'home' | 'agent-rent' | 'how-it-works' | 'feedback' | 'dashboard' | 'staking';
+  activePage?: 'home' | 'agent-rent' | 'how-it-works' | 'feedback' | 'dashboard' | 'staking' | 'docs';
   showConnect?: boolean;
 }
 
